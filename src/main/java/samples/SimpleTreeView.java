@@ -45,14 +45,7 @@ public class SimpleTreeView extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
-        File fileSystemRoot = null;
-		try {
-			fileSystemRoot = new File(".").getCanonicalFile();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        SimpleTreeView newContentPane = new SimpleTreeView(fileSystemRoot);
+        SimpleTreeView newContentPane = new SimpleTreeView();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
@@ -67,9 +60,16 @@ public class SimpleTreeView extends JPanel {
     private JButton quit;
     private JButton refresh;
 
-    public SimpleTreeView(File root) throws HeadlessException {
+    public SimpleTreeView() throws HeadlessException {
     	super(new BorderLayout());
-        this.root = root;
+        File fileSystemRoot = null;
+		try {
+			fileSystemRoot = new File(".").getCanonicalFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        this.root = fileSystemRoot;
         initGui();
         refresh();
 
@@ -79,7 +79,7 @@ public class SimpleTreeView extends JPanel {
                 this,
                 "refresh"));
 
-        quit.setMnemonic('q');
+        quit.setMnemonic('q'); // Alt-q
         quit.addActionListener((ActionListener) EventHandler.create(
                 ActionListener.class,
                 this,
