@@ -1,6 +1,7 @@
 package samples;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.HeadlessException;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -18,6 +19,9 @@ import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXFrame.StartPosition;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTree;
 
@@ -98,6 +102,10 @@ public class SimpleTreeView extends JXPanel {
         treeModel = new GenericTreeModel(fileRoot);
         gtroot = (GenericTreeNode<?>)treeModel.getRoot();
         tree = new JXTree(treeModel);
+        Highlighter redText = new ColorHighlighter(HighlightPredicate.ROLLOVER_CELL, null, Color.RED);
+        tree.addHighlighter(redText);
+        tree.setRolloverEnabled(true); // to show the rollover Highlighter
+        
         quit = new JXButton("Quit");
         expand = new JXButton("Expand");
 
