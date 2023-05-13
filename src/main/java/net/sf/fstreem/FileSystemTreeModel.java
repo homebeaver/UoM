@@ -15,7 +15,8 @@ import java.util.Vector;
  * change the tree's model to a new instance of this class.</p>
  */
 public class FileSystemTreeModel implements TreeModel {
-    private final FileSystemTreeNode root;
+	
+    private FileSystemTreeNode root;
 
     public FileSystemTreeModel(File root, Vector<FileFilter> filters) {
         this.root = FileSystemTreeNode.create(root, filters);
@@ -78,6 +79,11 @@ public class FileSystemTreeModel implements TreeModel {
      * @param newValue
      */
     public void valueForPathChanged(TreePath path, Object newValue) {
+    	System.out.println("path:"+path + ", root:"+root);
+    	if(path.getLastPathComponent()==root) {
+    		System.out.println("path == root:"+root);
+    		root = (FileSystemTreeNode)newValue; // geht nicht wenn root final!
+    	}
     }
 
     /**

@@ -142,9 +142,9 @@ public class FileSystemTreeModelTest extends AbstractFileSystemTestCase {
     	filters.add(directoryFilter);
     	
     	FileSystemTreeNode root =  FileSystemTreeNode.create(getTestRoot(), filters);
-    	System.out.println(root.getChildAt(0).location);
-    	System.out.println(root.getChildAt(1).location);
-    	System.out.println(root.getChildAt(2).location);
+    	System.out.println(root.getChildAt(0).getObject());
+    	System.out.println(root.getChildAt(1).getObject());
+    	System.out.println(root.getChildAt(2).getObject());
     	// root should should have 2 directories and 1 svg file
     	assertEquals(3, root.getChildCount());
     	// files directory should have 2 svg files

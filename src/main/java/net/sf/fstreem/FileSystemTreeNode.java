@@ -6,11 +6,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
+import io.homebeaver.GenericTreeNode;
+
 /**
  * A tree node that is based on the underlying file system.
  */
-public abstract class FileSystemTreeNode {
-    protected final File location;
+public abstract class FileSystemTreeNode extends GenericTreeNode<File> {
+//    protected final File location; // in super: protected TN object;
     
     protected Vector<FileFilter> filters;
     
@@ -19,7 +21,7 @@ public abstract class FileSystemTreeNode {
     }
 
     private FileSystemTreeNode(File location, Vector<FileFilter> filters) {
-        this.location = location;
+    	super(location);
         this.filters = filters;
     }
     
@@ -29,7 +31,7 @@ public abstract class FileSystemTreeNode {
      * @return The {#link File File} instance behind this node.
      */
     public File getFile() {
-        return location;
+        return super.getObject();
     }
 
     /**
@@ -57,9 +59,12 @@ public abstract class FileSystemTreeNode {
             throws NotAFolderException;
 
     public abstract boolean isFile();
+	public boolean isLeaf() {
+		return isFile();
+	}
 
     public int hashCode() {
-        return location.hashCode();
+        return super.hashCode();
     }
 
     /**
@@ -76,12 +81,13 @@ public abstract class FileSystemTreeNode {
         }
 
         FileSystemTreeNode other = (FileSystemTreeNode) obj;
-        return location.equals(other.location);
+        return getObject().equals(other.getObject());
     }
 
     public String toString() {
-        return location.getName();
+        return object.getName();
     }
+    
 
     /**
      * Public factory for creating
@@ -110,7 +116,7 @@ public abstract class FileSystemTreeNode {
     }
     
     private static final class DirectoryTreeNode extends FileSystemTreeNode {
-        //private File[] children;
+        //in super: Vector<TreeNode> children;
 
         private Vector<File> children;
         
@@ -140,7 +146,7 @@ public abstract class FileSystemTreeNode {
             if (null != children) return;
 
             children = new Vector<File>();
-            File[] preFilteredChildren = location.listFiles();
+            File[] preFilteredChildren = object.listFiles();
             
             if (preFilteredChildren != null) {
             	if (!filters.isEmpty()) {
@@ -173,7 +179,7 @@ public abstract class FileSystemTreeNode {
         }
 
         public FileSystemTreeNode getChildAt(int index) {
-            throw new NotAFolderException(location);
+            throw new NotAFolderException(object);
         }
 
         public int getChildCount() {
