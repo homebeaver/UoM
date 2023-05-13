@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXFrame.StartPosition;
@@ -71,8 +71,9 @@ public class SimpleTreeView extends JXPanel {
     private TreeModel treeModel;
     private JXTree tree;
 
-    private JXComboBox treeSelector; // name wie in VTreeMaintenance
-    private JButton quit;
+    private JXComboBox<String> treeSelector;
+    private JXButton expand;
+    private JXButton quit;
 
     public SimpleTreeView() throws HeadlessException {
     	super(new BorderLayout());
@@ -81,29 +82,29 @@ public class SimpleTreeView extends JXPanel {
 			fileSystemRoot = new File(".").getCanonicalFile();
 			LOG.info("fileSystemRoot.CanonicalPath="+fileSystemRoot.getCanonicalPath());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         this.fileRoot = fileSystemRoot;
         initGui();
 
         quit.setMnemonic('q'); // Alt-q
-        quit.addActionListener((ActionListener) EventHandler.create(
-                ActionListener.class,
-                this,
-                "quit"));
+        quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
 
+        expand.setMnemonic('e');
+        expand.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "expand"));
     }
 
     private void initGui() {
         treeModel = new GenericTreeModel(fileRoot);
         gtroot = (GenericTreeNode<?>)treeModel.getRoot();
         tree = new JXTree(treeModel);
-        quit = new JButton("Quit");
+        quit = new JXButton("Quit");
+        expand = new JXButton("Expand");
 
         Box rightPanel = Box.createVerticalBox();
         rightPanel.add(Box.createVerticalGlue());
         rightPanel.add(Box.createVerticalStrut(4));
+        rightPanel.add(expand);
         rightPanel.add(Box.createVerticalStrut(4));
         rightPanel.add(quit);
         rightPanel.add(Box.createVerticalStrut(4));
@@ -113,7 +114,7 @@ public class SimpleTreeView extends JXPanel {
         centerPanel.add(Box.createHorizontalStrut(4));
         centerPanel.add(rightPanel);
 
-    	treeSelector = new JXComboBox(selectorData());
+    	treeSelector = new JXComboBox<String>(selectorData());
     	add(treeSelector, BorderLayout.NORTH);
     	treeSelector.addActionListener( ae -> {
     		Object o = treeSelector.getSelectedItem();
@@ -127,7 +128,7 @@ public class SimpleTreeView extends JXPanel {
     public static final String FILESYSTEM = "file root(.)";
     public static final String UOM = "Units of Measure";
     public String[] selectorData() {
-    	return new String[] {EMPTY, FILESYSTEM, UOM};
+    	return new String[] {FILESYSTEM, EMPTY, UOM};
     }
 
     private void selectTree(String treeName) {
@@ -184,6 +185,10 @@ public class SimpleTreeView extends JXPanel {
     	return (GenericTreeNode<?>)uomModel.getRoot();    	
     }
     
+    public void expand() {
+    	tree.expandAll();
+    }
+
     public void quit() {
         System.exit(0);
     }
