@@ -14,6 +14,7 @@ import java.util.Vector;
  * <p>If you want to refresh your tree following changes in the filesystem,
  * change the tree's model to a new instance of this class.</p>
  */
+@Deprecated // use GenericTreeModel
 public class FileSystemTreeModel implements TreeModel {
 	
     private FileSystemTreeNode root;
