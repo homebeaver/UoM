@@ -49,7 +49,7 @@ public abstract class FileSystemTreeNode extends GenericTreeNode<File> {
      * <p>The child {@link File File} instances are returned in order,
      * according to {@link FileComparator FileComparator}.</p>
      *
-     * @param index Must be <code>0 <= index <= {@link #getChildCount() getChildCount() - 1}</code>
+     * @param index Must be <code>0 &lt;= index &lt;= {@link #getChildCount() getChildCount() - 1}</code>
      * @return A {@link FileSystemTreeNode FileSystemTreeNode} instance
      *         representing the node at the specified index.
      * @throws NotAFolderException If this node returns <code>true</code> for

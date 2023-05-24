@@ -8,8 +8,10 @@ import javax.swing.tree.TreeNode;
 
 /**
  * A tree node that is based on TN.
- * 
- * Simpler then DefaultMutableTreeNode:
+ *
+ * @param <TN> a tree node type
+ */
+/* Simpler then DefaultMutableTreeNode:
 
 public class javax.swing.tree.DefaultMutableTreeNode implements Cloneable, MutableTreeNode, Serializable
 public interface javax.swing.tree.MutableTreeNode extends TreeNode
