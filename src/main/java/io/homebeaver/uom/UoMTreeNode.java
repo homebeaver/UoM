@@ -2,9 +2,19 @@ package io.homebeaver.uom;
 
 import java.util.Vector;
 
+import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 
+import org.jdesktop.swingx.icon.JXIcon;
+import org.jdesktop.swingx.renderer.IconValue;
+import org.jdesktop.swingx.renderer.IconValues;
+
 import io.homebeaver.GenericTreeNode;
+import io.homebeaver.icon.KorelleRCircle_icons_clock;
+import io.homebeaver.icon.KorelleRCircle_icons_dolly;
+import io.homebeaver.icon.KorelleRCircle_icons_plugin;
+import io.homebeaver.icon.KorelleRCircle_icons_rulertriangle;
+import io.homebeaver.icon.KorelleRMilk_ballonicon2;
 
 /**
  * A tree node that is based on UoM.
@@ -18,30 +28,80 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
             return new DirectoryTreeNode(uom, childs);
         }
     }
-	private static final class DirectoryTreeNode extends UoMTreeNode {
+	public static final class DirectoryTreeNode extends UoMTreeNode {
         public DirectoryTreeNode(UoM uom, Vector<TreeNode> childs) {
             super(uom, childs==null?new Vector<TreeNode>():childs);
         }
-
-//		@Override
-//		public boolean isQuantity() {
-//        	// ==getUoM().isQuantity();
-//			return false;
-//		}
-
 	}
     // rename to ADUoM oder so
-    private static final class FileTreeNode extends UoMTreeNode {
+    public static final class FileTreeNode extends UoMTreeNode {
         public FileTreeNode(UoM uom) {
             super(uom);
         }
-
-//        public boolean isQuantity() {
-//        	// ==getUoM().isQuantity();
-//            return true;
-//        }
     }
 
+    /*
+     * Icons zu den SI-Basisgrößen - ohne Temperatur , Stoffmenge , Lichtstärke
+     * 
+     * Die Icons sind aus https://commons.wikimedia.org/wiki/User:Koreller/Icon ,
+     * in feather haben ich nichts passendes für Länge,Masse gefunden:
+     *    Volumen-box.svg , time-clock.svg , Stromstärke-activity.svg
+     */
+    @SuppressWarnings("serial")
+	public static final IconValue SI_ICON = new IconValue() {
+
+		@Override
+		public Icon getIcon(Object value) {
+            if (value instanceof DirectoryTreeNode dtn) {
+            	if("Länge".equals(dtn.getUoM().name)) {
+            		return KorelleRCircle_icons_rulertriangle.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	// "Fläche" ist Länge zum Quadrat
+            	if("Volumen".equals(dtn.getUoM().name)) { // Volumen ist Länge Hoch 3
+            		return KorelleRMilk_ballonicon2.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	if("Masse".equals(dtn.getUoM().name)) {
+            		return KorelleRCircle_icons_dolly.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	if("Zeit".equals(dtn.getUoM().name)) {
+            		return KorelleRCircle_icons_clock.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	if("Elektrische Stromstärke".equals(dtn.getUoM().name)) {
+            		return KorelleRCircle_icons_plugin.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            }
+            return IconValues.NONE.getIcon(value);
+		}
+
+    };
+    public static final IconValue UOM_ICON = new IconValue() {
+
+		@Override
+		public Icon getIcon(Object value) {
+            if (value instanceof FileTreeNode ftn) {
+            	UoMTreeNode parent = (UoMTreeNode)ftn.getParent();
+            	if("Länge".equals(parent.getUoM().name)) {
+            		return KorelleRCircle_icons_rulertriangle.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	if("Volumen".equals(parent.getUoM().name)) {
+            		return KorelleRMilk_ballonicon2.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	if("Masse".equals(parent.getUoM().name)) {
+            		return KorelleRCircle_icons_dolly.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	if("Zeit".equals(parent.getUoM().name)) {
+            		return KorelleRCircle_icons_clock.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}
+            	if("Elektrische Stromstärke".equals(parent.getUoM().name)) {
+            		return KorelleRCircle_icons_plugin.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	}            	
+            }
+
+            return IconValues.NONE.getIcon(value);
+		}
+    	
+    };
+    
     private UoMTreeNode(UoM uom) {
         super(uom);
     }

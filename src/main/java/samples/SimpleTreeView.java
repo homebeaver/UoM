@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
@@ -22,6 +23,10 @@ import org.jdesktop.swingx.JXFrame.StartPosition;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.renderer.IconValue;
+import org.jdesktop.swingx.renderer.IconValues;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTree;
 
@@ -30,6 +35,9 @@ import io.homebeaver.GenericTreeNode;
 import io.homebeaver.uom.UoM;
 import io.homebeaver.uom.UoMTreeNode;
 
+// TODO search
+// I18N
+// XXX welche  HighlightPredicate ???
 public class SimpleTreeView extends JXPanel {
 	
 	private static final long serialVersionUID = -833123829892622625L;
@@ -101,10 +109,36 @@ public class SimpleTreeView extends JXPanel {
     private void initGui() {
         treeModel = new GenericTreeModel(fileRoot);
         gtroot = (GenericTreeNode<?>)treeModel.getRoot();
-        tree = new JXTree(treeModel);
+        tree = new JXTree(treeModel) {
+            public TreeCellRenderer getCellRenderer() {
+            	IconValue iv = (Object value) -> {
+//            		LOG.info("<<<<<<<<< value:"+value + " type:"+value.getClass());
+                    if(value instanceof UoMTreeNode.FileTreeNode
+                    || value instanceof UoMTreeNode.DirectoryTreeNode
+                    ) {
+                    	return UoMTreeNode.SI_ICON.getIcon(value);
+                    }
+                    return IconValues.NONE.getIcon(value);
+            	};
+            	StringValue sv = (Object value) -> {
+//            		LOG.info("<<<<<<<<< value:"+value + " type:"+value.getClass());
+                    if(value instanceof UoMTreeNode.FileTreeNode) {
+                    	return StringValues.TO_STRING.getString(value);
+                    }
+                    if(value instanceof GenericTreeModel) {
+                    	return StringValues.TO_STRING.getString(value);
+                    }
+                    String simpleName = value.getClass().getSimpleName();
+                    return simpleName + "(" + value + ")";
+            	};
+                return new JXTree.DelegatingRenderer(iv, sv);
+            }
+
+        };
         Highlighter redText = new ColorHighlighter(HighlightPredicate.ROLLOVER_CELL, null, Color.RED);
         tree.addHighlighter(redText);
         tree.setRolloverEnabled(true); // to show the rollover Highlighter
+        tree.setCellRenderer(tree.getCellRenderer()); 
         
         quit = new JXButton("Quit");
         expand = new JXButton("Expand");
