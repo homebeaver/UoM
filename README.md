@@ -4,7 +4,7 @@
     - [Physikalische Größe](https://de.wikipedia.org/wiki/Physikalische_Gr%C3%B6%C3%9Fe)
         - SI-Basisgrößen
             - [Länge](https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29)
-            - [Masse](https://de.wikipedia.org/wiki/Masse_(Physik)
+            - [Masse](https://de.wikipedia.org/wiki/Masse_(Physik))
             - [Zeit](https://de.wikipedia.org/wiki/Zeit)
             - ...
         - [US units](https://en.wikipedia.org/wiki/Imperial_and_US_customary_measurement_systems)
