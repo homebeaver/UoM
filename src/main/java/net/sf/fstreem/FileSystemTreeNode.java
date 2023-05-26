@@ -55,8 +55,7 @@ public abstract class FileSystemTreeNode extends GenericTreeNode<File> {
      * @throws NotAFolderException If this node returns <code>true</code> for
      *                             {@link #isFile()}.
      */
-    public abstract FileSystemTreeNode getChildAt(int index)
-            throws NotAFolderException;
+    public abstract FileSystemTreeNode getChildAt(int index) throws NotAFolderException;
 
     public abstract boolean isFile();
 	public boolean isLeaf() {
@@ -115,7 +114,7 @@ public abstract class FileSystemTreeNode extends GenericTreeNode<File> {
         }
     }
     
-    private static final class DirectoryTreeNode extends FileSystemTreeNode {
+    public static final class DirectoryTreeNode extends FileSystemTreeNode {
         //in super: Vector<TreeNode> children;
 
         private Vector<File> children;
@@ -169,7 +168,7 @@ public abstract class FileSystemTreeNode extends GenericTreeNode<File> {
         }
     }
 
-    private static final class FileTreeNode extends FileSystemTreeNode {
+    public static final class FileTreeNode extends FileSystemTreeNode {
         public FileTreeNode(File location) {
             super(location);
         }
