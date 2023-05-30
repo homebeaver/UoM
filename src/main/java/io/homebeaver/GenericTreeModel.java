@@ -3,6 +3,7 @@ package io.homebeaver;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -15,6 +16,8 @@ import net.sf.fstreem.FileSystemTreeNode;
 // public class DefaultTreeModel implements Serializable, TreeModel {
 public class GenericTreeModel implements TreeModel {
 
+	private static final Logger LOG = Logger.getLogger(GenericTreeModel.class.getName());
+	
 	protected GenericTreeNode<?> root;
 	
     public GenericTreeModel(File root, Vector<FileFilter> filters) {
@@ -65,12 +68,31 @@ public class GenericTreeModel implements TreeModel {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc} <p>
+	 * 
+	 * called in BasicTreeUI#completeEditing
+	 */
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
-    	System.out.println("path:"+path + ", root:"+root + " newValue:"+newValue);
+    	LOG.info("path:"+path + ", root:"+root + " newValue:"+newValue + (newValue==null?"":", "+newValue.getClass()));
     	if(path.getLastPathComponent()==root) {
-    		System.out.println("path == root:"+root + " newValue:"+newValue);
-    		root = (GenericTreeNode<?>)newValue;
+    		if(newValue instanceof GenericTreeNode<?> newRoot) {
+    			// called in SimpleTreeView#selectTree to change the selected Tree
+        		System.out.println("path == root:"+root + " newRoot:"+newRoot);
+        		root = newRoot;
+    		} else {
+    			LOG.warning("Do not change the root object:"+root); // warum nicht?
+    		}
+    		return;
+    	} else {
+    		if(newValue==null) {
+    			// remove node
+    			GenericTreeNode<?> oldValue = (GenericTreeNode<?>)path.getLastPathComponent();
+    			System.out.println("remove node "+oldValue + " because newValue is null");
+    			oldValue.removeFromParent(); // ist definiert in interface MutableTreeNode extends TreeNode
+    			// aber noch nicht in GenericTreeNode<TN> TODO - fertig
+    		}
     	}
 	}
 
