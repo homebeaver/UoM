@@ -1,5 +1,13 @@
 package io.homebeaver.uom;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 /*
 
 aus ADempiere:
@@ -51,6 +59,39 @@ public class UoM {
 		return new UoM(-1, "Ampere", "https://de.wikipedia.org/wiki/Ampere", "A");
 	}
 
+	public static final String ID = "id";
+	public static final String NAME = "name";
+	public static final String DESCRIPTION = "description";
+	public static final String UOMSYMBOL = "uomSymbol";
+
+	public static UoM createFromJsonString(String jsonString) {
+		JSONParser parser = new JSONParser();
+		Reader reader = new StringReader(jsonString);
+		try {
+			Object jsonObj = parser.parse(reader);
+			JSONObject jsonObject = (JSONObject) jsonObj;
+			Long id = (Long) jsonObject.get(ID);
+			String name = (String) jsonObject.get(NAME);
+			System.out.println("Id = "+id + ", Name = " + name);
+			String description = (String) jsonObject.get(DESCRIPTION);
+			String uomSymbol = (String) jsonObject.get(UOMSYMBOL);
+			return new UoM(id.intValue(), name, description, uomSymbol);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	Integer id;
 	String name;
 	String description;
@@ -73,7 +114,26 @@ public class UoM {
 	}
 	
     public String toString() {
-        return name;
+        return isQuantity() ? uomSymbol+":"+name : name;
     }
 
+    public String externalize() {
+    	// Ergebnis als JSON
+/*
+UoM(50000, "Mililiter", null, "ml") ==>
+{"id":50000,"name":"Mililiter","description":null,"uomSymbol":"ml"}
+A ==>		
+{"id":-1,"name":"Ampere","description":"https://de.wikipedia.org/wiki/Ampere","uomSymbol":"A"}
+ */
+    	JSONObject obj = new JSONObject();
+    	obj.put(ID, id);
+    	obj.put(NAME, name);
+    	obj.put(DESCRIPTION, description);
+    	obj.put(UOMSYMBOL, uomSymbol);
+    	return obj.toJSONString();
+    }
+    public void inernalize(String ext) {
+    	// XXX use createFromJsonString
+    }
+    
 }
