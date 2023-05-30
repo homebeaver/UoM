@@ -32,7 +32,7 @@ public abstract class GenericTreeNode<TN> implements TreeNode {
      * An enumeration that is always empty. 
      * This is used when an enumeration of a leaf node's children is requested.
      */
-    public static final Enumeration<GenericTreeNode> EMPTY_ENUMERATION = Collections.emptyEnumeration();
+    public static final Enumeration<GenericTreeNode<?>> EMPTY_ENUMERATION = Collections.emptyEnumeration();
     /** this node's parent, or null if this node has no parent */
     protected GenericTreeNode<TN> parent;
     protected TN object;
@@ -126,12 +126,12 @@ public abstract class GenericTreeNode<TN> implements TreeNode {
      * Two nodes are equal if their underlying {@link TN TN} instances are equal.
      *
      * @param obj
-     * @return <code>true</code> if the two nodes represent the same
-     *         file system location, <code>false</code> otherwise.
+     * @return <code>true</code> if the two nodes represent the same object, 
+     * <code>false</code> otherwise.
      */
     public boolean equals(Object obj) {
     	if(obj instanceof GenericTreeNode<?> gtn) {
-    		return gtn.getObject().equals(this);
+    		return gtn.getObject().equals(this.getObject());
     	}
     	return false;
     }
