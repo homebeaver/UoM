@@ -3,6 +3,7 @@ package io.homebeaver.uom;
 import java.util.Vector;
 
 import javax.swing.Icon;
+import javax.swing.UIManager;
 import javax.swing.tree.TreeNode;
 
 import org.jdesktop.swingx.icon.JXIcon;
@@ -15,6 +16,7 @@ import io.homebeaver.icon.KorelleRCircle_icons_dolly;
 import io.homebeaver.icon.KorelleRCircle_icons_plugin;
 import io.homebeaver.icon.KorelleRCircle_icons_rulertriangle;
 import io.homebeaver.icon.KorelleRMilk_ballonicon2;
+import net.sf.fstreem.FileSystemTreeNode;
 
 /**
  * A tree node that is based on UoM.
@@ -23,7 +25,7 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
 
 	public static UoMTreeNode create(UoM uom, Vector<TreeNode> childs) {
 		if (uom.isQuantity()) {
-            return new FileTreeNode(uom);
+            return new QuantityTreeNode(uom);
         } else {
             return new DirectoryTreeNode(uom, childs);
         }
@@ -33,9 +35,8 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
             super(uom, childs==null?new Vector<TreeNode>():childs);
         }
 	}
-    // rename to ADUoM oder so
-    public static final class FileTreeNode extends UoMTreeNode {
-        public FileTreeNode(UoM uom) {
+    public static final class QuantityTreeNode extends UoMTreeNode {
+        public QuantityTreeNode(UoM uom) {
             super(uom);
         }
     }
@@ -52,6 +53,12 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
 
 		@Override
 		public Icon getIcon(Object value) {
+            if (value instanceof FileSystemTreeNode.DirectoryTreeNode) {
+            	return UIManager.getIcon("Tree.closedIcon");
+            }
+            if (value instanceof FileSystemTreeNode.FileTreeNode) {
+            	return UIManager.getIcon("Tree.leafIcon");
+            }
             if (value instanceof DirectoryTreeNode dtn) {
             	if("Länge".equals(dtn.getUoM().name)) {
             		return KorelleRCircle_icons_rulertriangle.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
@@ -69,6 +76,11 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
             	if("Elektrische Stromstärke".equals(dtn.getUoM().name)) {
             		return KorelleRCircle_icons_plugin.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
             	}
+            	//return FolderIcon.of(JXIcon.SMALL_ICON, JXIcon.SMALL_ICON);
+            	// javax.swing.tree.DefaultTreeCellRenderer:
+            	//getDefaultClosedIcon();
+//            	ComponentUI ui;
+//            	return sun.swing.DefaultLookup.getIcon(this, ui, "Tree.closedIcon");
             }
             return IconValues.NONE.getIcon(value);
 		}
@@ -78,7 +90,7 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
 
 		@Override
 		public Icon getIcon(Object value) {
-            if (value instanceof FileTreeNode ftn) {
+            if (value instanceof QuantityTreeNode ftn) {
             	UoMTreeNode parent = (UoMTreeNode)ftn.getParent();
             	if("Länge".equals(parent.getUoM().name)) {
             		return KorelleRCircle_icons_rulertriangle.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
@@ -133,90 +145,5 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
         	children.add(newChild);
         }		
 	}
-/*
-    protected Vector<Object> uoms;
 
-    public static UoMTreeNode create(UoM uom, Vector<Object> filters) {
-    	if (uom.isQuantity()) {
-            return new FileTreeNode(uom);
-        } else {
-            return new DirectoryTreeNode(uom, filters);
-        }
-    }
-    public static UoMTreeNode create(UoM uom) {
-        Vector<Object> filters = new Vector<Object>();
-
-    	if (uom.isQuantity()) {
-            return new FileTreeNode(uom);
-        } else {
-            return new DirectoryTreeNode(uom, filters);
-        }
-    }
-    
-//    private UoMTreeNode(UoM uom) {
-//        this(uom, new Vector<Object>());
-//    }
-//    private UoMTreeNode(UoM uom, Vector<Object> filters) {
-//        this.uom = uom;
-//        this.uoms = filters;
-//    }
-
-    public abstract int getChildCount(); // throws NotAFolderException;
-    public abstract UoMTreeNode getChildAt(int index);
-
-    // rename to ADUoM oder so
-    private static final class FileTreeNode extends UoMTreeNode {
-        public FileTreeNode(UoM uom) {
-            super(uom);
-        }
-
-        public boolean isQuantity() {
-        	// ==getUoM().isQuantity();
-            return true;
-        }
-
-        public UoMTreeNode getChildAt(int index) {
-//            throw new NotAFolderException(location);
-        	return null;
-        }
-
-        public int getChildCount() {
-        	return 0;
-        }
-    }
-
-    private static final class DirectoryTreeNode extends UoMTreeNode {
-        //private File[] children;
-
-        private Vector<UoM> children;
-        
-        public DirectoryTreeNode(UoM uom, Vector<Object> filters) {
-            super(uom, filters);
-        }
-
-        public boolean isQuantity() {
-        	// ==getUoM().isQuantity();
-            return false;
-        }
-		@Override
-		public int getChildCount() {
-            loadChildren();
-            if (children != null) {
-            	return children.size();	
-            } else {
-            	return 0;
-            }
-		}
-
-		@Override
-		public UoMTreeNode getChildAt(int index) {
-            loadChildren();
-            return UoMTreeNode.create(children.elementAt(index), uoms);
-		}
-
-        private synchronized void loadChildren() {
-        	// TODO
-        }
-    }
- */
 }
