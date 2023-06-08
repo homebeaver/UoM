@@ -37,7 +37,7 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
      */
     public static final Enumeration<GenericTreeNode<?>> EMPTY_ENUMERATION = Collections.emptyEnumeration();
     /** this node's parent, or null if this node has no parent */
-    protected GenericTreeNode<TN> parent;
+    protected GenericTreeNode<?> parent;
     protected TN object;
     protected Vector<TreeNode> children;
     
@@ -163,7 +163,7 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
         throw new IllegalArgumentException("argument "+newChild+" is not type GenericTreeNode");
     }
 
-	private void insert(GenericTreeNode<?> newChild, int childIndex) {
+	public void insert(GenericTreeNode<?> newChild, int childIndex) {
 		if (newChild == null) {
 			throw new IllegalArgumentException("new child is null");
 		} else if (isNodeAncestor(newChild)) {
@@ -248,7 +248,7 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
         }
         throw new IllegalArgumentException("argument "+newParent+" is not type GenericTreeNode");
     }
-    private void setParent(GenericTreeNode<TN> newParent) {
+    private void setParent(GenericTreeNode<?> newParent) {
     	parent = newParent;
     }
     
@@ -263,7 +263,7 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
 		}
     }
 
-    private static class ObjectTreeLeaf extends GenericTreeNode<Object> {
+    public static class ObjectTreeLeaf extends GenericTreeNode<Object> {
         public ObjectTreeLeaf(Object o) {
             super(o);
         }

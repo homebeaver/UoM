@@ -71,7 +71,7 @@ public class GenericTreeModel implements TreeModel {
 	/**
 	 * {@inheritDoc} <p>
 	 * 
-	 * called in BasicTreeUI#completeEditing
+	 * called in BasicTreeUI#completeEditing , TreeTransferHandler#cleanup
 	 */
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
@@ -92,6 +92,21 @@ public class GenericTreeModel implements TreeModel {
     			System.out.println("remove node "+oldValue + " because newValue is null");
     			oldValue.removeFromParent(); // ist definiert in interface MutableTreeNode extends TreeNode
     			// aber noch nicht in GenericTreeNode<TN> TODO - fertig
+    		} else {
+    			GenericTreeNode<?> oldValue = (GenericTreeNode<?>)path.getLastPathComponent();
+    			// insert leaf
+    			if(newValue instanceof GenericTreeNode.ObjectTreeLeaf leaf) {
+    				if(oldValue.isLeaf()) {
+    					// BUG dahinter ==> muss public sein: void insert(GenericTreeNode<?> newChild, int childIndex)
+    					int i = getIndexOfChild(oldValue.getParent(), oldValue);
+    					GenericTreeNode<?> p = (GenericTreeNode<?>) oldValue.getParent();
+    					p.insert(leaf, i+1);
+    				} else {
+    					// BUG insert ==> muss public sein: void insert(GenericTreeNode<?> newChild, int childIndex) 
+    					System.out.println("insert leaf "+leaf+" in node "+oldValue);
+    					oldValue.insert(leaf, oldValue.getChildCount());
+    				}
+    			}
     		}
     	}
 	}

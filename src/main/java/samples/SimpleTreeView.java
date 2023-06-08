@@ -2,6 +2,7 @@ package samples;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -9,29 +10,35 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractListModel;
 import javax.swing.Box;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DropMode;
+import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreeCellRenderer;
+import javax.swing.TransferHandler;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXFrame.StartPosition;
+import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.JYList;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.renderer.IconValue;
-import org.jdesktop.swingx.renderer.IconValues;
-import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
-import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.icon.JXIcon;
 
 import io.homebeaver.GenericTreeModel;
 import io.homebeaver.GenericTreeNode;
+import io.homebeaver.MyXTree;
+import io.homebeaver.TreeTransferHandler;
+import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.uom.UoM;
 import io.homebeaver.uom.UoMTreeNode;
 
@@ -81,9 +88,52 @@ public class SimpleTreeView extends JXPanel {
     private GenericTreeNode<?> gtroot;
     
     private TreeModel treeModel;
-    private JXTree tree;
+    private MyXTree tree;
 
     private JXComboBox<String> treeSelector;
+    private TransferHandler transferHandler;
+    private JList<Object> list; // a trash to drop for nodes to delete
+    private GeneratedListModel<?> listModel;
+    private JComponent createList() {
+        list = new JYList<>();
+        list.setName("deleteList");
+        //list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
+        list.setCellRenderer(new TrashListCellRenderer());
+        listModel = new GeneratedListModel<>();
+        list.setModel(listModel);
+        list.setVisibleRowCount(1);
+        //list.setDragEnabled(true);
+        list.setDropMode(DropMode.ON);
+        list.setTransferHandler(transferHandler);
+        list.setVisible(false);
+        return list;
+    }
+    class TrashListCellRenderer extends DefaultListCellRenderer {
+		public Component getListCellRendererComponent(JList<?> list, Object value
+				, int index, boolean isSelected, boolean cellHasFocus) {
+			
+			Component comp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			setIcon(KorelleRtrash_svgrepo_com.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
+			
+			return comp;
+		}
+
+    }
+    class GeneratedListModel<E> extends AbstractListModel<Object> {
+        public GeneratedListModel() {
+        }
+
+		@Override
+		public int getSize() {
+			return 1;
+		}
+
+		@Override
+		public Object getElementAt(int index) {
+			return "drop here to delete";
+		}
+
+    }
     private JXButton expand;
     private JXButton quit;
 
@@ -109,42 +159,22 @@ public class SimpleTreeView extends JXPanel {
     private void initGui() {
         treeModel = new GenericTreeModel(fileRoot);
         gtroot = (GenericTreeNode<?>)treeModel.getRoot();
-        tree = new JXTree(treeModel) {
-            public TreeCellRenderer getCellRenderer() {
-            	IconValue iv = (Object value) -> {
-//            		LOG.info("<<<<<<<<< value:"+value + " type:"+value.getClass());
-                    if(value instanceof UoMTreeNode.FileTreeNode
-                    || value instanceof UoMTreeNode.DirectoryTreeNode
-                    ) {
-                    	return UoMTreeNode.SI_ICON.getIcon(value);
-                    }
-                    return IconValues.NONE.getIcon(value);
-            	};
-            	StringValue sv = (Object value) -> {
-//            		LOG.info("<<<<<<<<< value:"+value + " type:"+value.getClass());
-                    if(value instanceof UoMTreeNode.FileTreeNode) {
-                    	return StringValues.TO_STRING.getString(value);
-                    }
-                    if(value instanceof GenericTreeModel) {
-                    	return StringValues.TO_STRING.getString(value);
-                    }
-                    String simpleName = value.getClass().getSimpleName();
-                    return simpleName + "(" + value + ")";
-            	};
-                return new JXTree.DelegatingRenderer(iv, sv);
-            }
-
-        };
+        tree = new MyXTree(treeModel);
         Highlighter redText = new ColorHighlighter(HighlightPredicate.ROLLOVER_CELL, null, Color.RED);
         tree.addHighlighter(redText);
         tree.setRolloverEnabled(true); // to show the rollover Highlighter
-        tree.setCellRenderer(tree.getCellRenderer()); 
+        tree.setOverwriteRendererIcons(true);
+//        tree.setCellRenderer(tree.getCellRenderer()); // nicht notwendig!
+        
+        transferHandler = new TreeTransferHandler();
         
         quit = new JXButton("Quit");
         expand = new JXButton("Expand");
 
         Box rightPanel = Box.createVerticalBox();
         rightPanel.add(Box.createVerticalGlue());
+        rightPanel.add(Box.createVerticalStrut(4));
+        rightPanel.add(createList());
         rightPanel.add(Box.createVerticalStrut(4));
         rightPanel.add(expand);
         rightPanel.add(Box.createVerticalStrut(4));
@@ -175,16 +205,28 @@ public class SimpleTreeView extends JXPanel {
 
     private void selectTree(String treeName) {
     	if(EMPTY.equals(treeName)) {
+    		list.setVisible(false);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
     		treeModel.valueForPathChanged(tp, GenericTreeNode.create(EMPTY));
+    		tree.setEditable(false);
+    		tree.setDragEnabled(false);
     		tree.updateUI();
     	} else if(FILESYSTEM.equals(treeName)) {
+    		list.setVisible(false);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
     		treeModel.valueForPathChanged(tp, gtroot);
+    		tree.setEditable(false);
+    		tree.setDragEnabled(false);
     		tree.updateUI();
     	} else if(UOM.equals(treeName)) {
+    		list.setVisible(true);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
     		treeModel.valueForPathChanged(tp, getUomModelRoot());
+    		tree.setEditable(true);
+    		tree.setDragEnabled(true);
+    		tree.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    		tree.setTransferHandler(transferHandler);
+    		tree.setDropMode(DropMode.ON); // drop mode is only meaningful if this component has a TransferHandler that accepts drops
     		tree.updateUI();
     	}
     }
