@@ -64,18 +64,18 @@ public class UoM {
 	public static final String DESCRIPTION = "description";
 	public static final String UOMSYMBOL = "uomSymbol";
 
-	public static UoM createFromJsonString(String jsonString) {
+	/**
+	 * factory to create an object from JSON
+	 * @param jsonString
+	 * @return UoM instance
+	 */
+	public static UoM internalize(String jsonString) {
 		JSONParser parser = new JSONParser();
 		Reader reader = new StringReader(jsonString);
+		UoM uom = null;
 		try {
-			Object jsonObj = parser.parse(reader);
-			JSONObject jsonObject = (JSONObject) jsonObj;
-			Long id = (Long) jsonObject.get(ID);
-			String name = (String) jsonObject.get(NAME);
-			System.out.println("Id = "+id + ", Name = " + name);
-			String description = (String) jsonObject.get(DESCRIPTION);
-			String uomSymbol = (String) jsonObject.get(UOMSYMBOL);
-			return new UoM(id.intValue(), name, description, uomSymbol);
+			Object jsonObject = parser.parse(reader); // throws IOException, ParseException
+			uom = create((JSONObject)jsonObject);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -89,7 +89,21 @@ public class UoM {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return uom;
+	}
+
+	/**
+	 * factory to create an instance from JSON object
+	 * @param jsonObject
+	 * @return UoM instance
+	 */
+	public static UoM create(JSONObject jsonObject) {
+		Long id = (Long) jsonObject.get(ID);
+		String name = (String) jsonObject.get(NAME);
+		String description = (String) jsonObject.get(DESCRIPTION);
+		String uomSymbol = (String) jsonObject.get(UOMSYMBOL);
+//		System.out.println("UoM.create(JSONObject): Id = "+id + ", Name = " + name + ", UomSymbol = "+ uomSymbol);
+		return new UoM(id.intValue(), name, description, uomSymbol);
 	}
 	
 	Integer id;
@@ -117,6 +131,13 @@ public class UoM {
         return isQuantity() ? uomSymbol+":"+name : name;
     }
 
+    public JSONObject externalize(JSONObject obj) {
+    	obj.put(ID, id);
+    	obj.put(NAME, name);
+    	obj.put(DESCRIPTION, description);
+    	obj.put(UOMSYMBOL, uomSymbol);
+    	return obj;
+    }
     public String externalize() {
     	// Ergebnis als JSON
 /*
@@ -125,15 +146,8 @@ UoM(50000, "Mililiter", null, "ml") ==>
 A ==>		
 {"id":-1,"name":"Ampere","description":"https://de.wikipedia.org/wiki/Ampere","uomSymbol":"A"}
  */
-    	JSONObject obj = new JSONObject();
-    	obj.put(ID, id);
-    	obj.put(NAME, name);
-    	obj.put(DESCRIPTION, description);
-    	obj.put(UOMSYMBOL, uomSymbol);
+    	JSONObject obj = externalize(new JSONObject());
     	return obj.toJSONString();
-    }
-    public void inernalize(String ext) {
-    	// XXX use createFromJsonString
     }
     
 }
