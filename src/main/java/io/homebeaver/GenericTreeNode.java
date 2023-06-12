@@ -57,6 +57,11 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
         return object;
     }
 
+    public String externalize() {
+//    	throw new Exception("not implemented"); // to be implemented by subclass!!!
+    	return null;
+    }
+    
     /* interface TreeNode implementation
 
     TreeNode getChildAt(int childIndex);
@@ -256,7 +261,6 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
         public ObjectTreeNode(Object o, Vector<TreeNode> ch) {
             super(o, ch);
         }
-
 		@Override
 		public boolean isLeaf() {
 			return children.isEmpty();

@@ -29,7 +29,7 @@ import net.sf.fstreem.FileSystemTreeNode;
 /**
  * A tree node that is based on UoM.
  */
-public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
+public class UoMTreeNode extends GenericTreeNode<UoM> {
 
 	public static final String OBJECT = "object";
 	public static final String CHILDREN = "children";
