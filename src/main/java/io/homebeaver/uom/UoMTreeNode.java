@@ -1,5 +1,9 @@
 package io.homebeaver.uom;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -9,6 +13,10 @@ import javax.swing.tree.TreeNode;
 import org.jdesktop.swingx.icon.JXIcon;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.IconValues;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import io.homebeaver.GenericTreeNode;
 import io.homebeaver.icon.KorelleRCircle_icons_clock;
@@ -23,6 +31,51 @@ import net.sf.fstreem.FileSystemTreeNode;
  */
 public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
 
+	public static final String OBJECT = "object";
+	public static final String CHILDREN = "children";
+
+	/**
+	 * factory to create an object from JSON
+	 * @param jsonString
+	 * @return UoMTreeNode instance
+	 */
+	public static UoMTreeNode internalize(String jsonString) {
+		JSONParser parser = new JSONParser();
+		Reader reader = new StringReader(jsonString);
+		UoMTreeNode uomTN = null;
+		try {
+			Object jsonObject = parser.parse(reader); // throws IOException, ParseException
+			uomTN = create((JSONObject)jsonObject);
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
+		try {
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return uomTN;
+	}
+	
+	/**
+	 * factory to create an instance from JSON object
+	 * @param jsonObject
+	 * @return UoMTreeNode instance
+	 */
+	public static UoMTreeNode create(JSONObject jsonObject) {
+		JSONObject uomJson = (JSONObject)jsonObject.get(OBJECT);
+		UoM uom = UoM.create(uomJson);
+		JSONArray chArrayJson = (JSONArray)jsonObject.get(CHILDREN);
+		Vector<TreeNode> childs = new Vector<TreeNode>();
+		if(chArrayJson!=null) chArrayJson.forEach( ch -> parseChildObject( (JSONObject) ch, childs ) );
+		return create(uom, childs);
+	}
+	private static void parseChildObject(JSONObject child, Vector<TreeNode> childs) {
+		JSONObject uomJson = (JSONObject)child.get(OBJECT);
+		UoMTreeNode uomTN = UoMTreeNode.create(uomJson);
+		childs.add(create(uomTN, null));
+	}
+	
 	public static UoMTreeNode create(UoM uom, Vector<TreeNode> childs) {
 		if (uom.isQuantity()) {
             return new QuantityTreeNode(uom);
@@ -144,6 +197,30 @@ public abstract class UoMTreeNode extends GenericTreeNode<UoM> {
         	newChild.setParent(this);
         	children.add(newChild);
         }		
+	}
+
+	public JSONObject externalize(JSONObject obj) {
+		obj.put(OBJECT, getUoM().externalize(new JSONObject()));
+		if(isLeaf()) {
+			return obj;
+		}
+		// non leaf - there are childs, add them to childs array
+		JSONArray childs = new JSONArray();
+		for (Enumeration<? extends TreeNode> e = children(); e.hasMoreElements();) {
+			TreeNode tn = e.nextElement();
+			if(tn instanceof UoMTreeNode uomtn) {
+				JSONObject cho = new JSONObject();
+				cho.put(OBJECT, uomtn.externalize(new JSONObject()));
+				childs.add(cho);
+			}
+		}
+		obj.put(CHILDREN, childs);
+		return obj;
+	}
+	// Ergebnis als JSON
+	public String externalize() {
+		JSONObject obj = externalize(new JSONObject());
+		return obj.toJSONString();
 	}
 
 }

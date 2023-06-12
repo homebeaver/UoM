@@ -76,17 +76,12 @@ public class UoM {
 		try {
 			Object jsonObject = parser.parse(reader); // throws IOException, ParseException
 			uom = create((JSONObject)jsonObject);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
 		try {
 			reader.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return uom;
