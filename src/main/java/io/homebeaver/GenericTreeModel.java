@@ -76,6 +76,10 @@ public class GenericTreeModel implements TreeModel {
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
     	LOG.info("path:"+path + ", root:"+root + " newValue:"+newValue + (newValue==null?"":", "+newValue.getClass()));
+    	if(path==null) {
+    		LOG.warning("path==null");
+    		return;
+    	}
     	if(path.getLastPathComponent()==root) {
     		if(newValue instanceof GenericTreeNode<?> newRoot) {
     			// called in SimpleTreeView#selectTree to change the selected Tree
@@ -91,13 +95,29 @@ public class GenericTreeModel implements TreeModel {
     			GenericTreeNode<?> oldValue = (GenericTreeNode<?>)path.getLastPathComponent();
     			System.out.println("remove node "+oldValue + " because newValue is null");
     			oldValue.removeFromParent(); // ist definiert in interface MutableTreeNode extends TreeNode
-    			// aber noch nicht in GenericTreeNode<TN> TODO - fertig
     		} else {
     			GenericTreeNode<?> oldValue = (GenericTreeNode<?>)path.getLastPathComponent();
     			// insert leaf
-    			if(newValue instanceof GenericTreeNode.ObjectTreeLeaf leaf) {
+    			System.out.println("insert at node "+oldValue + "/type="+oldValue.getClass()
+    					+ " newValue:"+newValue + " instanceof "+newValue.getClass());
+    			if(newValue instanceof UoMTreeNode.QuantityTreeNode qnode) {
+    				if(oldValue instanceof UoMTreeNode.QuantityTreeNode target) {
+    					int i = getIndexOfChild(oldValue.getParent(), oldValue);
+    					GenericTreeNode<?> p = (GenericTreeNode<?>) oldValue.getParent();
+    					p.insert(qnode, i+1);
+    				} else {
+//    					LOG.warning("darf das sein ?????????? 108"); ==> JA
+    					oldValue.insert(qnode, oldValue.getChildCount());
+    				}
+    			}
+    			if(newValue instanceof UoMTreeNode.DirectoryTreeNode dnode) {
     				if(oldValue.isLeaf()) {
-    					// BUG dahinter ==> muss public sein: void insert(GenericTreeNode<?> newChild, int childIndex)
+    					LOG.warning("darf das sein ?????????? 113");
+    				} else {
+    					oldValue.insert(dnode, oldValue.getChildCount());
+    				}
+    			} else if(newValue instanceof GenericTreeNode.ObjectTreeLeaf leaf) {
+    				if(oldValue.isLeaf()) {
     					int i = getIndexOfChild(oldValue.getParent(), oldValue);
     					GenericTreeNode<?> p = (GenericTreeNode<?>) oldValue.getParent();
     					p.insert(leaf, i+1);

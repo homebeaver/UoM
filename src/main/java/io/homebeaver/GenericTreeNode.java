@@ -263,7 +263,7 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
         }
 		@Override
 		public boolean isLeaf() {
-			return children.isEmpty();
+			return children==null || children.isEmpty();
 		}
     }
 
