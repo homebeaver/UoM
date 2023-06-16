@@ -57,6 +57,13 @@ public class UoMTest {
     }
     
     @Test
+    /* eine Zusammenfassung "Volumen" mit zwei Einheiten:
+
+Volumen
+- ml
+- L
+
+     */
     public void testExtIntVolumen() {
     	UoMTreeNode mlTN = UoMTreeNode.create(UoM.create_ml(), null);
     	UoMTreeNode lTN = UoMTreeNode.create(UoM.create_L(), null);
@@ -82,11 +89,18 @@ public class UoMTest {
     }
     
     @Test
+    /* eine Zusammenfassung "Volumen" mit einer Einheit "Liter" und einer leeren Zusammenfassung:
+
+Volumen
+- test (keine Einheit)
+- L 
+
+     */
     public void testExtIntVolumen2() {
-    	UoMTreeNode mlTN = UoMTreeNode.create(new UoM("test", "test"), null);
+    	UoMTreeNode testTN = UoMTreeNode.create(new UoM("test", "test"), null);
     	UoMTreeNode lTN = UoMTreeNode.create(UoM.create_L(), null);
     	Vector<TreeNode> childs = new Vector<TreeNode>();
-    	childs.add(mlTN);
+    	childs.add(testTN);
     	childs.add(lTN);
 		UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "test 2 childs: 1x NON quantity, 1xLiter"), childs);
     	//create(UoM uom, Vector<TreeNode> childs)
@@ -99,9 +113,47 @@ public class UoMTest {
     	GenericTreeNode tn0 = (GenericTreeNode)tn.getChildAt(0);
     	System.out.println("tn.getChildAt(0) getObject type = " + tn0.getObject().getClass());
     	if(tn0.getObject() instanceof UoMTreeNode uomTN) {
-    		System.out.println("test:"+mlTN.getObject());
-    		assertEquals(mlTN.getObject().id, uomTN.getObject().id);
-    		assertEquals(mlTN.getObject().name, uomTN.getObject().name);
+    		System.out.println("test:"+testTN.getObject());
+    		assertEquals(testTN.getObject().id, uomTN.getObject().id);
+    		assertEquals(testTN.getObject().name, uomTN.getObject().name);
+    	} else {
+    		fail("GenericTreeNode getChildAt(0)..getObject() is not UoMTreeNode!!!");
+    	}
+    }
+
+    /* eine Zusammenfassung "Volumen" mit einer Einheit "Liter" und einer nicht leeren Zusammenfassung:
+ 
+Volumen
+- test (keine Einheit)
+  -- ml
+- L 
+
+     */
+    @Test
+    public void testExtIntVolumen3() {
+    	UoMTreeNode mlTN = UoMTreeNode.create(UoM.create_ml(), null);
+    	Vector<TreeNode> child = new Vector<TreeNode>();
+    	child.add(mlTN);
+    	UoMTreeNode testTN = UoMTreeNode.create(new UoM("test", "test"), child);
+    	UoMTreeNode lTN = UoMTreeNode.create(UoM.create_L(), null);
+    	Vector<TreeNode> childs = new Vector<TreeNode>();
+    	childs.add(testTN);
+    	childs.add(lTN);
+		UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "test 2 childs: 1x NON quantity, 1xLiter"), childs);
+    	//create(UoM uom, Vector<TreeNode> childs)
+    	String json = volumen.externalize();
+    	System.out.println("json volumen = " + json);
+    	UoMTreeNode tn = UoMTreeNode.internalize(json);
+    	assertEquals("Volumen", tn.getObject().name);
+    	assertEquals(2, tn.getChildCount());
+    	System.out.println("tn.getChildAt(0) type = " + tn.getChildAt(0).getClass());
+    	GenericTreeNode tn0 = (GenericTreeNode)tn.getChildAt(0);
+    	System.out.println("tn.getChildAt(0) getObject type = " + tn0.getObject().getClass());
+    	if(tn0.getObject() instanceof UoMTreeNode uomTN) {
+    		System.out.println("test:"+testTN.getObject());
+    		assertEquals(testTN.getObject().id, uomTN.getObject().id);
+    		assertEquals(testTN.getObject().name, uomTN.getObject().name);
+    		assertEquals(1, uomTN.getChildCount());
     	} else {
     		fail("GenericTreeNode getChildAt(0)..getObject() is not UoMTreeNode!!!");
     	}

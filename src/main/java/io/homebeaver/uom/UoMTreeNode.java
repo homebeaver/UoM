@@ -45,7 +45,7 @@ public class UoMTreeNode extends GenericTreeNode<UoM> {
 		UoMTreeNode uomTN = null;
 		try {
 			Object jsonObject = parser.parse(reader); // throws IOException, ParseException
-			uomTN = create((JSONObject)jsonObject);
+			uomTN = UoMTreeNode.create((JSONObject)jsonObject);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
@@ -67,13 +67,38 @@ public class UoMTreeNode extends GenericTreeNode<UoM> {
 		UoM uom = UoM.create(uomJson);
 		JSONArray chArrayJson = (JSONArray)jsonObject.get(CHILDREN);
 		Vector<TreeNode> childs = new Vector<TreeNode>();
-		if(chArrayJson!=null) chArrayJson.forEach( ch -> parseChildObject( (JSONObject) ch, childs ) );
+		if(chArrayJson!=null) chArrayJson.forEach( ch -> parseJsonObject( (JSONObject) ch, childs ) );
 		return create(uom, childs);
 	}
-	private static void parseChildObject(JSONObject child, Vector<TreeNode> childs) {
-		JSONObject uomJson = (JSONObject)child.get(OBJECT);
-		UoMTreeNode uomTN = UoMTreeNode.create(uomJson);
-		childs.add(create(uomTN, null));
+//	private static UoMTreeNode create(JSONObject jsonObject, Vector<TreeNode> childs) {
+//		JSONArray chArrayJson = (JSONArray)jsonObject.get(CHILDREN);
+//		JSONObject uomJson = (JSONObject)jsonObject.get(OBJECT);
+//		UoM uom = UoM.create(uomJson);
+//		if(chArrayJson==null) {
+//			return create(uom, null);
+//		}
+//		Iterator<JSONObject> iter = chArrayJson.iterator();
+//		if(!iter.hasNext()) {
+//			return create(uom, null);
+//		}
+//		if(childs==null) childs = new Vector<TreeNode>();
+//		while (iter.hasNext()) {
+//			JSONObject next = iter.next();
+//			UoMTreeNode uomTN = UoMTreeNode.create(next, childs);
+//			childs.add(create(uomTN, null));
+//		}
+//		return create(uom, childs);
+//	}
+	private static void parseJsonObject(JSONObject jsonObject, Vector<TreeNode> childs) {
+		JSONObject uomJson = (JSONObject)jsonObject.get(OBJECT);
+		JSONArray chArrayJson = (JSONArray)jsonObject.get(CHILDREN);
+		if(chArrayJson==null) {
+			UoMTreeNode uomTN = UoMTreeNode.create(uomJson);
+			childs.add(create(uomTN, null));
+		} else {
+			// rekursion
+			chArrayJson.forEach( ch -> parseJsonObject( (JSONObject) ch, childs ) );
+		}
 	}
 	
 	public static UoMTreeNode create(UoM uom, Vector<TreeNode> childs) {
