@@ -2,6 +2,8 @@ package io.homebeaver;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -80,7 +82,34 @@ public class GenericTreeModel implements TreeModel {
     		LOG.warning("path==null");
     		return;
     	}
-    	if(path.getLastPathComponent()==root) {
+    	/*
+    	 * wann ist path root? beides ist möglich:
+    	 * - path.getParentPath()==null
+    	 * - path.getLastPathComponent()==root
+    	 */
+    	if(path.getParentPath()==null) {
+    		if(newValue instanceof UoMTreeNode && getRoot() instanceof UoMTreeNode) {
+    			// called in TreeTransferHandler#importData to move a UoMTreeNode node to root
+    			System.out.println("newValue instanceof UoMTreeNode && getRoot() instanceof UoMTreeNode");
+    			UoMTreeNode uomtn = (UoMTreeNode)getRoot();
+    			int cc = uomtn.getChildCount();
+    			TreeNode tn = uomtn.getChildAt(cc-1);
+    			//path = path.pathByAddingChild(tn);
+    			GenericTreeNode<?> oldValue = (GenericTreeNode<?>)path.getLastPathComponent();
+    			// TODO setParent für alle newValue childs !!! rekursiv
+    			UoMTreeNode uomNewValue = (UoMTreeNode)newValue;
+    			for (Enumeration<? extends TreeNode> e = uomNewValue.children(); e.hasMoreElements();) {
+    				TreeNode next = e.nextElement();
+    				System.out.println("setParent for "+ next.getClass());
+    				if(next instanceof GenericTreeNode.ObjectTreeNode uomtnext) {
+    					System.out.println("setParent for "+ uomtnext.getParent());
+    					uomtnext.setParent((GenericTreeNode<?>)newValue);
+    				}
+    			}
+    			
+    			oldValue.insert(uomNewValue, oldValue.getChildCount());
+    			return;
+    		}
     		if(newValue instanceof GenericTreeNode<?> newRoot) {
     			// called in SimpleTreeView#selectTree to change the selected Tree
         		System.out.println("path == root:"+root + " newRoot:"+newRoot);
@@ -93,7 +122,7 @@ public class GenericTreeModel implements TreeModel {
     		if(newValue==null) {
     			// remove node
     			GenericTreeNode<?> oldValue = (GenericTreeNode<?>)path.getLastPathComponent();
-    			System.out.println("remove node "+oldValue + " because newValue is null");
+    			System.out.println("remove node "+oldValue +"/type:"+oldValue.getClass() + " because newValue is null");
     			oldValue.removeFromParent(); // ist definiert in interface MutableTreeNode extends TreeNode
     		} else {
     			GenericTreeNode<?> oldValue = (GenericTreeNode<?>)path.getLastPathComponent();
@@ -106,13 +135,12 @@ public class GenericTreeModel implements TreeModel {
     					GenericTreeNode<?> p = (GenericTreeNode<?>) oldValue.getParent();
     					p.insert(qnode, i+1);
     				} else {
-//    					LOG.warning("darf das sein ?????????? 108"); ==> JA
     					oldValue.insert(qnode, oldValue.getChildCount());
     				}
     			}
     			if(newValue instanceof UoMTreeNode.DirectoryTreeNode dnode) {
     				if(oldValue.isLeaf()) {
-    					LOG.warning("darf das sein ?????????? 113");
+    					LOG.warning("darf das sein ?????????? 143");
     				} else {
     					oldValue.insert(dnode, oldValue.getChildCount());
     				}

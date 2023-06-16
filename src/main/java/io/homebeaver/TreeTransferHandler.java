@@ -35,18 +35,23 @@ Ablauf:
 
 
 Ein tree element verschieben:
+Dafür das element (source/drop data/newValue) per Drag-and-drop auf ein anderes tree element(target) ziehen.
 
-target:            QuantityTreeNode
-                   (src muss QuantityTreeNode sein!)
-source/newValue:
+source tree element : das element, das verschoben wird
+drop data : externalisertes source tree element JSON
+newValue : internalisiertes drop data, 
+           also Instanz vom Typ UoMTreeNode.QuantityTreeNode oder UoMTreeNode.DirectoryTreeNode,
+           SubClass von GenericTreeNode<?> 
 
-QuantityTreeNode   src hinter trg einfügen
-leaf
+target tree element : wohin wird source verschoben (immer hinter/unterhalb target)
+- target instanceof QuantityTreeNode: source muss QuantityTreeNode sein!
+                                      source instanceof DirectoryTreeNode ==> warnung: target QuantityTreeNode darf keine children haben
+                                      source wird hinter target verschoben
+- target instanceof DirectoryTreeNode: 
+-- source instanceof QuantityTreeNode: source wird unterhalb target verschoben (als letztes child)
+-- source instanceof DirectoryTreeNode: source-tree wird unterhalb target verschoben (als letztes child)
 
-DirectoryTreeNode  Fehler: DTN kann nicht hierhin
-                   verschoben werden
-
-TODO
+TODO tree element bearbeiten und neues tree element erstellen
 
  */
 /**
@@ -116,31 +121,6 @@ public class TreeTransferHandler extends TransferHandler {
         catch (Exception e) { return false; }
                         
         Component comp = info.getComponent();
-/* wird nicht benötigt:
-        if(comp instanceof JList<?> list) {
-        	ListModel<?> listModel = list.getModel();
-        	if(listModel instanceof DefaultListModel<?>) {
-        		DefaultListModel<Object> model = (DefaultListModel<Object>)listModel;
-                // Perform the actual import.  
-                if (insert) {
-                	model.add(index, data);
-                } else {
-                	model.set(index, data);
-                }
-                return true;
-        	}
-        	if(listModel instanceof DefaultComboBoxModel<?>) {
-        		DefaultComboBoxModel<Object> model = (DefaultComboBoxModel<Object>)listModel;
-                // Perform the actual import.  
-                if (insert || index<0) {
-                	model.addElement(data);
-                } else {
-                	model.insertElementAt(data, index);
-                }
-                return true;
-        	}
-        }
- */
         
         if(comp instanceof MyXTree tree) {
         	JTree.DropLocation shownDropLocation =tree.getDropLocation(); // the location that this component should visually indicate
@@ -152,17 +132,12 @@ public class TreeTransferHandler extends TransferHandler {
         			+"\n transferDropLocation.Path:"+tp
         			);
         	// TODO insert data to PATH 
-        	// BUG TODO: root nicht überschreiben
         	TreeModel model = tree.getModel();
         	if(model instanceof GenericTreeModel gtm) {
+        		GenericTreeNode<?> root = (GenericTreeNode<?>)gtm.getRoot();
         		LOG.info(">>>es wird in GenericTreeModel gtm "+gtm+" eingefügt, transferDropLocation.Path:"+tp);
-//        		UoM uom = UoM.createFromJsonString(data);
-//        		LOG.info(">>>was wird eingefügt uom:"+uom);
-//        		//GenericTreeNode<?> newValue = UoMTreeNode.create(uom);
-//        		GenericTreeNode<?> newValue = GenericTreeNode.create(uom);
         		GenericTreeNode<?> newValue = UoMTreeNode.internalize(data);
         		gtm.valueForPathChanged(tp, newValue);
-        		tree.updateUI(); // wird in cleanup gemacht
         	}
         	return true;
         }

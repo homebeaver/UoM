@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 /**
@@ -22,7 +21,7 @@ ObjectTreeNode extends GenericTreeNode<Object> -- sehr allgemein
 UoMTreeNode extends GenericTreeNode<UoM>
 FileSystemTreeNode extends GenericTreeNode<File>
  */
-public abstract class GenericTreeNode<TN> implements MutableTreeNode {
+public abstract class GenericTreeNode<TN> implements GenericMutableTreeNode<TN> {
 
     public static GenericTreeNode<?> create(Object o, Vector<TreeNode> ch) {
     	return new ObjectTreeNode(o, ch);
@@ -37,7 +36,7 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
      */
     public static final Enumeration<GenericTreeNode<?>> EMPTY_ENUMERATION = Collections.emptyEnumeration();
     /** this node's parent, or null if this node has no parent */
-    protected GenericTreeNode<?> parent;
+    protected GenericMutableTreeNode<?> parent;
     protected TN object;
     protected Vector<TreeNode> children;
     
@@ -148,37 +147,20 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
         return object.toString();
     }
 
-    /* interface MutableTreeNode implementation
+    // interface GenericMutableTreeNode implementation :
 
-    void insert(MutableTreeNode child, int index);
-    void remove(int index);
-    void remove(MutableTreeNode node);
-    void setUserObject(Object object);
-    void removeFromParent();
-    void setParent(MutableTreeNode newParent);
-
-     */
 	@Override
-    public void insert(MutableTreeNode newChild, int childIndex) {
-        if (newChild == null) {
-            throw new IllegalArgumentException("new child is null");
-        } else if (newChild instanceof GenericTreeNode<?> gtn) {
-    		insert(gtn, childIndex);
-    	}
-        throw new IllegalArgumentException("argument "+newChild+" is not type GenericTreeNode");
-    }
-
-	public void insert(GenericTreeNode<?> newChild, int childIndex) {
+	public void insert(GenericMutableTreeNode<?> newChild, int childIndex) {
 		if (newChild == null) {
 			throw new IllegalArgumentException("new child is null");
 		} else if (isNodeAncestor(newChild)) {
 			throw new IllegalArgumentException("new child is an ancestor");
 		}
 
-		GenericTreeNode<?> oldParent = (GenericTreeNode<?>) newChild.getParent();
+		TreeNode oldParent = newChild.getParent();
 
-		if (oldParent != null) {
-			oldParent.remove(newChild);
+		if (oldParent != null && oldParent instanceof GenericMutableTreeNode<?> op) {
+			op.remove(newChild);
 		}
 		newChild.setParent(this);
 		if (children == null) {
@@ -206,21 +188,13 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
     
 	@Override
     public void remove(int childIndex) {
-    	System.out.println("remove child at"+childIndex);
+    	System.out.println("remove child at "+childIndex);
     	GenericTreeNode<?> child = (GenericTreeNode<?>)getChildAt(childIndex);
         children.removeElementAt(childIndex);
         child.setParent(null);
     }
 	@Override
-    public void remove(MutableTreeNode aChild) {
-        if (aChild == null) {
-            throw new IllegalArgumentException("argument is null");
-        } else if (aChild instanceof GenericTreeNode<?> gtn) {
-			remove(gtn);
-		}
-        throw new IllegalArgumentException("argument "+aChild+" is not type GenericTreeNode");
-	}
-    private void remove(GenericTreeNode<?> aChild) {
+	public void remove(GenericMutableTreeNode<?> aChild) {
         if (aChild == null) {
             throw new IllegalArgumentException("argument is null");
         }
@@ -238,26 +212,20 @@ public abstract class GenericTreeNode<TN> implements MutableTreeNode {
         }
     }
 	@Override
-	public void setUserObject(Object object) {
+	public void setUserObject(TN object) {
 		try {
-			this.object = (TN)object;
+			this.object = object;
 //			return;
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 	@Override
-    public void setParent(MutableTreeNode newParent) {
-        if (newParent instanceof GenericTreeNode<?> gtn) {
-        	setParent(gtn);
-        }
-        throw new IllegalArgumentException("argument "+newParent+" is not type GenericTreeNode");
-    }
-    private void setParent(GenericTreeNode<?> newParent) {
+	public void setParent(GenericMutableTreeNode<?> newParent) {
     	parent = newParent;
     }
     
-    private static class ObjectTreeNode extends GenericTreeNode<Object> {
+	public static class ObjectTreeNode extends GenericTreeNode<Object> {
         public ObjectTreeNode(Object o, Vector<TreeNode> ch) {
             super(o, ch);
         }
