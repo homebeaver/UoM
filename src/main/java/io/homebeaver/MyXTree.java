@@ -14,7 +14,7 @@ import net.sf.fstreem.FileSystemTreeNode;
  * erweitert JXTree um
 
  - getCellRenderer() mit IconValue
- - setSelectionMode analog zu JList, sollte in JXTree implementiert werden TODO
+ - setSelectionMode analog zu JList, wurde in JXTree implementiert
  
  */
 public class MyXTree extends JXTree {
@@ -35,7 +35,9 @@ public class MyXTree extends JXTree {
             }
             return IconValues.FILE_ICON.getIcon(value);
 		};
-		return new JXTree.DelegatingRenderer(iv, null);
+		//return new JXTree.DelegatingRenderer(iv, null); gleichwertig mit
+		return new JXTree.DelegatingRenderer((TreeCellRenderer)null, iv, null);
+		// dieser ctor instanziert new DefaultXTreeCellRenderer()
 	}
 
     /*
@@ -43,16 +45,18 @@ public class MyXTree extends JXTree {
      * zum Validieren: private static int validateSelectionMode(int mode)
      * 
      * Bei "falschem" selectionMode wird DISCONTIGUOUS_TREE_SELECTION gesetzt! kein Exception!
+     * 
+     * setSelectionMode nicht mehr notwendig, da in JXTree implementiert
      */
 //    @BeanProperty(bound = true, enumerationValues = {
 //            "TreeSelectionModel.SINGLE_TREE_SELECTION",
 //            "TreeSelectionModel.CONTIGUOUS_TREE_SELECTION",
 //            "TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION"}, description = "The selection mode.")
-	public void setSelectionMode(int selectionMode) {
-		getSelectionModel().setSelectionMode(selectionMode);
-	}
-    public int getSelectionMode() {
-        return getSelectionModel().getSelectionMode();
-    }
+//	public void setSelectionMode(int selectionMode) {
+//		getSelectionModel().setSelectionMode(selectionMode);
+//	}
+//    public int getSelectionMode() {
+//        return getSelectionModel().getSelectionMode();
+//    }
 
 }
