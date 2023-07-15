@@ -1,13 +1,22 @@
 package io.homebeaver;
 
+import java.awt.Component;
+
+import javax.swing.JTree;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.renderer.ComponentProvider;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.IconValues;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.rollover.RolloverProducer;
+import org.jdesktop.swingx.rollover.RolloverRenderer;
 
 import io.homebeaver.uom.UoMTreeNode;
 import net.sf.fstreem.FileSystemTreeNode;
@@ -50,11 +59,93 @@ public class MyXTree extends JXTree {
             }
             return IconValues.FILE_ICON.getIcon(value);
 		};
+		StringValue sv = (Object value) -> {
+            if(value instanceof UoMTreeNode.QuantityTreeNode
+            || value instanceof UoMTreeNode.DirectoryTreeNode
+//            || value instanceof FileSystemTreeNode.DirectoryTreeNode
+//            || value instanceof FileSystemTreeNode.FileTreeNode
+            ) {
+//            	System.out.println("sv --------> value:"+value);
+            	return StringValues.TO_STRING.getString(value);
+            }
+            return StringValues.FILE_NAME.getString(value);
+		};
 		//return new JXTree.DelegatingRenderer(iv, null); gleichwertig mit
 		//       new JXTree.DelegatingRenderer((TreeCellRenderer)null, iv, null)
 		// dieser ctor instanziert new DefaultXTreeCellRenderer(), mit MyTreeCellRenderer kann ich experimentieren:
-		return new JXTree.DelegatingRenderer(
-				new MyTreeCellRenderer(), iv, null);
+//		return new JXTree.DelegatingRenderer(new MyTreeCellRenderer(), iv, sv);
+		return new MyDelegatingRenderer(new MyDefaultTreeCellRenderer(), iv, sv);
+	}
+	
+	public class MyDelegatingRenderer extends DefaultTreeRenderer implements TreeCellRenderer, RolloverRenderer {
+        private TreeCellRenderer delegate;
+		public MyDelegatingRenderer(TreeCellRenderer delegate, IconValue iv, StringValue sv) {
+			//super(iv, sv);
+			// in super org.jdesktop.swingx.renderer.DefaultTreeRenderer ctor: creates new WrappingProvider(iv, sv)
+			//    which is ComponentProvider<?> componentProvider
+			//    and calls AbstractRenderer ctor super(componentProvider);
+			//                                    this.cellContext = new TreeCellContext();
+			// boolean unwrapUserObject
+			super(new WrappingProvider(iv, sv, false));
+			if(delegate instanceof MyDefaultTreeCellRenderer myCellRenderer) {
+				//System.out.println("*** +++ delegate:"+delegate);
+				delegate = myCellRenderer;
+			} else {
+				System.out.println("*** --- delegate:"+delegate);
+			}
+		}
+        public TreeCellRenderer getDelegateRenderer() {
+            return delegate;
+        }
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                boolean selected, boolean expanded, boolean leaf, int row,boolean hasFocus) {
+            Component result = super.getTreeCellRendererComponent(tree, value, 
+            	selected, expanded, leaf, row, hasFocus);
+//            System.out.println("*** --- result Component:"+result);
+            if ((compoundHighlighter != null) && (row < getRowCount()) && (row >= 0)) {
+                result = compoundHighlighter.highlight(result, getComponentAdapter(row));
+//                System.out.println("*** --- compoundHighlighter:"+compoundHighlighter);
+            } 
+            System.out.println("***"+(compoundHighlighter!=null?row:"")+" --- result Component:"+result);
+            
+            return result;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        /*
+         * definiert in interface org.jdesktop.swingx.rollover.RolloverRenderer
+         * überschreibt die implementierung aus org.jdesktop.swingx.renderer.AbstractRenderer
+         *  dort wird ComponentProvider<?> componentController und nicht delegate genommen XXX ?
+         *  TODO kann ich auf delegate verzichten und stattdessen componentController nutzen
+         *  TODO das ist nie true
+         */
+        @Override
+        public boolean isEnabled() {
+//        	boolean ret = (delegate instanceof RolloverRenderer) && ((RolloverRenderer) delegate).isEnabled();
+        	boolean ret = (delegate instanceof MyDefaultTreeCellRenderer);
+        	System.out.println("isEnabled() liefert "+ret + " "+delegate);
+//        	((MyDefaultTreeCellRenderer)delegate).selected
+            return ret;
+        }
+            
+        /**
+         * {@inheritDoc}
+         */
+        /*
+         * definiert in interface org.jdesktop.swingx.rollover.RolloverRenderer
+         * überschreibt die implementierung aus org.jdesktop.swingx.renderer.AbstractRenderer,
+         *  dort wird ComponentProvider<?> componentController und nicht delegate genommen XXX ?
+         */
+        @Override
+        public void doClick() {
+            if (isEnabled()) {
+            	System.out.println("isEnabled() ist TRUE in this:"+this);
+                ((RolloverRenderer) delegate).doClick();
+            }
+        }
 	}
 
 	public void setCellEditor(TreeCellEditor cellEditor) {
