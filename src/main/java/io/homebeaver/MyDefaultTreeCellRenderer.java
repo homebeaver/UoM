@@ -16,15 +16,18 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+import javax.swing.plaf.BorderUIResource.EmptyBorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.UIResource;
-import javax.swing.plaf.BorderUIResource.EmptyBorderUIResource;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.tree.TreeCellRenderer;
 
+/*
+ * Replaces javax.swing.tree.DefaultTreeCellRenderer
+ */
 @SuppressWarnings("serial") // Same-version serialization only
-// ? XXX extends JXLabel
+// ? XXX extends JXLabel with PainterSupport
 public class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRenderer {
 
 	private static final Logger LOG = Logger.getLogger(MyDefaultTreeCellRenderer.class.getName());
@@ -47,8 +50,7 @@ public class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRendere
      */
     private Color treeBGColor;
     /**
-     * Color to draw the focus indicator in, determined from the background.
-     * color.
+     * Color to draw the focus indicator in, determined from the background color.
      */
     private Color focusBGColor;
 
@@ -90,9 +92,9 @@ public class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRendere
 	@Override
 	public Component getTreeCellRendererComponent(JTree tree, Object value, 
 			boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-		LOG.info(" tree:"+tree + "\n Object value:"+value);
+		LOG.info(" tree:"+tree + "\n row="+row + " Object value:"+value + " "+value.getClass());
 		String stringValue = tree.convertValueToText(value, sel, expanded, leaf, row, hasFocus);
-		LOG.info(" stringValue:"+stringValue);
+//		LOG.info(" stringValue:"+stringValue);
 		
         this.tree = tree;
         this.hasFocus = hasFocus;
@@ -151,12 +153,22 @@ public class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRendere
 
     public MyDefaultTreeCellRenderer() {
         inited = true;
-        LOG.info("inited="+inited + " text="+getText() + " name="+getName());
+//        LOG.info("inited="+inited + " text="+getText() + " name="+getName());
     }
 
+    // TODO in UIManagerExt aufnehmen
+    public static boolean getUIManagerExtBoolean(Object key, boolean deflt) {
+    	Object value = UIManager.get(key);
+    	if (value instanceof Boolean) {
+    		return (Boolean) value;
+    	}
+    	return deflt;
+    }
+    
     public void updateUI() {
         super.updateUI();
-        LOG.info("inited="+inited + " LeafIcon="+getLeafIcon());
+//		ComponentUI ui = UIManager.getUI(this);
+//		LOG.info("inited="+inited + " ui="+ui); // ui=javax.swing.plaf.synth.SynthLabelUI
         // To avoid invoking new methods from the constructor, the
         // inited field is first checked. If inited is false, the constructor
         // has not run and there is no point in checking the value. As
@@ -207,12 +219,18 @@ public class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRendere
                     );
         }
         drawsFocusBorderAroundIcon = //DefaultLookup.getBoolean(this, ui, "Tree.drawsFocusBorderAroundIcon", false);
-        		UIManager.getBoolean("Tree.drawsFocusBorderAroundIcon"); // throws NullPointerException if key is null
+/*
+ * die doku "throws NullPointerException if key is null" on UIManager.getBoolean stimmt nicht XXX
+ *  - es wird false geliefert:
+        		UIManager.getBoolean("Tree.drawsFocusBorderAroundIcon");
+ * daher implementiere ich es mit default:
+ */
+        		getUIManagerExtBoolean("Tree.drawsFocusBorderAroundIcon", true);
         drawDashedFocusIndicator = //DefaultLookup.getBoolean(this, ui, "Tree.drawDashedFocusIndicator", false);
-        		UIManager.getBoolean("Tree.drawDashedFocusIndicator");
+        		getUIManagerExtBoolean("Tree.drawDashedFocusIndicator", true);
         
         fillBackground = //DefaultLookup.getBoolean(this, ui, "Tree.rendererFillBackground", true);
-        		UIManager.getBoolean("Tree.rendererFillBackground");
+        		getUIManagerExtBoolean("Tree.rendererFillBackground", true);
 
         if (!inited || getBorder() instanceof UIResource)  {
 //            Insets margins = DefaultLookup.getInsets(this, ui, "Tree.rendererMargins");
@@ -337,6 +355,7 @@ public class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRendere
         Color bColor;
 
         if (isDropCell) {
+        	LOG.info("isDropCell selected="+selected);
 //            bColor = DefaultLookup.getColor(this, ui, "Tree.dropCellBackground");
             bColor = UIManager.getColor("Tree.dropCellBackground");
             if (bColor == null) {
@@ -363,6 +382,8 @@ public class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRendere
         }
 
         if (hasFocus) {
+        	LOG.info("hasFocus drawsFocusBorderAroundIcon="+drawsFocusBorderAroundIcon);
+        	// erkennt man nur in Metal
             if (drawsFocusBorderAroundIcon) {
                 imageOffset = 0;
             }
