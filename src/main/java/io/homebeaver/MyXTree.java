@@ -1,6 +1,7 @@
 package io.homebeaver;
 
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JTree;
 import javax.swing.tree.TreeCellEditor;
@@ -8,12 +9,13 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.JXTree;
-import org.jdesktop.swingx.renderer.ComponentProvider;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.IconValues;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
@@ -77,7 +79,19 @@ public class MyXTree extends JXTree {
 		return new MyDelegatingRenderer(new MyDefaultTreeCellRenderer(), iv, sv);
 	}
 	
+	public TreeCellRenderer getWrappedCellRenderer() {
+		return getCellRenderer();
+	}
+	
 	public class MyDelegatingRenderer extends DefaultTreeRenderer implements TreeCellRenderer, RolloverRenderer {
+		/*
+MyDefaultTreeCellRenderer delegate bzw. TreeCellRenderer delegate wird nicht verwendet,
+ da Component aus super.getTreeCellRendererComponent genommen wird
+ 
+ 
+MyDefaultTreeCellRenderer delegate arbeitet ohne IconValue iv, StringValue sv
+
+		 */
         private TreeCellRenderer delegate;
 		public MyDelegatingRenderer(TreeCellRenderer delegate, IconValue iv, StringValue sv) {
 			//super(iv, sv);
@@ -89,7 +103,7 @@ public class MyXTree extends JXTree {
 			super(new WrappingProvider(iv, sv, false));
 			if(delegate instanceof MyDefaultTreeCellRenderer myCellRenderer) {
 				//System.out.println("*** +++ delegate:"+delegate);
-				delegate = myCellRenderer;
+				this.delegate = myCellRenderer;
 			} else {
 				System.out.println("*** --- delegate:"+delegate);
 			}
@@ -97,19 +111,34 @@ public class MyXTree extends JXTree {
         public TreeCellRenderer getDelegateRenderer() {
             return delegate;
         }
+        /**
+         * {@inheritDoc}
+         * Returns a configured component, appropriate to render the given tree cell.
+         */
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
-                boolean selected, boolean expanded, boolean leaf, int row,boolean hasFocus) {
-            Component result = super.getTreeCellRendererComponent(tree, value, 
+                boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        	/* super.getTreeCellRendererComponent :
+        	 *  cellContext.installContext(tree, value, row, 0, selected, hasFocus, expanded, leaf);
+        	 *  Component comp = componentController.getRendererComponent(cellContext);
+        	 *  cellContext.replaceValue(null);
+        	 *  return comp;
+        	 */       	
+            Component comp = super.getTreeCellRendererComponent(tree, value, 
             	selected, expanded, leaf, row, hasFocus);
-//            System.out.println("*** --- result Component:"+result);
             if ((compoundHighlighter != null) && (row < getRowCount()) && (row >= 0)) {
-                result = compoundHighlighter.highlight(result, getComponentAdapter(row));
-//                System.out.println("*** --- compoundHighlighter:"+compoundHighlighter);
+            	// doHighlight comp is WrappingIconPanel:
+            	ComponentAdapter componentAdapter = getComponentAdapter(row);           	
+            	System.out.println(" doHighlight for "+row+" value="+componentAdapter.getValue()
+//            	+ " with "+componentAdapter + " and "+comp);
+            	+ " / "+((WrappingIconPanel)comp).getComponent());
+            	comp = compoundHighlighter.highlight(comp, componentAdapter);
             } 
-            System.out.println("***"+(compoundHighlighter!=null?row:"")+" --- result Component:"+result);
-            
-            return result;
+//            System.out.println("***"+(compoundHighlighter!=null?row:"")+" --- result Component:"+comp);           
+            return comp;
+//            */
+//        	return delegate.getTreeCellRendererComponent(tree, value, 
+//                	selected, expanded, leaf, row, hasFocus);
         }
         
         /**
@@ -119,20 +148,20 @@ public class MyXTree extends JXTree {
          * definiert in interface org.jdesktop.swingx.rollover.RolloverRenderer
          * überschreibt die implementierung aus org.jdesktop.swingx.renderer.AbstractRenderer
          *  dort wird ComponentProvider<?> componentController und nicht delegate genommen XXX ?
-         *  TODO kann ich auf delegate verzichten und stattdessen componentController nutzen
          *  TODO das ist nie true
          */
         @Override
         public boolean isEnabled() {
 //        	boolean ret = (delegate instanceof RolloverRenderer) && ((RolloverRenderer) delegate).isEnabled();
         	boolean ret = (delegate instanceof MyDefaultTreeCellRenderer);
-        	System.out.println("isEnabled() liefert "+ret + " "+delegate);
-//        	((MyDefaultTreeCellRenderer)delegate).selected
+//        	System.out.println("isEnabled() liefert "+ret + " "+delegate);
             return ret;
         }
             
         /**
          * {@inheritDoc}
+         * Programmatically perform a "click". 
+         * This does the same thing as if the user had pressed and released the button.
          */
         /*
          * definiert in interface org.jdesktop.swingx.rollover.RolloverRenderer
@@ -141,9 +170,18 @@ public class MyXTree extends JXTree {
          */
         @Override
         public void doClick() {
-            if (isEnabled()) {
-            	System.out.println("isEnabled() ist TRUE in this:"+this);
-                ((RolloverRenderer) delegate).doClick();
+            if(isEnabled()) {
+            	if(delegate instanceof MyDefaultTreeCellRenderer renderer) {
+                	Dimension size = getSize(); //delegate.getSize(size);
+                	System.out.println("isEnabled() ist TRUE, selected="+renderer.selected
+                			+" size="+size
+                			+" "+renderer.getText()
+//                			+componentController.toString()
+                			+" in this:"+this);
+//                    ((RolloverRenderer) delegate).doClick();
+//                	delegate.setBackground(Color.YELLOW);
+//                	delegate.paintImmediately(new Rectangle(0,0, size.width, size.height));
+            	}
             }
         }
 	}

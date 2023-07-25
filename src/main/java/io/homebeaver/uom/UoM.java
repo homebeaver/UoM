@@ -111,7 +111,7 @@ public class UoM {
 		this.name = name;
 		this.description = description;
 	}
-	private UoM(Integer id, String name, String description, String uomSymbol) {
+	public UoM(Integer id, String name, String description, String uomSymbol) {
 		this.id = id;
 		this.name = name;
 		this.description = description;

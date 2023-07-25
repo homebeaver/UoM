@@ -46,11 +46,11 @@ public class MyTreeCellEditor extends DefaultTreeCellEditor implements UIDepende
 	public void valueChanged(TreeSelectionEvent e) {
 //		LOG.info("number of nodes selected="+(tree==null?"":tree.getSelectionCount())+" TreeSelectionEvent:"+e);
 		super.valueChanged(e); // Resets <code>lastPath</code>.
-		LOG.info("path that was selected="+lastPath+" TreeSelectionEvent:"+e);
+//		LOG.info("path that was selected="+lastPath+" TreeSelectionEvent:"+e);
 		if(lastPath!=null) {
 			Object lpo = lastPath.getLastPathComponent();
 			int[] selRows = tree.getSelectionRows();
-			LOG.info("lastPath Object (selected)="+lpo.getClass()+"/"+lpo +selRows[0]+ "\n realEditor:"+realEditor);
+			LOG.info("lastPath Object (selected)="+lpo.getClass()+"/"+lpo + " row="+selRows[0]+ "\n realEditor:"+realEditor);
 			// show selected Object in Editor:
 			// @param   isSelected      true if the cell is to be rendered with selection highlighting
 			// @param   expanded        true if the node is expanded
@@ -68,7 +68,7 @@ public class MyTreeCellEditor extends DefaultTreeCellEditor implements UIDepende
         if (getRenderer() != null) {
             SwingUtilities.updateComponentTreeUI(getRenderer());
         }
-        LOG.info("renderer:"+renderer + "\n realEditor:"+realEditor);
+//        LOG.info("renderer:"+renderer + "\n realEditor:"+realEditor);
         if (realEditor instanceof JComponent) {
             SwingUtilities.updateComponentTreeUI((JComponent) realEditor);
         } else if (realEditor instanceof UIDependent) {

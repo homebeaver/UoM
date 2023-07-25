@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.HeadlessException;
+import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.io.File;
@@ -12,13 +13,18 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -33,13 +39,18 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.icon.JXIcon;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 
 import io.homebeaver.GenericTreeModel;
 import io.homebeaver.GenericTreeNode;
+import io.homebeaver.MyDefaultTreeCellRenderer;
+import io.homebeaver.MyTreeCellEditor;
+import io.homebeaver.MyTreeRolloverProducer;
 import io.homebeaver.MyXTree;
 import io.homebeaver.TreeTransferHandler;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.uom.UoM;
+import io.homebeaver.uom.UoMCellEditor;
 import io.homebeaver.uom.UoMTreeNode;
 
 // TODO search
@@ -108,6 +119,11 @@ public class SimpleTreeView extends JXPanel {
         list.setVisible(false);
         return list;
     }
+    private JPanel editPane;
+    private JComponent createEditPane() {
+    	editPane = new UoMCellEditor.UoMComponent(new SpringLayout());
+    	return editPane;
+    }
     class TrashListCellRenderer extends DefaultListCellRenderer {
 		public Component getListCellRendererComponent(JList<?> list, Object value
 				, int index, boolean isSelected, boolean cellHasFocus) {
@@ -166,6 +182,43 @@ public class SimpleTreeView extends JXPanel {
         tree.setOverwriteRendererIcons(true);
 //        tree.setCellRenderer(tree.getCellRenderer()); // nicht notwendig!
         
+        /*
+         * addPropertyChangeListener(String propertyName, PropertyChangeListener listener) is defined in
+         * java.awt.Component and called in java.awt.Container
+         */
+//        tree.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, propertyChangeEvent -> {
+//        	// Code for PropertyChange: auch für FILESYSTEM tree!!!
+//        	MyXTree source = (MyXTree)propertyChangeEvent.getSource();
+//        	if(!source.getDragEnabled()) return; // because I set DragEnabled only for UOM
+//        	
+//        	
+//        	Point newPoint = (Point)propertyChangeEvent.getNewValue();
+//        	if(newPoint!=null && newPoint.y>-1) {
+//        		TreePath treePath = source.getPathForRow(newPoint.y);
+//        		MyTreeRolloverProducer mtrop = (MyTreeRolloverProducer)source.getRolloverProducer();
+//        		LOG.info("CLICKED_KEY isDragging="+source.getDragEnabled()+mtrop.isDragging()
+//        		+" >>>>>>>>>>>> tree newPoint:"+newPoint + " TreePath:"+treePath);
+//            	if(treePath.getLastPathComponent() instanceof UoMTreeNode uomTN) {
+//                	LOG.info("TODO editor for uomTN:"+uomTN);
+//            	};
+//        	}
+//        });
+//        tree.addPropertyChangeListener(RolloverProducer.ROLLOVER_KEY, propertyChangeEvent -> {
+//        	// Code for propertyChange:
+//        	MyXTree source = (MyXTree)propertyChangeEvent.getSource();
+//        	if(!source.getDragEnabled()) return; // because I set DragEnabled only for UOM
+//        	
+//        	// es gibt zwei flags tree.getDragEnabled() und isDragging in RolloverProducer
+//        	Point newPoint = (Point)propertyChangeEvent.getNewValue();
+//        	if(newPoint!=null && newPoint.y>-1) {
+//        		TreePath treePath = source.getPathForRow(newPoint.y);
+//        		MyTreeRolloverProducer mtrop = (MyTreeRolloverProducer)source.getRolloverProducer();
+//        		// mtrop.isDragging() ist zwar true, aber der Listener kommt erst dran nach TreeTransferHandler cleanup
+//            	LOG.info("ROLLOVER isDragging="+source.getDragEnabled()+mtrop.isDragging()
+//            		+" >>>>>>>>>>>> tree newPoint:"+newPoint + " TreePath:"+treePath);
+//        	}
+//        });
+        
         transferHandler = new TreeTransferHandler();
         
         quit = new JXButton("Quit");
@@ -173,6 +226,8 @@ public class SimpleTreeView extends JXPanel {
 
         Box rightPanel = Box.createVerticalBox();
         rightPanel.add(Box.createVerticalGlue());
+        rightPanel.add(Box.createVerticalStrut(4));
+        rightPanel.add(createEditPane());
         rightPanel.add(Box.createVerticalStrut(4));
         rightPanel.add(createList());
         rightPanel.add(Box.createVerticalStrut(4));
@@ -222,12 +277,42 @@ public class SimpleTreeView extends JXPanel {
     		list.setVisible(true);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
     		treeModel.valueForPathChanged(tp, getUomModelRoot());
+    		tree.addTreeSelectionListener( treeSelectionEvent -> {
+    			UoMTreeNode tn = (UoMTreeNode)tree.getLastSelectedPathComponent();
+    			LOG.info("???????? event:"+tree // ==treeSelectionEvent.getSource()
+    					.getCellEditor()
+    					+"\n"+tn.externalize()+"??????????"+treeSelectionEvent.getNewLeadSelectionPath()+" "+treeSelectionEvent.getNewLeadSelectionPath());
+    			// TODO editPane mit tn.getObject() befüllen
+    			MyTreeCellEditor realEditor = (MyTreeCellEditor)tree.getCellEditor(); // cellEditor
+    			realEditor.updateUI();
+    			//tree.getWrappedCellRenderer();
+//    			realEditor.getCellEditorValue();
+//    			tn.getObject();
+    			LOG.info("tn.getObject:"+tn.getObject().getClass()+"/"+tn.getObject()
+    			+", realEditor.getRenderer:"+realEditor.getRenderer()
+    			+"\n, realEditor.getCellEditorValue:"+realEditor.getCellEditorValue());
+    		});
     		tree.setEditable(true);
+    		// JTree.setCellEditor(TreeCellEditor cellEditor)
+    		// DefaultXTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer, TreeCellEditor editor)
+    		// class org.jdesktop.swingx.table.DatePickerCellEditor extends AbstractCellEditor implements TableCellEditor, TreeCellEditor
+//    		tree.setCellEditor(new DefaultXTreeCellEditor(tree, null, new DatePickerCellEditor());
+    		// default in init:
+    		// setCellEditor(new DefaultXTreeCellEditor(this, (DefaultTreeCellRenderer) getWrappedCellRenderer()));
+    		LOG.info("----WrappedCellRenderer:"+tree.getWrappedCellRenderer());
+    		tree.setCellEditor(
+    			new MyTreeCellEditor(tree, (MyDefaultTreeCellRenderer)((MyXTree.MyDelegatingRenderer)tree.getWrappedCellRenderer()).getDelegateRenderer()
+    					, new UoMCellEditor(editPane))
+    			);
     		tree.setDragEnabled(true);
     		tree.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     		tree.setTransferHandler(transferHandler);
     		tree.setDropMode(DropMode.ON); // drop mode is only meaningful if this component has a TransferHandler that accepts drops
     		tree.updateUI();
+    	}
+    	TreeSelectionListener[] listeners = tree.getTreeSelectionListeners();
+    	for(int i=0; i<listeners.length; i++) {
+    		System.out.println("listener"+i+":"+listeners[i]);
     	}
     }
 
