@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -18,6 +20,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.TreeCellEditor;
 
+import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.plaf.UIDependent;
 
 import io.homebeaver.uom.UoMTreeNode;
@@ -36,7 +39,7 @@ public class MyTreeCellEditor extends DefaultTreeCellEditor implements UIDepende
 		super(tree, null, editor); // TODO in super ist nur javax.swing.tree.DefaultTreeCellRenderer vorgesehen
 		// MyDefaultTreeCellRenderer ist aber nicht davon abgeleitet, sondern:
 		// class MyDefaultTreeCellRenderer extends JLabel implements TreeCellRenderer
-		LOG.info("ctor fertig mit renderer:"+renderer);
+		LOG.info("ctor fertig mit \n renderer:"+renderer + " \n editor:"+editor + " \n realEditor:"+realEditor);
 		myRenderer = renderer;
 	}
 
@@ -50,12 +53,25 @@ public class MyTreeCellEditor extends DefaultTreeCellEditor implements UIDepende
 		if(lastPath!=null) {
 			Object lpo = lastPath.getLastPathComponent();
 			int[] selRows = tree.getSelectionRows();
-			LOG.info("lastPath Object (selected)="+lpo.getClass()+"/"+lpo + " row="+selRows[0]+ "\n realEditor:"+realEditor);
+//			LOG.info("lastPath Object (selected)="+lpo.getClass()+"/"+lpo + " row="+selRows[0]+ "\n realEditor:"+realEditor);
 			// show selected Object in Editor:
 			// @param   isSelected      true if the cell is to be rendered with selection highlighting
 			// @param   expanded        true if the node is expanded
 			// @param   leaf            true if the node is a leaf node
 			Component comp = realEditor.getTreeCellEditorComponent(tree, lpo, true, true, lpo instanceof UoMTreeNode.DirectoryTreeNode, selRows[0]);
+			LOG.info("lastPath Object (selected)="+lpo.getClass()+"/"+lpo + " row="+selRows[0]+ "\n realEdito componentr:"+comp);
+			// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+			if(comp.getClass()!=JXPanel.class && comp instanceof JXPanel panel) {
+				panel.setEnabled(true);
+				Component[] components = panel.getComponents();
+				for(int i=0; i<components.length; i++) {
+		        	if(components[i] instanceof JTextField iTextField) {
+		        		iTextField.setEnabled(panel.isEnabled());
+		        	} else if(components[i] instanceof JLabel iLabel) {
+		        		iLabel.setEnabled(panel.isEnabled());
+		        	}
+				}
+			}
 		}
 	}
 	

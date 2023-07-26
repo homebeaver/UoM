@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.NumberFormatter;
 import javax.swing.tree.TreeCellEditor;
@@ -233,15 +232,22 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 	    	fields[1] = nameField;
 	    	fields[2] = descriptionField;
 	    	fields[3] = uomSymbolField;
-//	    	add(idField);
-//	    	add(nameField);
-//	    	add(descriptionField);
-//	    	add(uomSymbolField);
+	    	/* 
+	    	 * start with disabled component parts (label and fields).
+	    	 * Disabling a component does not disable its children
+	    	 * 
+	    	 * Will be enabled when an uom element is selected to be edited
+	    	 * @see MyTreeCellEditor#valueChanged
+	    	 */
+	    	this.setEnabled(false); // .
 			for (int i = 0; i < labels.length; i++) {
 			    JLabel l = new JLabel(labels[i], JLabel.TRAILING);
 			    this.add(l);
 			    l.setLabelFor(fields[i]);
 			    this.add(fields[i]);
+			    // disable label and fields
+			    l.setEnabled(this.isEnabled());
+			    fields[i].setEnabled(this.isEnabled());
 			}
 			//Lay out the panel.
 			SpringUtilities.makeCompactGrid(this,
