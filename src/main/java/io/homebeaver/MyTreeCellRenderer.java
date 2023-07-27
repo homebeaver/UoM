@@ -1,16 +1,11 @@
 package io.homebeaver;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.util.logging.Logger;
 
 import javax.swing.Icon;
-import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.jdesktop.swingx.SwingXUtilities;
@@ -19,9 +14,12 @@ import org.jdesktop.swingx.SwingXUtilities;
 // javax.swing.tree.DefaultTreeCellRenderer extends JLabel implements TreeCellRenderer
 // ist also die "alte" swing api
 
-// lt. kleopatra sollte die "alte" swing api ersetzt werden. durch DelegatingRenderer?
-// public class DefaultTreeRenderer extends AbstractRenderer implements TreeCellRenderer {
+// lt. kleopatra sollte die "alte" swing api ersetzt werden. durch DelegatingRenderer? - daher deprecated
+// public class javax.swing.tree.DefaultTreeRenderer extends AbstractRenderer implements TreeCellRenderer 
+//                                          ^
+//                                          |
 // public class DelegatingRenderer extends DefaultTreeRenderer implements TreeCellRenderer, RolloverRenderer
+@Deprecated
 public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 	
 	private static final Logger LOG = Logger.getLogger(MyTreeCellRenderer.class.getName());
@@ -32,6 +30,22 @@ public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 		// JLabel(String text, Icon icon, int horizontalAlignment)
 		// mit ("", null, LEADING) gerufen
 	}
+
+	public Icon getDefaultOpenIcon() {
+		// in super: DefaultLookup.getIcon(this, ui, "Tree.openIcon");
+//		LOG.info("sun.swing.DefaultLookup is not visible - can use UIManager::::");
+		return UIManager.getIcon("Tree.openIcon");
+	}
+    public Icon getDefaultClosedIcon() {
+		Icon icon = UIManager.getIcon("Tree.closedIcon");
+		LOG.info("sun.swing.DefaultLookup is not visible - can use UIManager got "+icon);
+        return icon;
+    }
+    public Icon getDefaultLeafIcon() {
+		Icon icon = UIManager.getIcon("Tree.leafIcon");
+		LOG.info("sun.swing.DefaultLookup is not visible - can use UIManager got "+icon);
+        return icon;
+    }
 
     /**
      * {@inheritDoc} <p>
