@@ -55,8 +55,7 @@ public class UoMCellEditor extends AbstractCellEditor implements TableCellEditor
     /** The Swing component being edited. */
     protected JComponent editorComponent;
     /**
-     * The delegate inner class which handles all methods sent from the
-     * <code>CellEditor</code>.
+     * The delegate inner class which handles all methods sent from the <code>CellEditor</code>.
      */
     protected EditorDelegate delegate;
     /**
@@ -81,9 +80,9 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
             public void setValue(Object value) {
             	// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
             	if(value != null && value.getClass()!=UoMTreeNode.class && value instanceof UoMTreeNode uomtn) {
-//            		LOG.info("Hurra?????????????????value:"+value.getClass()+" : "+value);
+            		LOG.info("Hurra?????????????????value:"+value.getClass()+" : "+value);
             		UoMComponent uomPanel = (UoMComponent)editorComponent;
-            		uomPanel.setFields(uomtn.getObject());
+            		uomPanel.setModel(uomtn.getObject());
             	} else {
             		LOG.warning("MIST?????????????????value:"+value.getClass()+" : "+value);
             	}
@@ -203,10 +202,11 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 		return null;
 	}
 
-	public static class UoMComponent extends JXPanel {
+	public static class UoMComponent extends JXPanel implements ActionListener {
 		
 		static String[] labels = {UoM.ID, UoM.NAME, UoM.DESCRIPTION, UoM.UOMSYMBOL};
 		static JTextField[] fields = new JTextField[labels.length];
+		static UoM model;
 		JTextField idField;
     	JTextField nameField = new JTextField(20);
     	JTextField descriptionField = new JTextField(40);
@@ -239,7 +239,7 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 	    	 * Will be enabled when an uom element is selected to be edited
 	    	 * @see MyTreeCellEditor#valueChanged
 	    	 */
-	    	this.setEnabled(false); // .
+	    	this.setEnabled(false); // disable
 			for (int i = 0; i < labels.length; i++) {
 			    JLabel l = new JLabel(labels[i], JLabel.TRAILING);
 			    this.add(l);
@@ -249,6 +249,10 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 			    l.setEnabled(this.isEnabled());
 			    fields[i].setEnabled(this.isEnabled());
 			}
+			idField.addActionListener(this);
+			nameField.addActionListener(this);
+			descriptionField.addActionListener(this);
+			uomSymbolField.addActionListener(this);
 			//Lay out the panel.
 			SpringUtilities.makeCompactGrid(this,
 					labels.length, 2, //rows, cols
@@ -256,11 +260,31 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 					6, 6);       //xPad, yPad
 		}
 		
-		void setFields(UoM uom) {
+		void setModel(UoM uom) {
+			model = uom;
 			((JFormattedTextField)idField).setValue(uom.id);
 	    	nameField.setText(uom.name);
 	    	descriptionField.setText(uom.description);
 	    	uomSymbolField.setText(uom.uomSymbol);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			Object src = e.getSource();
+			LOG.info(">>>>>>>>>> ActionEvent "+e.getID() +" source:"+src + "\ne:"+e);
+			if(e.getID()!=ActionEvent.ACTION_PERFORMED) return;
+			if(src==idField) {
+//				model.id  = idField.getText() // TODO to Integer
+			} else if(src==nameField) {		
+				LOG.info(">>>>>>>>>> oldVlaue "+model.name +" newValue:"+nameField.getText());
+				// Cannot make a static reference to the non-static method getCellEditorValue() from the type UoMCellEditor :
+				//getCellEditorValue();
+				model.name = nameField.getText();
+			} else if(src==descriptionField) {
+				LOG.info(">>>>>>>>>> oldVlaue "+model.description +" newValue:"+descriptionField.getText());
+				model.description = descriptionField.getText();
+			} else if(src==uomSymbolField) {
+				model.uomSymbol = uomSymbolField.getText();
+			}
 		}
 		
 	    public synchronized void addActionListener(ActionListener l) {
