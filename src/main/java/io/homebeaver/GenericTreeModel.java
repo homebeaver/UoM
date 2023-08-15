@@ -3,7 +3,6 @@ package io.homebeaver;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -22,6 +21,7 @@ public class GenericTreeModel implements TreeModel {
 	
 	protected GenericTreeNode<?> root;
 	
+	@Deprecated // this ctor is not used
     public GenericTreeModel(File root, Vector<FileFilter> filters) {
         this.root = FileSystemTreeNode.create(root, filters);
     }
@@ -33,7 +33,12 @@ public class GenericTreeModel implements TreeModel {
         this.root = root;
     }
     public GenericTreeModel(Object root) {
+    	// root ist damit vom Typ GenericTreeNode.ObjectTreeLeaf
         this.root = GenericTreeNode.create(root);
+    }
+    public GenericTreeModel(Object root, Vector<TreeNode> ch) {
+    	// root ist damit vom Typ GenericTreeNode.ObjectTreeNode
+        this.root = GenericTreeNode.create(root, ch);
     }
 
 	@Override
@@ -54,7 +59,59 @@ public class GenericTreeModel implements TreeModel {
 		if (parent instanceof UoMTreeNode uomtn) {
 			return uomtn.getChildCount();
 		}
-		throwArgException(FileSystemTreeNode.class, parent);
+		LOG.warning("parent is instanceof "+parent.getClass());
+		/*
+java.lang.IllegalArgumentException: Expected a net.sf.fstreem.FileSystemTreeNode instance
+, received a io.homebeaver.GenericTreeNode$ObjectTreeNode
+	at io.homebeaver.GenericTreeModel.throwArgException(GenericTreeModel.java:200)
+	at io.homebeaver.GenericTreeModel.getChildCount(GenericTreeModel.java:62)
+	at java.desktop/javax.swing.tree.VariableHeightLayoutCache$TreeStateNode.expand(VariableHeightLayoutCache.java:1457)
+	at java.desktop/javax.swing.tree.VariableHeightLayoutCache$TreeStateNode.expand(VariableHeightLayoutCache.java:1272)
+	at java.desktop/javax.swing.tree.VariableHeightLayoutCache.rebuild(VariableHeightLayoutCache.java:728)
+	at java.desktop/javax.swing.tree.VariableHeightLayoutCache.setModel(VariableHeightLayoutCache.java:111)
+	at java.desktop/javax.swing.plaf.basic.BasicTreeUI.configureLayoutCache(BasicTreeUI.java:2131)
+	at java.desktop/javax.swing.plaf.basic.BasicTreeUI.completeUIInstall(BasicTreeUI.java:840)
+	at java.desktop/javax.swing.plaf.basic.BasicTreeUI.installUI(BasicTreeUI.java:800)
+	at java.desktop/javax.swing.plaf.metal.MetalTreeUI.installUI(MetalTreeUI.java:121)
+	at java.desktop/javax.swing.JComponent.setUI(JComponent.java:685)
+	at java.desktop/javax.swing.JTree.setUI(JTree.java:706)
+	at java.desktop/javax.swing.JTree.updateUI(JTree.java:727)
+	at org.jdesktop.swingx.JXTree.updateUI(JXTree.java:741)
+	at io.homebeaver.MyXTreeTest.test2(MyXTreeTest.java:75)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:78)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:567)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.eclipse.jdt.internal.junit4.runner.JUnit4TestReference.run(JUnit4TestReference.java:93)
+	at org.eclipse.jdt.internal.junit.runner.TestExecution.run(TestExecution.java:40)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:529)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.runTests(RemoteTestRunner.java:756)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.run(RemoteTestRunner.java:452)
+	at org.eclipse.jdt.internal.junit.runner.RemoteTestRunner.main(RemoteTestRunner.java:210)
+		 */
+    	// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+    	if(parent.getClass()!=GenericTreeNode.class && parent instanceof GenericTreeNode gtn) {
+    		LOG.info("parent is instanceof "+parent.getClass() + " with ChildCount="+gtn.getChildCount());
+    		return gtn.getChildCount();
+    	}
+
+		throwArgException(GenericTreeNode.class, parent);
 		return 0;
 	}
 
@@ -111,8 +168,8 @@ public class GenericTreeModel implements TreeModel {
     			return;
     		}
     		if(newValue instanceof GenericTreeNode<?> newRoot) {
-    			// called in SimpleTreeView#selectTree to change the selected Tree
-        		System.out.println("path == root:"+root + " newRoot:"+newRoot);
+    			LOG.info("called in SimpleTreeView#selectTree to change the selected Tree."
+    				+ " path == root:"+root + " newRoot:"+newRoot);
         		root = newRoot;
     		} else {
     			LOG.warning("Do not change the root object:"+root); // warum nicht?
@@ -179,16 +236,15 @@ public class GenericTreeModel implements TreeModel {
         return -1;
 	}
 
-	@Override
+	@Override // Change Event
 	public void addTreeModelListener(TreeModelListener l) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	@Override // Change Event
 	public void removeTreeModelListener(TreeModelListener l) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 
     private void throwArgException(Class<?> expectedClass, Object node) {
