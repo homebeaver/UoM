@@ -233,14 +233,23 @@ public abstract class GenericTreeNode<TN> implements GenericMutableTreeNode<TN> 
 		public boolean isLeaf() {
 			return children==null || children.isEmpty();
 		}
+		@Override
+		public boolean getAllowsChildren() {
+			return true;
+		}
     }
 
     public static class ObjectTreeLeaf extends GenericTreeNode<Object> {
         public ObjectTreeLeaf(Object o) {
             super(o);
         }
+		@Override
         public boolean isLeaf() {
             return true;
         }
+		@Override
+		public boolean getAllowsChildren() {
+			return false;
+		}
     }
 }

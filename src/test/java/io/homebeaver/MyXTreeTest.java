@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import io.homebeaver.GenericTreeNode.ObjectTreeNode;
+import io.homebeaver.GenericTreeNode;
 import junit.framework.TestCase;
 
 @RunWith(JUnit4.class)
@@ -33,7 +33,7 @@ public class MyXTreeTest extends TestCase {
     	MyXTree tree = new MyXTree(treeModel);
     	Object root = tree.getModel().getRoot();
     	System.out.println("root.Object:"+root.getClass()+"/"+root);
-    	assertEquals(io.homebeaver.GenericTreeNode.ObjectTreeLeaf.class, root.getClass());
+    	assertEquals(GenericTreeNode.ObjectTreeLeaf.class, root.getClass());
     	// TODO insert muss zu exception führen
     }
 
@@ -44,7 +44,7 @@ public class MyXTreeTest extends TestCase {
     	MyXTree tree = new MyXTree(treeModel);
     	Object root = tree.getModel().getRoot();
     	System.out.println("root.Object type/value:"+root.getClass()+"/"+root);
-    	assertEquals(io.homebeaver.GenericTreeNode.ObjectTreeNode.class, root.getClass());
+    	assertEquals(GenericTreeNode.ObjectTreeNode.class, root.getClass());
     	
 //    	tree.expandedStack; // field JTree.expandedStack is not visible
     	System.out.println("getToggleClickCount="+tree.getToggleClickCount());
@@ -58,27 +58,29 @@ public class MyXTreeTest extends TestCase {
     			+ " isCollapsed="+tree.isCollapsed(tpToRoot)
     			+ " isExpanded="+tree.isExpanded(tpToRoot)
     			+ " hasBeenExpanded="+tree.hasBeenExpanded(tpToRoot));
-    	tree.hasBeenExpanded(tpToRoot);
     	
     	int rows = tree.getRowCount();    	
     	for(int i=0;i<rows;i++) {
     		System.out.println("row i="+i+"/"+rows+" isExpanded="+tree.isExpanded(i));		
     	}
     	
-    	Object o = tree.getModel().getRoot();
-    	GenericTreeNode.ObjectTreeNode child = new ObjectTreeNode("child", null);
+    	GenericTreeNode.ObjectTreeNode child = new GenericTreeNode.ObjectTreeNode("child", null);
+    	assertTrue(child.getAllowsChildren());
+    	GenericTreeNode.ObjectTreeLeaf leafChild = new GenericTreeNode.ObjectTreeLeaf("leafChild");
+    	assertFalse(leafChild.getAllowsChildren());
     	// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
-    	if(o.getClass()!=GenericTreeNode.class && o instanceof GenericTreeNode<?> gtn) {
+    	if(root.getClass()!=GenericTreeNode.class && root instanceof GenericTreeNode<?> gtn) {
         	System.out.println("root.Object:"+gtn.getObject().getClass()+"/"+gtn.getObject());
-        	
+        	assertTrue(gtn.getAllowsChildren());
         	gtn.insert(child, 0);
-//        	tree.updateUI();
+        	gtn.insert(leafChild, 1);
     	}
-    	tree.expandAll(); // diese Wiederholung ist notwendig!!!
+    	tree.expandAll(); // diese Wiederholung ist notwendig!!! damit expandedState gesetzt wird
     	// TODO sollte JXTree.expandAll setExpandedState setzen? !!!
     	rows = tree.getRowCount();    	
     	for(int i=0;i<rows;i++) {
-    		System.out.println("row i="+i+"/"+rows+" isExpanded="+tree.isExpanded(i));		
+    		TreePath tp = tree.getPathForRow(i); // hasBeenExpanded(i) gibt es nicht
+    		System.out.println("row i="+i+"/"+rows+" isExpanded="+tree.isExpanded(i)+ " hasBeenExpanded="+tree.hasBeenExpanded(tp));		
     	}
  	
     }
