@@ -206,6 +206,9 @@ public class UoMTreeNode extends GenericTreeNode<UoM> {
     public boolean isQuantity() {
 		return getUoM().isQuantity();
     }
+    public boolean getAllowsChildren() {
+		return !isQuantity();
+    }
 	public boolean isLeaf() {
 		return isQuantity() || children.isEmpty();
 	}

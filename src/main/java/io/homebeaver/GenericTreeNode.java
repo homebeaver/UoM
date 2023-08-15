@@ -94,10 +94,10 @@ public abstract class GenericTreeNode<TN> implements GenericMutableTreeNode<TN> 
         }
         return children.indexOf(aChild);
 	}
-	@Override
-	public boolean getAllowsChildren() {
-		return true;
-	}
+//	@Override
+//	public boolean getAllowsChildren() {
+//		return true;
+//	}
 	@Override
     public abstract boolean isLeaf();
 	@Override
@@ -157,6 +157,10 @@ public abstract class GenericTreeNode<TN> implements GenericMutableTreeNode<TN> 
 			throw new IllegalArgumentException("new child is an ancestor");
 		}
 
+		if(!getAllowsChildren()) {
+			System.out.println("GenericTreeNode.insert !!!!the receiver does not allow children!!!! this.Class:"+this.getClass());
+			return;
+		}
 		TreeNode oldParent = newChild.getParent();
 
 		if (oldParent != null && oldParent instanceof GenericMutableTreeNode<?> op) {

@@ -58,6 +58,9 @@ public abstract class FileSystemTreeNode extends GenericTreeNode<File> {
     public abstract FileSystemTreeNode getChildAt(int index) throws NotAFolderException;
 
     public abstract boolean isFile();
+    public boolean getAllowsChildren() {
+		return !isFile();
+    }
 	public boolean isLeaf() {
 		return isFile();
 	}
