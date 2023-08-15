@@ -34,7 +34,14 @@ public class MyXTreeTest extends TestCase {
     	Object root = tree.getModel().getRoot();
     	System.out.println("root.Object:"+root.getClass()+"/"+root);
     	assertEquals(GenericTreeNode.ObjectTreeLeaf.class, root.getClass());
-    	// TODO insert muss zu exception führen
+    	// insert muss zu exception führen oder warnen
+    	// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
+    	if(root.getClass()!=GenericTreeNode.class && root instanceof GenericTreeNode<?> gtn) {
+        	System.out.println("root.Object:"+gtn.getObject().getClass()+"/"+gtn.getObject());
+        	assertFalse(gtn.getAllowsChildren());
+        	gtn.insert(new GenericTreeNode.ObjectTreeLeaf("leafChild"), 0);
+    	}
+
     }
 
     @Test

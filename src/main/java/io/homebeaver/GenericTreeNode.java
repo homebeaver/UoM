@@ -158,7 +158,8 @@ public abstract class GenericTreeNode<TN> implements GenericMutableTreeNode<TN> 
 		}
 
 		if(!getAllowsChildren()) {
-			System.out.println("GenericTreeNode.insert !!!!the receiver does not allow children!!!! this.Class:"+this.getClass());
+			System.out.println("GenericTreeNode.insert: the receiver "+this.getClass()
+				+" does not allow children. Not inserted:"+newChild+"/"+newChild.getClass());
 			return;
 		}
 		TreeNode oldParent = newChild.getParent();
