@@ -82,7 +82,9 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
             	if(value != null && value.getClass()!=UoMTreeNode.class && value instanceof UoMTreeNode uomtn) {
             		LOG.info("Hurra?????????????????value:"+value.getClass()+" : "+value);
             		UoMComponent uomPanel = (UoMComponent)editorComponent;
-            		uomPanel.setModel(uomtn.getObject());
+            		if(uomPanel!=null) {
+                		uomPanel.setModel(uomtn.getObject());
+            		}
             	} else {
             		LOG.warning("MIST?????????????????value:"+value.getClass()+" : "+value);
             	}
@@ -101,7 +103,9 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
         // addActionListener(UoMCellEditor.EditorDelegate) is undefined for the type JPanel
         //jPanel.addActionListener(delegate);
         UoMComponent uomPanel = (UoMComponent)editorComponent;
-        uomPanel.addActionListener(delegate);
+        if(uomPanel!=null) {
+            uomPanel.addActionListener(delegate);
+        }
     }
     
     @ConstructorProperties({"component"})
@@ -191,7 +195,6 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 			boolean leaf, int row) {
 		LOG.info("Object value:"+value.getClass()+" "+value);
 		String stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, false);
-//		delegate.setValue(stringValue);
 		delegate.setValue(value);
 		return editorComponent;
 	}

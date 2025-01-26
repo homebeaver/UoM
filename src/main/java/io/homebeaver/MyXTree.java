@@ -7,6 +7,7 @@ import javax.swing.JTree;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -26,17 +27,39 @@ import net.sf.fstreem.FileSystemTreeNode;
 /*
  * erweitert JXTree um
 
+ - ctor MyXTree(TreeModel newModel, NodeElementContainer nodeElementsContainer)
  - getCellRenderer() mit IconValue
  - setSelectionMode analog zu JList, wurde in JXTree implementiert
  - getRolloverProducer() mit public boolean isDragging() accessor
+ - setSelectionPath(TreePath path)
  
  */
 public class MyXTree extends JXTree {
 
 	public MyXTree(TreeModel newModel) {
+		this(newModel, null);
+	}
+	public MyXTree(TreeModel newModel, NodeElementContainer nodeElementsContainer) {
 		super(newModel);
+		this.nodeElementsContainer = nodeElementsContainer;
 	}
 	
+	NodeElementContainer nodeElementsContainer;
+	
+	@Override
+    public void setSelectionPath(TreePath path) {
+    	Object lpc = path.getLastPathComponent();
+    	System.out.println("getLastPathComponent = " + lpc + " / " + lpc.getClass());
+    	super.setSelectionPath(path);
+    	if(lpc instanceof UoMTreeNode uom) {
+        	nodeElementsContainer.add(uom);
+    	} else if(lpc instanceof FileSystemTreeNode.DirectoryTreeNode dtn) {
+        	System.out.println(dtn.getFile().getPath() + " : dir with " + dtn.getFile().listFiles().length + " files/dirs");
+    	} else if(lpc instanceof FileSystemTreeNode.FileTreeNode ftn) {
+        	System.out.println(ftn.getFile().getPath() + " : bytes = " + ftn.getFile().length() + (ftn.getFile().isHidden() ? " (hidden)" : ""));
+    	}
+    }
+
 	MyTreeRolloverProducer myTreeRolloverProducer; // boolean RolloverProducer.isDragging ist private,
 	// daher public boolean isDragging() accessor
 	
@@ -129,16 +152,12 @@ MyDefaultTreeCellRenderer delegate arbeitet ohne IconValue iv, StringValue sv
             if ((compoundHighlighter != null) && (row < getRowCount()) && (row >= 0)) {
             	// doHighlight comp is WrappingIconPanel:
             	ComponentAdapter componentAdapter = getComponentAdapter(row);           	
-            	System.out.println(" doHighlight for "+row+" value="+componentAdapter.getValue()
-//            	+ " with "+componentAdapter + " and "+comp);
-            	+ " / "+((WrappingIconPanel)comp).getComponent());
+//            	System.out.println("MyDelegatingRenderer doHighlight for "+row+" value="+componentAdapter.getValue()
+////            	+ " with "+componentAdapter + " and "+comp);
+//            	+ " / "+((WrappingIconPanel)comp).getComponent());
             	comp = compoundHighlighter.highlight(comp, componentAdapter);
             } 
-//            System.out.println("***"+(compoundHighlighter!=null?row:"")+" --- result Component:"+comp);           
             return comp;
-//            */
-//        	return delegate.getTreeCellRendererComponent(tree, value, 
-//                	selected, expanded, leaf, row, hasFocus);
         }
         
         /**
@@ -197,7 +216,7 @@ MyDefaultTreeCellRenderer delegate arbeitet ohne IconValue iv, StringValue sv
         firePropertyChange(CELL_EDITOR_PROPERTY, oldEditor, cellEditor);
         invalidate();
 		 */
-		System.out.println("--------> cellEditor:"+cellEditor);
+		System.out.println("setCellEditor -------->:"+cellEditor);
 		super.setCellEditor(cellEditor);
 	}
 	

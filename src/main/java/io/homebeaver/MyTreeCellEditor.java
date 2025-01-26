@@ -59,9 +59,10 @@ public class MyTreeCellEditor extends DefaultTreeCellEditor implements UIDepende
 			// @param   expanded        true if the node is expanded
 			// @param   leaf            true if the node is a leaf node
 			Component comp = realEditor.getTreeCellEditorComponent(tree, lpo, true, true, lpo instanceof UoMTreeNode.DirectoryTreeNode, selRows[0]);
-			LOG.info("lastPath Object (selected)="+lpo.getClass()+"/"+lpo + " row="+selRows[0]+ "\n realEdito componentr:"+comp);
+			LOG.info("lastPath Object (selected)="+lpo.getClass()+"/"+lpo + " row="+selRows[0]+ "\n realEditor component:"+comp);
 			// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
-			if(comp.getClass()!=JXPanel.class && comp instanceof JXPanel panel) {
+			if(comp instanceof JXPanel panel && comp.getClass()!=JXPanel.class) {
+				System.out.println("enable "+comp.getClass().getName());
 				panel.setEnabled(true);
 				Component[] components = panel.getComponents();
 				for(int i=0; i<components.length; i++) {
