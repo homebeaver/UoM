@@ -46,6 +46,15 @@ methods to implement:
 	public void CellEditor#addCellEditorListener(CellEditorListener l)
 	public void CellEditor#removeCellEditorListener(CellEditorListener l)
 	
+Sets an initial <I>value</I> for the editor:
+public interface TableCellEditor extends CellEditor 
+    Component getTableCellEditorComponent(JTable table, Object value,
+                                          boolean isSelected, int row, int column);
+
+public interface TreeCellEditor extends CellEditor
+    Component getTreeCellEditorComponent(JTree tree, Object value,
+          boolean isSelected, boolean expanded, boolean leaf, int row);
+
  */
 @SuppressWarnings("serial") // Same-version serialization only
 public class UoMCellEditor extends AbstractCellEditor implements TableCellEditor, TreeCellEditor {
@@ -87,8 +96,8 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
             		UoMComponent uomPanel = (UoMComponent)editorComponent;
             		LOG.info("Hurra?????????????????value:"+value.getClass()+" : "+value + " uomPanel:"+uomPanel);
             		if(uomPanel!=null) {
-//            			JSONObject jsonUom = uomtn.externalize(new JSONObject());
-//            			uomPanel.add(jsonUom);
+            			JSONObject jsonUom = uomtn.externalize(new JSONObject());
+//            			uomPanel.add(jsonUom); XXX ?
                 		uomPanel.setModel(uomtn.getObject());
             		}
             	} else {
