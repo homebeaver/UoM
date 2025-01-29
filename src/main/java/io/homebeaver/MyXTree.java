@@ -51,7 +51,7 @@ public class MyXTree extends JXTree {
     	Object lpc = path.getLastPathComponent();
     	System.out.println("getLastPathComponent = " + lpc + " / " + lpc.getClass());
     	super.setSelectionPath(path);
-    	if(lpc instanceof UoMTreeNode uom) {
+    	if(nodeElementsContainer!=null && lpc instanceof UoMTreeNode uom) {
         	nodeElementsContainer.add(uom);
     	} else if(lpc instanceof FileSystemTreeNode.DirectoryTreeNode dtn) {
         	System.out.println(dtn.getFile().getPath() + " : dir with " + dtn.getFile().listFiles().length + " files/dirs");
@@ -154,7 +154,10 @@ MyDefaultTreeCellRenderer delegate arbeitet ohne IconValue iv, StringValue sv
             	ComponentAdapter componentAdapter = getComponentAdapter(row);           	
 //            	System.out.println("MyDelegatingRenderer doHighlight for "+row+" value="+componentAdapter.getValue()
 ////            	+ " with "+componentAdapter + " and "+comp);
-//            	+ " / "+((WrappingIconPanel)comp).getComponent());
+//            	+ " cellRenderer:"+((MyXTree)tree).getCellRenderer()
+////            	+ " delegate:"+(MyDefaultTreeCellRenderer)getDelegateRenderer()
+////            	+ " / "+((WrappingIconPanel)comp).getComponent() // org.jdesktop.swingx.renderer.JRendererLabel[Tree.cellRenderer
+//            	);
             	comp = compoundHighlighter.highlight(comp, componentAdapter);
             } 
             return comp;

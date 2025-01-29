@@ -1,7 +1,7 @@
 package io.homebeaver.uom;
 
 import java.awt.Component;
-import java.awt.LayoutManager;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -11,6 +11,7 @@ import java.beans.ConstructorProperties;
 import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractCellEditor;
@@ -21,13 +22,16 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.NumberFormatter;
 import javax.swing.tree.TreeCellEditor;
+import javax.swing.tree.TreeNode;
 
+import org.jdesktop.swingx.JXFormattedTextField;
 import org.jdesktop.swingx.JXPanel;
-
-import layout.SpringUtilities;
+import org.json.simple.JSONObject;
 
 /* copied from javax.swing.DefaultCellEditor
 
@@ -80,9 +84,11 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
             public void setValue(Object value) {
             	// @see https://stackoverflow.com/questions/2699788/java-is-there-a-subclassof-like-instanceof
             	if(value != null && value.getClass()!=UoMTreeNode.class && value instanceof UoMTreeNode uomtn) {
-            		LOG.info("Hurra?????????????????value:"+value.getClass()+" : "+value);
             		UoMComponent uomPanel = (UoMComponent)editorComponent;
+            		LOG.info("Hurra?????????????????value:"+value.getClass()+" : "+value + " uomPanel:"+uomPanel);
             		if(uomPanel!=null) {
+//            			JSONObject jsonUom = uomtn.externalize(new JSONObject());
+//            			uomPanel.add(jsonUom);
                 		uomPanel.setModel(uomtn.getObject());
             		}
             	} else {
@@ -207,6 +213,7 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 
 	public static class UoMComponent extends JXPanel implements ActionListener {
 		
+		static final String TITLE = "Node Element";
 		static String[] labels = {UoM.ID, UoM.NAME, UoM.DESCRIPTION, UoM.UOMSYMBOL};
 		static JTextField[] fields = new JTextField[labels.length];
 		static UoM model;
@@ -214,11 +221,10 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
     	JTextField nameField = new JTextField(20);
     	JTextField descriptionField = new JTextField(40);
     	JTextField uomSymbolField = new JTextField(20);
-    	
-		public UoMComponent(LayoutManager layout) {
-			super(layout);
-			LOG.info("--------------- ctor --------------------- \n layout:"+layout);
-//			setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+		public UoMComponent() {
+			super(new GridLayout(0, 2));
+	        setBorder(new TitledBorder(TITLE));
 			NumberFormat format = NumberFormat.getInstance();
 		    NumberFormatter formatter = new NumberFormatter(format);
 		    formatter.setValueClass(Integer.class);
@@ -235,33 +241,75 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 	    	fields[1] = nameField;
 	    	fields[2] = descriptionField;
 	    	fields[3] = uomSymbolField;
-	    	/* 
-	    	 * start with disabled component parts (label and fields).
-	    	 * Disabling a component does not disable its children
-	    	 * 
-	    	 * Will be enabled when an uom element is selected to be edited
-	    	 * @see MyTreeCellEditor#valueChanged
-	    	 */
-	    	this.setEnabled(false); // disable
-			for (int i = 0; i < labels.length; i++) {
-			    JLabel l = new JLabel(labels[i], JLabel.TRAILING);
-			    this.add(l);
-			    l.setLabelFor(fields[i]);
-			    this.add(fields[i]);
-			    // disable label and fields
-			    l.setEnabled(this.isEnabled());
-			    fields[i].setEnabled(this.isEnabled());
-			}
-			idField.addActionListener(this);
-			nameField.addActionListener(this);
-			descriptionField.addActionListener(this);
-			uomSymbolField.addActionListener(this);
-			//Lay out the panel.
-			SpringUtilities.makeCompactGrid(this,
-					labels.length, 2, //rows, cols
-					6, 6,        //initX, initY
-					6, 6);       //xPad, yPad
+//	    	/* 
+//	    	 * start with disabled component parts (label and fields).
+//	    	 * Disabling a component does not disable its children
+//	    	 * 
+//	    	 * Will be enabled when an uom element is selected to be edited
+//	    	 * @see MyTreeCellEditor#valueChanged
+//	    	 */
+//	    	this.setEnabled(false); // disable
+//			for (int i = 0; i < labels.length; i++) {
+//			    JLabel l = new JLabel(labels[i], JLabel.TRAILING);
+//			    this.add(l);
+//			    l.setLabelFor(fields[i]);
+//			    this.add(fields[i]);
+//			    // disable label and fields
+//			    l.setEnabled(this.isEnabled());
+//			    fields[i].setEnabled(this.isEnabled());
+//			}
+//			idField.addActionListener(this);
+//			nameField.addActionListener(this);
+//			descriptionField.addActionListener(this);
+//			uomSymbolField.addActionListener(this);
+//			//Lay out the panel.
+//			SpringUtilities.makeCompactGrid(this,
+//					labels.length, 2, //rows, cols
+//					6, 6,        //initX, initY
+//					6, 6);       //xPad, yPad
 		}
+
+    	private void add(JSONObject o) {
+    		HashMap<String, Object> jo = o;
+    		jo.forEach( (k, v) -> {
+    			System.out.println("key:"+k + " value:"+v 
+    					+ (v==null ? "" : "<of type "+v.getClass().getSimpleName()+">"));
+    			JLabel label = new JLabel((String)k);
+           		if (v instanceof Integer) {
+        			NumberFormat format = NumberFormat.getNumberInstance();
+        			JXFormattedTextField field = new JXFormattedTextField(format);
+        			field.setValue(v);
+        			field.setHorizontalAlignment(SwingConstants.RIGHT);
+        			field.setEditable(false); // read only
+        			label.setLabelFor(field);
+        			add(label);
+        			add(field);
+           		} else if (v==null && "uomSymbol".equals(k)) {
+           			// bei v==null uomSymbol nicht anzeigen
+           		} else {
+        			JFormattedTextField field = new JFormattedTextField();
+        			field.setValue(v); // auch bei v==null
+        			label.setLabelFor(field);
+        			add(label);
+        			add(field);
+           		}
+    		});
+    	}
+    	public void add(UoMTreeNode uomNode) {
+        	TreeNode parent = uomNode.getParent();
+        	setBorder(new TitledBorder(parent == null ? TITLE : TITLE + " of Type "+uomNode.getParent()));
+        	removeAll();
+        	
+        	if (uomNode instanceof UoMTreeNode.DirectoryTreeNode dtn) {
+        		JSONObject jsonUom = dtn.externalize(new JSONObject());
+        		add((JSONObject)jsonUom.get(UoMTreeNode.OBJECT));
+        	} else if (uomNode instanceof UoMTreeNode.QuantityTreeNode uom) { 
+        		JSONObject jsonUom = uom.externalize(new JSONObject());
+        		add((JSONObject)jsonUom.get(UoMTreeNode.OBJECT));
+        	}
+        	revalidate();
+        	setVisible(true);
+    	}
 		
 		void setModel(UoM uom) {
 			model = uom;

@@ -21,7 +21,6 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.TreeSelectionListener;
@@ -134,15 +133,15 @@ public class SimpleTreeView extends JXPanel {
         return list;
     }
     
-    private NodeElementContainer nodeElementContainer; // aka editPane
-    private JPanel createNodeElementsContainer() {
-        nodeElementContainer = new NodeElementContainer();
-        nodeElementContainer.setVisible(false);
-        return nodeElementContainer;
-	}
+//    private NodeElementContainer nodeElementContainer; // aka editPane
     private JPanel editPane;
+    private NodeElementContainer createNodeElementsContainer() {
+    	editPane = new NodeElementContainer();
+    	editPane.setVisible(false);
+        return (NodeElementContainer)editPane;
+	}
     private JComponent createEditPane() {
-        editPane = new UoMCellEditor.UoMComponent(new SpringLayout());
+        editPane = new UoMCellEditor.UoMComponent();
         editPane.setVisible(false);
         return editPane;
     }
@@ -198,9 +197,8 @@ public class SimpleTreeView extends JXPanel {
     private void initGui() {
         treeModel = new GenericTreeModel(fileRoot);
         gtroot = (GenericTreeNode<?>)treeModel.getRoot();
-        createNodeElementsContainer();
-        tree = new MyXTree(treeModel, nodeElementContainer);
-//        tree = new MyXTree(treeModel);
+        tree = new MyXTree(treeModel, createNodeElementsContainer());
+        tree = new MyXTree(treeModel);
         Highlighter redText = new ColorHighlighter(HighlightPredicate.ROLLOVER_CELL, null, Color.RED);
         tree.addHighlighter(redText);
         tree.setRolloverEnabled(true); // to show the rollover Highlighter
@@ -215,8 +213,7 @@ public class SimpleTreeView extends JXPanel {
         rightPanel.add(Box.createVerticalGlue());
         rightPanel.add(Box.createVerticalStrut(4));
         createEditPane();
-//        rightPanel.add(createEditPane());
-        rightPanel.add(nodeElementContainer);
+        rightPanel.add(editPane);
         rightPanel.add(Box.createVerticalStrut(4));
         trashLabel = new JXLabel("drop here to delete:");
         trashLabel.setVisible(false);
@@ -256,8 +253,7 @@ public class SimpleTreeView extends JXPanel {
 
     private void selectTree(String treeName) {
     	if(EMPTY.equals(treeName)) {
-    		nodeElementContainer.setVisible(false);
-//    		editPane.setVisible(false);
+    		editPane.setVisible(false);
     		trashLabel.setVisible(false);
     		list.setVisible(false);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
@@ -266,8 +262,7 @@ public class SimpleTreeView extends JXPanel {
     		tree.setDragEnabled(false);
     		tree.updateUI();
     	} else if(FILESYSTEM.equals(treeName)) {
-    		nodeElementContainer.setVisible(false);
-//    		editPane.setVisible(false);
+    		editPane.setVisible(false);
     		trashLabel.setVisible(false);
     		list.setVisible(false);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
@@ -277,7 +272,7 @@ public class SimpleTreeView extends JXPanel {
     		tree.updateUI();
     	} else if(UOM.equals(treeName)) {
 //    		editPane.setVisible(true);
-    		nodeElementContainer.setVisible(false); // true in NodeElementContainer.add
+//    		editPane.setVisible(false); // true in NodeElementContainer.add
     		list.setVisible(true);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
     		treeModel.valueForPathChanged(tp, getUomModelRoot());
@@ -290,6 +285,7 @@ public class SimpleTreeView extends JXPanel {
     			MyTreeCellEditor realEditor = (MyTreeCellEditor)tree.getCellEditor(); // cellEditor
     			realEditor.updateUI();
     			LOG.info("tn.getObject:"+tn.getObject().getClass()+"/"+tn.getObject()
+    			+"\n, realEditor:"+realEditor
     			+", realEditor.getRenderer:"+realEditor.getRenderer()
     			+"\n, realEditor.getCellEditorValue:"+realEditor.getCellEditorValue());
     		});
@@ -300,10 +296,11 @@ public class SimpleTreeView extends JXPanel {
 //    		tree.setCellEditor(new DefaultXTreeCellEditor(tree, null, new DatePickerCellEditor());
     		// default in init:
     		// setCellEditor(new DefaultXTreeCellEditor(this, (DefaultTreeCellRenderer) getWrappedCellRenderer()));
-    		LOG.info("----WrappedCellRenderer:"+tree.getWrappedCellRenderer());
+    		LOG.info("----WrappedCellRenderer:"+tree.getWrappedCellRenderer());   		
     		tree.setCellEditor(
-    			new MyTreeCellEditor(tree, (MyDefaultTreeCellRenderer)((MyXTree.MyDelegatingRenderer)tree.getWrappedCellRenderer()).getDelegateRenderer()
-    					, new UoMCellEditor(editPane))
+    			new MyTreeCellEditor(tree // JTree
+    					, (MyDefaultTreeCellRenderer)((MyXTree.MyDelegatingRenderer)tree.getWrappedCellRenderer()).getDelegateRenderer()
+    					, new UoMCellEditor(editPane)) // TreeCellEditor mit JPanel
     			);
     		tree.setDragEnabled(true);
     		tree.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
