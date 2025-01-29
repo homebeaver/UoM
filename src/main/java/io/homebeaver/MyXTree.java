@@ -22,6 +22,7 @@ import org.jdesktop.swingx.rollover.RolloverProducer;
 import org.jdesktop.swingx.rollover.RolloverRenderer;
 
 import io.homebeaver.uom.UoMTreeNode;
+import io.homebeaver.uom.UoMTreeNodeContainer;
 import net.sf.fstreem.FileSystemTreeNode;
 
 /*
@@ -39,20 +40,20 @@ public class MyXTree extends JXTree {
 	public MyXTree(TreeModel newModel) {
 		this(newModel, null);
 	}
-	public MyXTree(TreeModel newModel, NodeElementContainer nodeElementsContainer) {
+	public MyXTree(TreeModel newModel, UoMTreeNodeContainer uomTreeNodeContainer) {
 		super(newModel);
-		this.nodeElementsContainer = nodeElementsContainer;
+		this.nodeContainer = uomTreeNodeContainer;
 	}
 	
-	NodeElementContainer nodeElementsContainer;
+	UoMTreeNodeContainer nodeContainer;
 	
 	@Override
     public void setSelectionPath(TreePath path) {
     	Object lpc = path.getLastPathComponent();
     	System.out.println("getLastPathComponent = " + lpc + " / " + lpc.getClass());
     	super.setSelectionPath(path);
-    	if(nodeElementsContainer!=null && lpc instanceof UoMTreeNode uom) {
-        	nodeElementsContainer.add(uom);
+    	if(nodeContainer!=null && lpc instanceof UoMTreeNode uomTreeNode) {
+        	nodeContainer.add(uomTreeNode);
     	} else if(lpc instanceof FileSystemTreeNode.DirectoryTreeNode dtn) {
         	System.out.println(dtn.getFile().getPath() + " : dir with " + dtn.getFile().listFiles().length + " files/dirs");
     	} else if(lpc instanceof FileSystemTreeNode.FileTreeNode ftn) {

@@ -220,7 +220,7 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
 		return null;
 	}
 
-	public static class UoMComponent extends JXPanel implements ActionListener {
+	public static class UoMComponent extends JXPanel implements ActionListener, UoMTreeNodeContainer {
 		
 		static final String TITLE = "Node Element";
 		static String[] labels = {UoM.ID, UoM.NAME, UoM.DESCRIPTION, UoM.UOMSYMBOL};
@@ -304,7 +304,7 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
            		}
     		});
     	}
-    	public void add(UoMTreeNode uomNode) {
+    	public Component add(UoMTreeNode uomNode) {
         	TreeNode parent = uomNode.getParent();
         	setBorder(new TitledBorder(parent == null ? TITLE : TITLE + " of Type "+uomNode.getParent()));
         	removeAll();
@@ -318,6 +318,7 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
         	}
         	revalidate();
         	setVisible(true);
+        	return this;
     	}
 		
 		void setModel(UoM uom) {

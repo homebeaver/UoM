@@ -51,6 +51,7 @@ import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.uom.UoM;
 import io.homebeaver.uom.UoMCellEditor;
 import io.homebeaver.uom.UoMTreeNode;
+import io.homebeaver.uom.UoMTreeNodeContainer;
 
 // TODO search
 // I18N
@@ -135,15 +136,15 @@ public class SimpleTreeView extends JXPanel {
     
 //    private NodeElementContainer nodeElementContainer; // aka editPane
     private JPanel editPane;
-    private NodeElementContainer createNodeElementsContainer() {
+    private UoMTreeNodeContainer createNodeElementContainer() {
     	editPane = new NodeElementContainer();
     	editPane.setVisible(false);
-        return (NodeElementContainer)editPane;
+        return (UoMTreeNodeContainer)editPane;
 	}
-    private JComponent createEditPane() {
+    private UoMTreeNodeContainer createEditPane() {
         editPane = new UoMCellEditor.UoMComponent();
         editPane.setVisible(false);
-        return editPane;
+        return (UoMTreeNodeContainer)editPane;
     }
     class TrashListCellRenderer extends DefaultListCellRenderer {
 		public Component getListCellRendererComponent(JList<?> list, Object value
@@ -197,8 +198,8 @@ public class SimpleTreeView extends JXPanel {
     private void initGui() {
         treeModel = new GenericTreeModel(fileRoot);
         gtroot = (GenericTreeNode<?>)treeModel.getRoot();
-        tree = new MyXTree(treeModel, createNodeElementsContainer());
-        tree = new MyXTree(treeModel);
+//        tree = new MyXTree(treeModel, createNodeElementContainer());
+        tree = new MyXTree(treeModel, createEditPane());
         Highlighter redText = new ColorHighlighter(HighlightPredicate.ROLLOVER_CELL, null, Color.RED);
         tree.addHighlighter(redText);
         tree.setRolloverEnabled(true); // to show the rollover Highlighter
@@ -212,7 +213,7 @@ public class SimpleTreeView extends JXPanel {
         Box rightPanel = Box.createVerticalBox();
         rightPanel.add(Box.createVerticalGlue());
         rightPanel.add(Box.createVerticalStrut(4));
-        createEditPane();
+//        createEditPane();
         rightPanel.add(editPane);
         rightPanel.add(Box.createVerticalStrut(4));
         trashLabel = new JXLabel("drop here to delete:");
