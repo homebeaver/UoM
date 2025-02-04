@@ -136,11 +136,11 @@ public class SimpleTreeView extends JXPanel {
     
 //    private NodeElementContainer nodeElementContainer; // aka editPane
     private JPanel editPane;
-    private UoMTreeNodeContainer createNodeElementContainer() {
-    	editPane = new NodeElementContainer();
-    	editPane.setVisible(false);
-        return (UoMTreeNodeContainer)editPane;
-	}
+//    private UoMTreeNodeContainer createNodeElementContainer() {
+//    	editPane = new NodeElementContainer();
+//    	editPane.setVisible(false);
+//        return (UoMTreeNodeContainer)editPane;
+//	}
     private UoMTreeNodeContainer createEditPane() {
         editPane = new UoMCellEditor.UoMComponent();
         editPane.setVisible(false);
@@ -279,16 +279,19 @@ public class SimpleTreeView extends JXPanel {
     		treeModel.valueForPathChanged(tp, getUomModelRoot());
     		tree.addTreeSelectionListener( treeSelectionEvent -> {
     			UoMTreeNode tn = (UoMTreeNode)tree.getLastSelectedPathComponent();
-    			LOG.info("???????? event:"+tree // ==treeSelectionEvent.getSource()
+    			LOG.info("treeSelectionEvent: tree.cellEditor="+tree // ==treeSelectionEvent.getSource()
     					.getCellEditor()
-    					+"\n"+tn.externalize()+"??????????"+treeSelectionEvent.getNewLeadSelectionPath()+" "+treeSelectionEvent.getNewLeadSelectionPath());
-    			// TODO editPane mit tn.getObject() befüllen
-    			MyTreeCellEditor realEditor = (MyTreeCellEditor)tree.getCellEditor(); // cellEditor
-    			realEditor.updateUI();
-    			LOG.info("tn.getObject:"+tn.getObject().getClass()+"/"+tn.getObject()
-    			+"\n, realEditor:"+realEditor
-    			+", realEditor.getRenderer:"+realEditor.getRenderer()
-    			+"\n, realEditor.getCellEditorValue:"+realEditor.getCellEditorValue());
+    					+"\n LastSelectedPathComponent="+tn.externalize()
+    					+"\n NewLeadSelectionPath="+treeSelectionEvent.getNewLeadSelectionPath()+" "+treeSelectionEvent.getNewLeadSelectionPath()
+    					);
+    			// XXX editPane mit tn.getObject() befüllen
+// editPane (UoMCellEditor auf der rechten Seite) ist befüllt, den Code braucht es nicht:		
+//    			MyTreeCellEditor realEditor = (MyTreeCellEditor)tree.getCellEditor(); // cellEditor
+//    			realEditor.updateUI();
+//    			LOG.info("tn.getObject:"+tn.getObject().getClass()+"/"+tn.getObject()
+//    			+"\n, realEditor:"+realEditor
+//    			+", realEditor.getRenderer:"+realEditor.getRenderer()
+//    			+"\n, realEditor.getCellEditorValue:"+realEditor.getCellEditorValue());
     		});
     		tree.setEditable(true);
     		// JTree.setCellEditor(TreeCellEditor cellEditor)
