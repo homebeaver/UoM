@@ -93,7 +93,8 @@ public class GenericTreeModel implements TreeModel {
 	/**
 	 * {@inheritDoc} <p>
 	 * 
-	 * called in BasicTreeUI#completeEditing , TreeTransferHandler#cleanup
+	 * called in BasicTreeUI#completeEditing , TreeTransferHandler#cleanup ,
+	 * (main) SimpleTreeView#selectTree treeSelector actionListener
 	 */
 	@Override
 	public void valueForPathChanged(TreePath path, Object newValue) {
