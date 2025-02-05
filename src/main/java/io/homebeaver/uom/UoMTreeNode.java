@@ -170,6 +170,7 @@ public class UoMTreeNode extends GenericTreeNode<UoM> {
 		public Icon getIcon(Object value) {
             if (value instanceof QuantityTreeNode ftn) {
             	UoMTreeNode parent = (UoMTreeNode)ftn.getParent();
+            	if(parent==null) return IconValues.NONE.getIcon(value);
             	if("Länge".equals(parent.getUoM().name)) {
             		return KorelleRCircle_icons_rulertriangle.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
             	}
