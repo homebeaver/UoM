@@ -96,8 +96,8 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
             		UoMComponent uomPanel = (UoMComponent)editorComponent;
             		LOG.info("Hurra?????????????????value:"+value.getClass()+" : "+value + " uomPanel:"+uomPanel);
             		if(uomPanel!=null) {
-            			JSONObject jsonUom = uomtn.externalize(new JSONObject());
-//            			uomPanel.add(jsonUom); XXX ?
+//            			JSONObject jsonUom = uomtn.externalize(new JSONObject());
+//            			uomPanel.add(jsonUom);
                 		uomPanel.setModel(uomtn.getObject());
             		}
             	} else {
@@ -298,12 +298,26 @@ valueChanged(TreeSelectionEvent e) in MyTreeCellEditor
            		} else {
         			JFormattedTextField field = new JFormattedTextField();
         			field.setValue(v); // auch bei v==null
+        			field.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
         			label.setLabelFor(field);
         			add(label);
         			add(field);
            		}
     		});
+	    	/* start with disabled component fields.
+	    	 * Disabling a component does not disable its children
+	    	 */
+    		setEnabled(false); // disable component and children
     	}
+        public void setEnabled(boolean enabled) {
+        	super.setEnabled(enabled);
+    		Component[] components = getComponents();
+    		for (Component c : components) {
+    			if(c instanceof JFormattedTextField f) {
+    				f.setEnabled(enabled);
+    			}
+    		}
+        }
     	public Component add(UoMTreeNode uomNode) {
         	TreeNode parent = uomNode.getParent();
         	setBorder(new TitledBorder(parent == null ? TITLE : TITLE + " of Type "+uomNode.getParent()));
