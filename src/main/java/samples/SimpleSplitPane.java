@@ -16,7 +16,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -30,10 +29,14 @@ import javax.swing.border.EtchedBorder;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXFrame.StartPosition;
+import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.JYList;
 import org.jdesktop.swingx.MultiSplitLayout;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.IconValue;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.uom.UoM;
@@ -439,9 +442,16 @@ public class SimpleSplitPane extends JXPanel {
 //    	}
 //    }
 
-    private JList<UoMTreeNode> list;
+    private JXList<UoMTreeNode> list;
     private DefaultListModel<UoMTreeNode> listModel;
     private JComponent createList() {
+		UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
+		UoMTreeNode SI = UoMTreeNode.create(new UoM("SI-Basisgrößen", null), null);
+		UoMTreeNode len = UoMTreeNode.create(new UoM("Länge", "https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29"), null);
+		UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "https://de.wikipedia.org/wiki/Volumen"), null);
+		UoMTreeNode WE = UoMTreeNode.create(new UoM("Masse", "https://de.wikipedia.org/wiki/Masse_(Physik)"), null);
+		UoMTreeNode time = UoMTreeNode.create(new UoM("Zeit", "https://de.wikipedia.org/wiki/Zeit"), null);
+		UoMTreeNode I = UoMTreeNode.create(new UoM("Elektrische Stromstärke", "https://de.wikipedia.org/wiki/Elektrische_Stromst%C3%A4rke"), null);
 		UoMTreeNode ml = UoMTreeNode.create(UoM.create_ml(), null);
 		UoMTreeNode L = UoMTreeNode.create(UoM.create_L(), null);
 		UoMTreeNode Kg = UoMTreeNode.create(UoM.create_Kg(), null);
@@ -451,75 +461,54 @@ public class SimpleSplitPane extends JXPanel {
 		UoMTreeNode m = UoMTreeNode.create(UoM.create_m(), null);
 		UoMTreeNode A = UoMTreeNode.create(UoM.create_A(), null);
         listModel = new DefaultListModel<UoMTreeNode>();
+        listModel.addElement(uom);
+        listModel.addElement(SI);
+        listModel.addElement(len);
+        listModel.addElement(m);
+        listModel.addElement(volumen);
         listModel.addElement(ml);
         listModel.addElement(L);
+        listModel.addElement(WE);
         listModel.addElement(Kg);
         listModel.addElement(mg);
         listModel.addElement(t);
+        listModel.addElement(time);
         listModel.addElement(h);
+        listModel.addElement(I);
+        listModel.addElement(A);
         //Create the list and put it in a scroll pane.
-        list = new JYList<UoMTreeNode>(listModel);
-        LOG.info("JList<UoMTreeNode> list = new JYList<UoMTreeNode>(listModel)");
+        list = new JXList<UoMTreeNode>(listModel);
 //        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
 //        list.addListSelectionListener(this);
         list.setVisibleRowCount(5);
 //        JScrollPane listScrollPane = new JScrollPane(list);
+		IconValue iv = (Object value) -> {
+			if (value instanceof UoMTreeNode c) {
+				return UoMTreeNode.SI_ICON.getIcon(c);
+			}
+			return IconValue.NULL_ICON;
+		};
+
+        // custom String representation: concat various element fields
+        StringValue sv = (Object value) -> {
+            if (value instanceof UoMTreeNode c) {
+            	return c.toString();
+            }
+            return StringValues.TO_STRING.getString(value);
+        };
+        list.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
         list.addListSelectionListener( listSelectionEvent -> {
-        	UoMTreeNode tn = list.getSelectedValue();
+        	UoMTreeNode node = list.getSelectedValue();
 			LOG.info("listSelectionEvent: list.cellRenderer="+list // ==listSelectionEvent.getSource()
 					.getCellRenderer()
-					+"\n LastSelectedPathComponent="+tn.externalize()
+					+"\n externalized node="+node.externalize()
 					);
-			getUoMTreeNodeContainer().add(tn);
+			getUoMTreeNodeContainer().add(node);
         });
         return list;
   }
-    
-
-//    private TreeModel uomModel; 
-//    private GenericTreeNode<?> getUomModelRoot() {
-//    	if(uomModel==null) {
-//    		UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
-//    		UoMTreeNode SI = UoMTreeNode.create(new UoM("SI-Basisgrößen", null), null);
-//    		UoMTreeNode len = UoMTreeNode.create(new UoM("Länge", "https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29"), null);
-//    		UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "https://de.wikipedia.org/wiki/Volumen"), null);
-//    		UoMTreeNode WE = UoMTreeNode.create(new UoM("Masse", "https://de.wikipedia.org/wiki/Masse_(Physik)"), null);
-//    		UoMTreeNode time = UoMTreeNode.create(new UoM("Zeit", "https://de.wikipedia.org/wiki/Zeit"), null);
-//    		UoMTreeNode I = UoMTreeNode.create(new UoM("Elektrische Stromstärke", "https://de.wikipedia.org/wiki/Elektrische_Stromst%C3%A4rke"), null);
-//    		uom.add(SI);
-//    		SI.add(len);
-//    		SI.add(WE);
-//    		SI.add(time);
-//    		SI.add(I);
-//    		// ...
-//    		UoMTreeNode ml = UoMTreeNode.create(UoM.create_ml(), null);
-//    		UoMTreeNode L = UoMTreeNode.create(UoM.create_L(), null);
-//    		UoMTreeNode Kg = UoMTreeNode.create(UoM.create_Kg(), null);
-//    		UoMTreeNode mg = UoMTreeNode.create(UoM.create_mg(), null);
-//    		UoMTreeNode t = UoMTreeNode.create(UoM.create_t(), null);
-//    		UoMTreeNode h = UoMTreeNode.create(UoM.create_h(), null);
-//    		UoMTreeNode m = UoMTreeNode.create(UoM.create_m(), null);
-//    		UoMTreeNode A = UoMTreeNode.create(UoM.create_A(), null);
-//    		len.add(m);
-//    		len.add(volumen);
-//    		volumen.add(L);
-//    		volumen.add(ml);
-//    		WE.add(Kg);
-//    		WE.add(mg);
-//    		WE.add(t);
-//    		time.add(h);
-//    		I.add(A);
-//    		uomModel = new GenericTreeModel(uom);
-//    	}
-//    	return (GenericTreeNode<?>)uomModel.getRoot();    	
-//    }
-//    
-//    public void expand() {
-//    	tree.expandAll();
-//    	this.updateUI();
-//    }
 
     public void quit() {
         System.exit(0);
