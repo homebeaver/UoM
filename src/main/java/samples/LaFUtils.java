@@ -26,7 +26,7 @@ public class LaFUtils {
     		String lafClassName = info.getClassName();
     		if(lafClassName.contains(nameSnippet)) {
     			try {
-    	    		LOG.info("switch to LaF ClassName="+lafClassName + " from "+UIManager.getLookAndFeel());
+    	    		LOG.config("switch to LaF ClassName="+lafClassName + " from "+UIManager.getLookAndFeel());
 					UIManager.setLookAndFeel(lafClassName);
 					SwingXUtilities.updateAllComponentTreeUIs();
 					return !lafClassName.equals(currentClassName);
@@ -71,7 +71,7 @@ public class LaFUtils {
 				}
     		}
 		} else if(lafChanged) {
-	    	LOG.info("Look and Feel changed.");
+	    	LOG.config("Look and Feel changed.");
 		}
     }
 
