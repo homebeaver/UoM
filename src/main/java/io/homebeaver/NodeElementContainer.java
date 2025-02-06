@@ -59,6 +59,9 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
     			JXFormattedTextField field = new JXFormattedTextField(format);
     			field.setValue(v);
     			field.setHorizontalAlignment(SwingConstants.RIGHT);
+    			/*
+    			 * in nimbus ist das feld read only, aber Background ist unverändert
+    			 */
     			field.setEditable(false); // read only
     			label.setLabelFor(field);
     			add(label);

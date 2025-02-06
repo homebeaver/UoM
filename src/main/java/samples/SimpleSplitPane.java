@@ -141,7 +141,7 @@ public class SimpleSplitPane extends JXPanel {
     protected JMenuItem createLafMenuItem(UIManager.LookAndFeelInfo info) {
 //    	SetPlafAction action = new SetPlafAction(info.getName(), info.getClassName(), getLaFGroup(), this);
 //    	JMenuItem mi = new JRadioButtonMenuItem(action);
-    	LOG.info(info.getName());
+//    	LOG.info(info.getName());
     	JMenuItem mi = new JRadioButtonMenuItem(info.getName());
     	if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
     		mi.setSelected(true);
