@@ -279,8 +279,7 @@ public class SimpleSplitPane extends JXPanel {
         msp.add( editPane, "editor" );
         
         editSelected.addActionListener( ae -> {
-        	getUoMTreeNodeContainer().setEnabled(editSelected.isSelected());
-        	// TODO nimbus : die ro bleiben disabled!
+            getUoMTreeNodeContainer().setEnabled(editSelected.isSelected());
         });
         msp.add(editSelected, "bottom.left" );
         
