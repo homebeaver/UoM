@@ -12,5 +12,5 @@ public interface UoMTreeNodeContainer {
 	 * @param uomNode UoMTreeNode
 	 */
 	public Component add(UoMTreeNode uomNode);
-	
+	public void setEnabled(boolean enabled);
 }

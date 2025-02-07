@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 import java.text.NumberFormat;
 import java.util.HashMap;
 
+import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -13,6 +14,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.tree.TreeNode;
 
 import org.jdesktop.swingx.JXFormattedTextField;
+import org.jdesktop.swingx.JXTextField;
 import org.json.simple.JSONObject;
 
 import io.homebeaver.uom.UoMTreeNode;
@@ -22,9 +24,11 @@ import io.homebeaver.uom.UoMTreeNodeContainer;
 public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer {
 
 	static final String TITLE = "Node Element";
-	public NodeElementContainer() {
+	JCheckBox editSelected;
+	public NodeElementContainer(JCheckBox editSelected) {
 		super(new GridLayout(0, 2));
         setBorder(new TitledBorder(TITLE));
+        this.editSelected = editSelected;
 	}
 	
 	// in (super) public Component Container.add(Component comp)
@@ -68,6 +72,12 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
     			add(field);
        		} else if (v==null && "uomSymbol".equals(k)) {
        			// bei v==null uomSymbol nicht anzeigen
+       			// doch anzeigen wg Nimbus BG - TODO wieder raus
+    			JXTextField field = new JXTextField();
+    			field.setEditable(false); // read only
+    			label.setLabelFor(field);
+    			add(label);
+    			add(field);
        		} else {
     			JFormattedTextField field = new JFormattedTextField();
     			field.setValue(v); // auch bei v==null
@@ -76,5 +86,22 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
     			add(field);
        		}
 		});
+    	/* start with disabled component fields.
+    	 * Disabling a component does not disable its children
+    	 */
+		setEnabled(editSelected.isSelected()); // disable component and children
 	}
+	
+	/*
+	 * Disabling/Enabling a component does not disable its children
+	 */
+    public void setEnabled(boolean enabled) {
+    	super.setEnabled(enabled);
+		Component[] components = getComponents();
+		for (Component c : components) {
+			if(c instanceof JFormattedTextField f) {
+				f.setEnabled(enabled);
+			}
+		}
+    }
 }

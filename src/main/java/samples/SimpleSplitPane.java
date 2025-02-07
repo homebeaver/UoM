@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -27,6 +28,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXComboBox;
@@ -58,19 +60,34 @@ public class SimpleSplitPane extends JXPanel {
     public static final Dimension PREFERRED_SIZE = new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
 	protected static final boolean exitOnClose = true; // used in JXFrame of the demo
 
+	/*
+	 * Das Starten mit param Nimbus und LaFUtils.setLAFandTheme funktioniert zwar,
+	 * ABER: die values props [Selected] für JXList<String> lafSelector sind initial nicht korrekt:
+	 * - dunkle Schrift auf dunkelblauen Hintergrund. BUG? XXX
+	 * 
+	 * Erst nach dem Umschalten Nimbus -> andere LaF -> Nimbus ist es korrekt
+	 * 
+	 * Daher kommentiere ich setLAFandTheme in main aus und verschiebe es nach createAndShowGUI.
+	 * Dazu dient initialLaF, da ich bei invokeLater bleiben will.
+	 * Dann wird JXList<UoMTreeNode> uomLlist korrekt dargestellt.
+	 * Bei lafSelector ist select nicht gesetzt und daher wird nichts hervorgehoben.
+	 * Versucht man es zu setzten, so taucht das Problem wieder auf.
+	 */
+	protected static List<String> initialLaF = null;
+	
 	/**
 	 * 
 	 * @param args (optional) 
-	 *  1st : LookAndFeel (metal, nimbus, ...), 
+	 *  1st : LookAndFeel (Metal, Nimbus, ...), 
 	 *  2nd : metal theme class name (f.i. javax.swing.plaf.metal.DefaultMetalTheme)
 	 */
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
     	if(args.length>0) {
-    		List<String> a = Arrays.asList(args);
-        	LOG.info("args: "+a);
-    		LaFUtils.setLAFandTheme(a);
+    		initialLaF = Arrays.asList(args);
+        	LOG.info("args: "+initialLaF);
+//    		LaFUtils.setLAFandTheme(initialLaF); // siehe Kommentar zu initialLaF
     	}
         SwingUtilities.invokeLater( () -> {
             createAndShowGUI();
@@ -94,10 +111,13 @@ public class SimpleSplitPane extends JXPanel {
         //Display the window.
         frame.pack();
         frame.setVisible(true);
+        newContentPane.setLaFandTheme(initialLaF.get(0));
+        // setzen von Nimbus hier ==> text ist nicht hell wie er sein soll
+//        newContentPane.lafSelector.setSelectedIndex(2); //.setSelectedValue(initialLaF, false);
     }
 
     static final int W = 1; // BORDER width in pixels
-    static final String STEEL = "javax.swing.plaf.metal.DefaultMetalTheme";   
+    static final String STEEL = "javax.swing.plaf.metal.DefaultMetalTheme";
     static final String OCEAN = "javax.swing.plaf.metal.OceanTheme";
     
     private JXFrame xframe;
@@ -107,6 +127,7 @@ public class SimpleSplitPane extends JXPanel {
     private DefaultListModel<String> lafModel;
     private ButtonGroup lafMenuGroup;
     private JPanel editPane;
+    
     UoMTreeNodeContainer getUoMTreeNodeContainer() {
     	return (UoMTreeNodeContainer)editPane;
     }
@@ -151,12 +172,14 @@ public class SimpleSplitPane extends JXPanel {
     	return mi;
     }
 
+    private JCheckBox editSelected;
+    
     private JXButton quit;
 
 	private Map<String, List<String>> lafInfoMap; // info -> [classname] | [classname,themeclassname]
-	private String lastLaFandTheme;
+	private String lastLaFandTheme = null;
 	private void setLaFandTheme(String key) {
-		if (key != null) lastLaFandTheme = key;
+		if (key != null) lastLaFandTheme = key == null ? initialLaF.get(0) : key;
 		if ("Metal".equals(key)) {
 			LaFUtils.setLAFandTheme(Arrays.asList("metal", STEEL));
 		} else {
@@ -164,7 +187,32 @@ public class SimpleSplitPane extends JXPanel {
 				LaFUtils.setLAFandTheme(lafInfoMap.get(lastLaFandTheme));
 	        });
 		}
+//		lafSelector.setSelectedValue(lastLaFandTheme, false);
 	}
+	private void setSelectedIndexToCurrentLaF() {
+    	String currentClassName = UIManager.getLookAndFeel().getClass().getName();
+    	for (int i = 0; i < lafModel.getSize(); i++) {
+    		if(currentClassName.contains(lafModel.getElementAt(i))) {
+    			lafSelector.setSelectedIndex(i); 
+    			break;
+    		}
+    	}
+	}
+    private JComponent createLafList() {
+    	lafModel = new DefaultListModel<String>();
+    	lafModel.addAll(lafInfoMap.keySet());
+    	// autoCreateRowSorter:
+    	lafSelector = new JXList<String>(lafModel, true);
+    	// setSelectedIndex to current LaF:
+    	setSelectedIndexToCurrentLaF();
+    	// default is UNSORTED:
+    	lafSelector.setSortOrder(SortOrder.DESCENDING);
+    	lafSelector.addListSelectionListener( listSelectionEvent -> {
+        	String lafKey = lafSelector.getSelectedValue();
+    		setLaFandTheme(lafKey); 		
+    	});
+    	return lafSelector;
+    }
   
     public SimpleSplitPane(JXFrame frame) throws HeadlessException {
     	super(new BorderLayout());
@@ -174,24 +222,6 @@ public class SimpleSplitPane extends JXPanel {
 		JMenu plafMenu = createPlafMenu(xframe);
 //		if(plafMenu != null) xframe.getJMenuBar().add(plafMenu);
 
-    	lafModel = new DefaultListModel<String>();
-    	lafModel.addAll(lafInfoMap.keySet());
-    	// autoCreateRowSorter:
-    	lafSelector = new JXList<String>(lafModel, true);
-    	// setSelectedIndex to current LaF:
-    	String currentClassName = UIManager.getLookAndFeel().getClass().getName();
-    	for (int i = 0; i < lafModel.getSize(); i++) {
-    		if(currentClassName.contains(lafModel.getElementAt(i))) {
-    			lafSelector.setSelectedIndex(i); 
-    			break;
-    		}
-    	}
-    	// default is UNSORTED:
-    	lafSelector.setSortOrder(SortOrder.DESCENDING);
-    	lafSelector.addListSelectionListener( listSelectionEvent -> {
-        	String lafKey = lafSelector.getSelectedValue();
-    		setLaFandTheme(lafKey); 		
-    	});
 /* buggy:
     	String[] toArray = new String[9];
     	// mit autoCreateRowSorter:
@@ -210,28 +240,27 @@ public class SimpleSplitPane extends JXPanel {
         String layoutDef 
         = "(COLUMN " 
         +		"(ROW weight=0.8 " 
-        + 		"(COLUMN weight=0.25 "
-        + 			"(LEAF name=left.top weight=0.5) (LEAF name=left.middle weight=0.5) "
-        + 		") "
-        + 		"(LEAF name=editor weight=0.75) "
+        + 			"(COLUMN weight=0.25 "
+        + 				"(LEAF name=left.top weight=0.5) (LEAF name=left.middle weight=0.5) "
+        + 			") "
+        + 			"(LEAF name=editor weight=0.75) "
         +		") " 
-        +		"(LEAF name=bottom weight=0.2) " 
+//        +		"(LEAF name=bottom weight=0.2) " 
+        +		"(ROW weight=0.2 " 
+        + 				"(LEAF name=bottom.left weight=0.25) (LEAF name=bottom.right weight=0.75) "
+        +		") " 
         +	")" ;
         MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel( layoutDef );
         msp.getMultiSplitLayout().setModel( modelRoot );
         msp.setDividerSize(2);
         
-//        msp.add( new JButton( "Left Top" ), "left.top" );
-//        JXPanel lafSelectorPane = new JXPanel(new GridLayout(1, 0)); //new BorderLayout());
-//        lafSelectorPane.add(lafSelector, BorderLayout.CENTER);
         Box lafSelectorPane = Box.createVerticalBox();
+        lafSelectorPane.setBorder(new TitledBorder("Look and Feel Selector"));
         lafSelectorPane.add(Box.createVerticalGlue());
-//        lafSelectorPane.add(Box.createVerticalStrut(10));
-        lafSelectorPane.add(lafSelector);
-//        lafSelectorPane.add(Box.createVerticalStrut(80));
+        lafSelectorPane.add(createLafList());
         lafSelectorPane.add(Box.createVerticalGlue());
-    	msp.add(lafSelectorPane, "left.top");
-    	
+        msp.add(lafSelectorPane, "left.top");
+
 //        msp.add( new JButton( "Left Middle" ), "left.middle" );
 //        JXPanel listPane = new JXPanel(new BorderLayout());
 //        listPane.add(createList(), BorderLayout.CENTER);
@@ -244,14 +273,21 @@ public class SimpleSplitPane extends JXPanel {
         listPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( listPane, "left.middle" );
         
-        editPane = new NodeElementContainer();
+        editSelected = new JCheckBox("Edit selected UoM");
+        editPane = new NodeElementContainer(editSelected);
         editPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( editPane, "editor" );
+        
+        editSelected.addActionListener( ae -> {
+        	getUoMTreeNodeContainer().setEnabled(editSelected.isSelected());
+        	// TODO nimbus : die ro bleiben disabled!
+        });
+        msp.add(editSelected, "bottom.left" );
         
         quit = new JXButton("Quit");
         quit.setMnemonic('q'); // Alt-q
         quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
-        msp.add(quit, "bottom" );
+        msp.add(quit, "bottom.right" );
 
         // ADDING A BORDER TO THE MULTISPLITPANE CAUSES ALL SORTS OF ISSUES 
         msp.setBorder( BorderFactory.createEmptyBorder(W, W, W, W) );
@@ -260,7 +296,7 @@ public class SimpleSplitPane extends JXPanel {
         
     }
 
-    private JXList<UoMTreeNode> list;
+    private JXList<UoMTreeNode> uomLlist;
     private DefaultListModel<UoMTreeNode> listModel;
     private JComponent createList() {
 		UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
@@ -295,12 +331,12 @@ public class SimpleSplitPane extends JXPanel {
         listModel.addElement(I);
         listModel.addElement(A);
         //Create the list and put it in a scroll pane.
-        list = new JXList<UoMTreeNode>(listModel);
+        uomLlist = new JXList<UoMTreeNode>(listModel);
 //        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setSelectedIndex(0);
+        uomLlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        uomLlist.setSelectedIndex(0);
 //        list.addListSelectionListener(this);
-        list.setVisibleRowCount(5);
+        uomLlist.setVisibleRowCount(5);
 //        JScrollPane listScrollPane = new JScrollPane(list);
 		IconValue iv = (Object value) -> {
 			if (value instanceof UoMTreeNode c) {
@@ -316,16 +352,16 @@ public class SimpleSplitPane extends JXPanel {
             }
             return StringValues.TO_STRING.getString(value);
         };
-        list.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
-        list.addListSelectionListener( listSelectionEvent -> {
-        	UoMTreeNode node = list.getSelectedValue();
-			LOG.info("listSelectionEvent: list.cellRenderer="+list // ==listSelectionEvent.getSource()
+        uomLlist.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
+        uomLlist.addListSelectionListener( listSelectionEvent -> {
+        	UoMTreeNode node = uomLlist.getSelectedValue();
+			LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
 					.getCellRenderer()
 					+"\n externalized node="+node.externalize()
 					);
 			getUoMTreeNodeContainer().add(node);
         });
-        return list;
+        return uomLlist;
     }
 
     public void quit() {
