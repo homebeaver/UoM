@@ -14,7 +14,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.tree.TreeNode;
 
 import org.jdesktop.swingx.JXFormattedTextField;
-import org.jdesktop.swingx.JXTextField;
 import org.json.simple.JSONObject;
 
 import io.homebeaver.uom.UoMTreeNode;
@@ -63,21 +62,12 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
     			JXFormattedTextField field = new JXFormattedTextField(format);
     			field.setValue(v);
     			field.setHorizontalAlignment(SwingConstants.RIGHT);
-    			/*
-    			 * in nimbus ist das feld read only, aber Background ist unverändert
-    			 */
     			field.setEditable(false); // read only
     			label.setLabelFor(field);
     			add(label);
     			add(field);
        		} else if (v==null && "uomSymbol".equals(k)) {
        			// bei v==null uomSymbol nicht anzeigen
-       			// doch anzeigen wg Nimbus BG - TODO wieder raus
-    			JXTextField field = new JXTextField();
-    			field.setEditable(false); // read only
-    			label.setLabelFor(field);
-    			add(label);
-    			add(field);
        		} else {
     			JFormattedTextField field = new JFormattedTextField();
     			field.setValue(v); // auch bei v==null
