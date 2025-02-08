@@ -73,7 +73,7 @@ public class SimpleSplitPane extends JXPanel {
 	 * Bei lafSelector ist select nicht gesetzt und daher wird nichts hervorgehoben.
 	 * Versucht man es zu setzten, so taucht das Problem wieder auf.
 	 */
-	protected static List<String> initialLaF = null;
+	protected static List<String> initialLaF = Arrays.asList("Nimbus");
 	
 	/**
 	 * 
