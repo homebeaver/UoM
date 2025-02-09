@@ -42,6 +42,7 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
+import org.jdesktop.swingx.rollover.RolloverProducer;
 
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.uom.UoM;
@@ -209,7 +210,7 @@ public class SimpleSplitPane extends JXPanel {
     	lafSelector.setSortOrder(SortOrder.DESCENDING);
     	lafSelector.addListSelectionListener( listSelectionEvent -> {
         	String lafKey = lafSelector.getSelectedValue();
-    		setLaFandTheme(lafKey); 		
+    		setLaFandTheme(lafKey); 
     	});
     	return lafSelector;
     }
@@ -356,9 +357,12 @@ public class SimpleSplitPane extends JXPanel {
         	UoMTreeNode node = uomLlist.getSelectedValue();
 			LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
 					.getCellRenderer()
-					+"\n externalized node="+node.externalize()
+//					+"\n externalized node="+node.externalize() // NPE "node" is null
 					);
 			getUoMTreeNodeContainer().add(node);
+        });
+        uomLlist.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, propertyChangeEvent -> {
+        	LOG.info("propertyChangeEvent: propertyChangeEvent="+propertyChangeEvent);
         });
         return uomLlist;
     }
