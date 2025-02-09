@@ -274,7 +274,7 @@ public class SimpleSplitPane extends JXPanel {
         msp.add( listPane, "left.middle" );
         
         editSelected = new JCheckBox("Edit selected UoM");
-        editPane = new NodeElementContainer(editSelected);
+        editPane = new NodeElementContainer(editSelected, uomLlist);
         editPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( editPane, "editor" );
         
