@@ -19,6 +19,7 @@ import javax.swing.tree.TreeNode;
 
 import org.jdesktop.swingx.JXFormattedTextField;
 import org.jdesktop.swingx.JXTextField;
+import org.jdesktop.swingx.plaf.AbstractComponentAddon;
 import org.json.simple.JSONObject;
 
 import io.homebeaver.uom.UoMTreeNode;
@@ -61,7 +62,7 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
     	add(toJSONObject(uomNode));
     	
     	revalidate();
-    	setVisible(true);
+//    	setVisible(true);
     	this.uomNode = uomNode;
     	return this;
 	}
@@ -112,43 +113,17 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
 		Component[] components = getComponents();
 		for (Component c : components) {
 			if(c instanceof JXFormattedTextField f) {
-				f.setEnabled(enabled);
+				f.setEnabled(AbstractComponentAddon.isNimbus() && enabled ? f.isEditable() : enabled);
 			} else if(c instanceof JXTextField f) {
 				f.setEnabled(enabled);
 				if(enabled) {
 					f.getDocument().addDocumentListener(this);
-//					f.addPropertyChangeListener(pce -> {
+//					f.addPropertyChangeListener(pce -> ...
 /*
      * Note that text is not a bound property, 
      * so no <code>PropertyChangeEvent</code> is fired when it changes. 
      * To listen for changes to the text, use <code>DocumentListener</code>.
  */
-//						Object source = pce.getSource();
-////			    		System.out.println("field PropertyChangeEvent "+pce
-////			    		+ "\n Source:"+source
-////			    		);
-//			    		if(source instanceof JXTextField tf) {
-//			    			JLabel labeledBy = (JLabel)tf.getClientProperty("labeledBy");
-////				    		System.out.println("field "+labeledBy.getText()+" value="+tf.getText());
-//				    		HashMap<String, Object> jo = toJSONObject(uomNode);
-//				    		Object old = jo.get(labeledBy.getText());
-//				    		if(tf.getText().equals(old)) {
-//				    			// unverändert
-//				    		} else {
-//					    		System.out.println("CHANGED field "+labeledBy.getText()+" value="+tf.getText());
-//					    		// TODO das elem UoMTreeNode in listModel ermitteln und ändern
-//				    		}
-//			    		}
-///*
-//        	LOG.info("amountXField PropertyChangeEvent:"+pce +
-//        			"\n Source:"+pce.getSource());
-//        	xamount = ((Number)amountXField.getValue()).doubleValue();
-//        	Double d = Double.valueOf(computePayment(xamount, xrate, xnumPeriods));
-//            paymentXField.setValue(d);
-//            paymentXField.setForeground(d<0 ? Color.red : Color.black);
-//
-// */
-//					});
 				}
 			}
 		}
