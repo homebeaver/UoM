@@ -118,6 +118,18 @@ public class UoM {
 		this.uomSymbol = uomSymbol;
 	}
 	
+	public void set(String k, Object v) {
+		if(ID.equals(k)) {
+			id = (Integer)v;
+		} else if(NAME.equals(k)) {
+			name = (String)v;
+		} else if(DESCRIPTION.equals(k)) {
+			description = (String)v;
+		} else if(UOMSYMBOL.equals(k)) {
+			uomSymbol = (String)v;
+		} 
+	}
+	
 	boolean isQuantity() {
 		return uomSymbol!=null;
 	}
