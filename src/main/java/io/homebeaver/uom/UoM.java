@@ -3,6 +3,8 @@ package io.homebeaver.uom;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -128,6 +130,20 @@ public class UoM {
 		} else if(UOMSYMBOL.equals(k)) {
 			uomSymbol = (String)v;
 		} 
+	}
+	
+	public URI getURI() {
+		if(description==null) return null;
+		try {
+			return new URI(description);
+//			Locale defaultLocale = JComponent.getDefaultLocale();
+//			return new URI(url.replace("{language}", defaultLocale.getLanguage()));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			System.out.println("not URI:"+description);
+		}
+		return null;
 	}
 	
 	boolean isQuantity() {

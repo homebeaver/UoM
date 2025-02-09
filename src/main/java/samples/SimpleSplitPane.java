@@ -1,11 +1,17 @@
 package samples;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
+import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.EventHandler;
+import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -42,7 +48,6 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
-import org.jdesktop.swingx.rollover.RolloverProducer;
 
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.uom.UoM;
@@ -355,15 +360,35 @@ public class SimpleSplitPane extends JXPanel {
         uomLlist.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
         uomLlist.addListSelectionListener( listSelectionEvent -> {
         	UoMTreeNode node = uomLlist.getSelectedValue();
-			LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
-					.getCellRenderer()
-//					+"\n externalized node="+node.externalize() // NPE "node" is null
-					);
+//			LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
+//					.getCellRenderer()
+////					+"\n externalized node="+node.externalize() // NPE "node" is null
+//					);
 			getUoMTreeNodeContainer().add(node);
         });
-        uomLlist.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, propertyChangeEvent -> {
-        	LOG.info("propertyChangeEvent: propertyChangeEvent="+propertyChangeEvent);
+        
+        uomLlist.addMouseListener(
+        	new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if(e.getClickCount()==2){
+        			Point point = e.getPoint();
+        			int i =uomLlist.locationToIndex(point);
+//                	System.out.println("double clicked at "+(i>=0?uomLlist.getElementAt(i):i));
+                	if(i>=0) {
+                		UoMTreeNode uomNode = uomLlist.getElementAt(i);
+                		URI uri = uomNode.getObject().getURI();
+    					if(uri!=null) try {
+    						Desktop.getDesktop().browse(uri);
+    					} catch (IOException ex) {
+    						// TODO Auto-generated catch block
+    						ex.printStackTrace();
+    					}
+                	}
+                }
+            }
         });
+
         return uomLlist;
     }
 
