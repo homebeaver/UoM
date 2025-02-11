@@ -55,46 +55,45 @@ import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
 public class SimpleSplitPane extends JXPanel {
-	
-	private static final long serialVersionUID = -833123829892622625L;
-	private static final Logger LOG = Logger.getLogger(SimpleSplitPane.class.getName());
-	private static final String DESCRIPTION = "SimpleSplitPane";
+    
+    private static final long serialVersionUID = -833123829892622625L;
+    private static final Logger LOG = Logger.getLogger(SimpleSplitPane.class.getName());
+    private static final String DESCRIPTION = "SimpleSplitPane";
 
-	// The preferred size of the demo
+    // The preferred size of the demo
     static int PREFERRED_WIDTH = 700;
     static int PREFERRED_HEIGHT = 600;
     public static final Dimension PREFERRED_SIZE = new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-	protected static final boolean exitOnClose = true; // used in JXFrame of the demo
+    protected static final boolean exitOnClose = true; // used in JXFrame of the demo
 
-	/*
-	 * Das Starten mit param Nimbus und LaFUtils.setLAFandTheme funktioniert zwar,
-	 * ABER: die values props [Selected] für JXList<String> lafSelector sind initial nicht korrekt:
-	 * - dunkle Schrift auf dunkelblauen Hintergrund. BUG? XXX
-	 * 
-	 * Erst nach dem Umschalten Nimbus -> andere LaF -> Nimbus ist es korrekt
-	 * 
-	 * Daher kommentiere ich setLAFandTheme in main aus und verschiebe es nach createAndShowGUI.
-	 * Dazu dient initialLaF, da ich bei invokeLater bleiben will.
-	 * Dann wird JXList<UoMTreeNode> uomLlist korrekt dargestellt.
-	 * Bei lafSelector ist select nicht gesetzt und daher wird nichts hervorgehoben.
-	 * Versucht man es zu setzten, so taucht das Problem wieder auf.
-	 */
-	protected static List<String> initialLaF = Arrays.asList("Nimbus");
-	
-	/**
-	 * 
-	 * @param args (optional) 
-	 *  1st : LookAndFeel (Metal, Nimbus, ...), 
-	 *  2nd : metal theme class name (f.i. javax.swing.plaf.metal.DefaultMetalTheme)
-	 */
+    /*
+     * Das Starten mit param Nimbus und LaFUtils.setLAFandTheme funktioniert zwar,
+     * ABER: die values props [Selected] für JXList<String> lafSelector sind initial nicht korrekt:
+     * - dunkle Schrift auf dunkelblauen Hintergrund. BUG? ==> gelöst
+     * 
+     * Erst nach dem Umschalten Nimbus -> andere LaF -> Nimbus ist es korrekt
+     * 
+     * Daher kommentiere ich setLAFandTheme in main aus und verschiebe es nach createAndShowGUI.
+     * Dazu dient initialLaF, da ich bei invokeLater bleiben will.
+     * Dann wird JXList<UoMTreeNode> uomLlist korrekt dargestellt.
+     * Bei lafSelector ist select nicht gesetzt und daher wird nichts hervorgehoben.
+     * Versucht man es zu setzten, so taucht das Problem wieder auf.
+     */
+    protected static List<String> initialLaF = Arrays.asList("Nimbus");
+    
+    /**
+     * 
+     * @param args (optional) 
+     *  1st : LookAndFeel (Metal, Nimbus, ...), 
+     *  2nd : metal theme class name (f.i. javax.swing.plaf.metal.DefaultMetalTheme)
+     */
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
-    	if(args.length>0) {
-    		initialLaF = Arrays.asList(args);
-        	LOG.info("args: "+initialLaF);
-//    		LaFUtils.setLAFandTheme(initialLaF); // siehe Kommentar zu initialLaF
-    	}
+        if(args.length>0) {
+            initialLaF = Arrays.asList(args);
+            LOG.info("args: "+initialLaF);
+        }
         SwingUtilities.invokeLater( () -> {
             createAndShowGUI();
         });
@@ -117,9 +116,7 @@ public class SimpleSplitPane extends JXPanel {
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-        newContentPane.setLaFandTheme(initialLaF.get(0));
-        // setzen von Nimbus hier ==> text ist nicht hell wie er sein soll
-//        newContentPane.lafSelector.setSelectedIndex(2); //.setSelectedValue(initialLaF, false);
+        newContentPane.lafSelector.setSelectedValue(initialLaF.get(0), false); // no scroll
     }
 
     static final int W = 1; // BORDER width in pixels
@@ -135,127 +132,127 @@ public class SimpleSplitPane extends JXPanel {
     private JPanel editPane;
     
     UoMTreeNodeContainer getUoMTreeNodeContainer() {
-    	return (UoMTreeNodeContainer)editPane;
+        return (UoMTreeNodeContainer)editPane;
     }
 
     protected JMenu createPlafMenu(Window target) {
-    	UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
-    	lafInfoMap = new Hashtable<String, List<String>>();
+        UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
+        lafInfoMap = new Hashtable<String, List<String>>();
         JMenu menu = new JMenu("Set L&F");
         lafMenuGroup = new ButtonGroup(); // wg. mi.setSelected
         for (LookAndFeelInfo info : lafInfo) {
-        	if ("Metal".equals(info.getName())) {
-            	lafInfoMap.putIfAbsent("Metal STEEL"
-            			, Arrays.asList(info.getClassName(), STEEL));
-            	lafInfoMap.putIfAbsent("Metal OCEAN"
-            			, Arrays.asList(info.getClassName(), OCEAN));
+            if ("Metal".equals(info.getName())) {
+                lafInfoMap.putIfAbsent("Metal STEEL"
+                        , Arrays.asList(info.getClassName(), STEEL));
+                lafInfoMap.putIfAbsent("Metal OCEAN"
+                        , Arrays.asList(info.getClassName(), OCEAN));
                 JMenuItem mi = createLafMenuItem(info);
                 lafMenuGroup.add(mi);
                 menu.add(mi);
-        	} else {
-            	lafInfoMap.putIfAbsent(info.getName(), Arrays.asList(info.getClassName()));
+            } else {
+                lafInfoMap.putIfAbsent(info.getName(), Arrays.asList(info.getClassName()));
                 JMenuItem mi = createLafMenuItem(info);
                 LOG.fine("JMenuItem mi.Action:"+mi.getAction() + " ClassName="+info.getClassName());
                 lafMenuGroup.add(mi);
                 if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
-                	mi.setSelected(true);
+                    mi.setSelected(true);
                 }
                 menu.add(mi);
-        	}
+            }
         }
         return menu;
     }
     protected JMenuItem createLafMenuItem(UIManager.LookAndFeelInfo info) {
-//    	SetPlafAction action = new SetPlafAction(info.getName(), info.getClassName(), getLaFGroup(), this);
-//    	JMenuItem mi = new JRadioButtonMenuItem(action);
-//    	LOG.info(info.getName());
-    	JMenuItem mi = new JRadioButtonMenuItem(info.getName());
-    	if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
-    		mi.setSelected(true);
-    	}
-//    	getLaFGroup().add(mi);
-    	lafMenuGroup.add(mi);
-    	return mi;
+//        SetPlafAction action = new SetPlafAction(info.getName(), info.getClassName(), getLaFGroup(), this);
+//        JMenuItem mi = new JRadioButtonMenuItem(action);
+//        LOG.info(info.getName());
+        JMenuItem mi = new JRadioButtonMenuItem(info.getName());
+        if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
+            mi.setSelected(true);
+        }
+//        getLaFGroup().add(mi);
+        lafMenuGroup.add(mi);
+        return mi;
     }
 
     private JCheckBox editSelected;
     
     private JXButton quit;
 
-	private Map<String, List<String>> lafInfoMap; // info -> [classname] | [classname,themeclassname]
-	private String lastLaFandTheme = null;
-	private void setLaFandTheme(String key) {
-		if (key != null) lastLaFandTheme = key == null ? initialLaF.get(0) : key;
-		if ("Metal".equals(key)) {
-			LaFUtils.setLAFandTheme(Arrays.asList("metal", STEEL));
-		} else {
-	        SwingUtilities.invokeLater( () -> {
-				LaFUtils.setLAFandTheme(lafInfoMap.get(lastLaFandTheme));
-	        });
-		}
-//		lafSelector.setSelectedValue(lastLaFandTheme, false);
-	}
-	private void setSelectedIndexToCurrentLaF() {
-    	String currentClassName = UIManager.getLookAndFeel().getClass().getName();
-    	for (int i = 0; i < lafModel.getSize(); i++) {
-    		if(currentClassName.contains(lafModel.getElementAt(i))) {
-    			lafSelector.setSelectedIndex(i); 
-    			break;
-    		}
-    	}
-	}
+    private Map<String, List<String>> lafInfoMap; // info -> [classname] | [classname,themeclassname]
+    private String lastLaFandTheme = null;
+    private void setLaFandTheme(String key) {
+        if (key != null) lastLaFandTheme = key == null ? initialLaF.get(0) : key;
+        if ("Metal".equals(key)) {
+            LaFUtils.setLAFandTheme(Arrays.asList("metal", STEEL));
+        } else {
+            SwingUtilities.invokeLater( () -> {
+                LaFUtils.setLAFandTheme(lafInfoMap.get(lastLaFandTheme));
+            });
+        }
+//        lafSelector.setSelectedValue(lastLaFandTheme, false);
+    }
+    private void setSelectedIndexToCurrentLaF() {
+        String currentClassName = UIManager.getLookAndFeel().getClass().getName();
+        for (int i = 0; i < lafModel.getSize(); i++) {
+            if(currentClassName.contains(lafModel.getElementAt(i))) {
+                lafSelector.setSelectedIndex(i); 
+                break;
+            }
+        }
+    }
     private JComponent createLafList() {
-    	lafModel = new DefaultListModel<String>();
-    	lafModel.addAll(lafInfoMap.keySet());
-    	// autoCreateRowSorter:
-    	lafSelector = new JXList<String>(lafModel, true);
-    	// setSelectedIndex to current LaF:
-    	setSelectedIndexToCurrentLaF();
-    	// default is UNSORTED:
-    	lafSelector.setSortOrder(SortOrder.DESCENDING);
-    	lafSelector.addListSelectionListener( listSelectionEvent -> {
-        	String lafKey = lafSelector.getSelectedValue();
-    		setLaFandTheme(lafKey); 
-    	});
-    	return lafSelector;
+        lafModel = new DefaultListModel<String>();
+        lafModel.addAll(lafInfoMap.keySet());
+        // autoCreateRowSorter:
+        lafSelector = new JXList<String>(lafModel, true);
+        // setSelectedIndex to current LaF:
+        setSelectedIndexToCurrentLaF();
+        // default is UNSORTED:
+        lafSelector.setSortOrder(SortOrder.DESCENDING);
+        lafSelector.addListSelectionListener( listSelectionEvent -> {
+            String lafKey = lafSelector.getSelectedValue();
+            setLaFandTheme(lafKey); 
+        });
+        return lafSelector;
     }
   
     public SimpleSplitPane(JXFrame frame) throws HeadlessException {
-    	super(new BorderLayout());
-    	super.setPreferredSize(PREFERRED_SIZE);
-    	xframe = frame;
-    	
-		JMenu plafMenu = createPlafMenu(xframe);
-//		if(plafMenu != null) xframe.getJMenuBar().add(plafMenu);
+        super(new BorderLayout());
+        super.setPreferredSize(PREFERRED_SIZE);
+        xframe = frame;
+        
+        JMenu plafMenu = createPlafMenu(xframe);
+//        if(plafMenu != null) xframe.getJMenuBar().add(plafMenu);
 
 /* buggy:
-    	String[] toArray = new String[9];
-    	// mit autoCreateRowSorter:
-    	//lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray), true);
-    	lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray));
-    	lafSelector.setSelectedIndex(4);
-    	lafSelector.addActionListener( ae -> {
-    		Object o = lafSelector.getSelectedItem();
-    		String k = (String)o;
-    		setLaFandTheme(k);
-//    		ae.getSource(); == lafSelector
-    		msp.updateUI();
-    	});
+        String[] toArray = new String[9];
+        // mit autoCreateRowSorter:
+        //lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray), true);
+        lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray));
+        lafSelector.setSelectedIndex(4);
+        lafSelector.addActionListener( ae -> {
+            Object o = lafSelector.getSelectedItem();
+            String k = (String)o;
+            setLaFandTheme(k);
+//            ae.getSource(); == lafSelector
+            msp.updateUI();
+        });
 */
-    	msp = new JXMultiSplitPane();
+        msp = new JXMultiSplitPane();
         String layoutDef 
         = "(COLUMN " 
-        +		"(ROW weight=0.8 " 
-        + 			"(COLUMN weight=0.25 "
-        + 				"(LEAF name=left.top weight=0.5) (LEAF name=left.middle weight=0.5) "
-        + 			") "
-        + 			"(LEAF name=editor weight=0.75) "
-        +		") " 
-//        +		"(LEAF name=bottom weight=0.2) " 
-        +		"(ROW weight=0.2 " 
-        + 				"(LEAF name=bottom.left weight=0.25) (LEAF name=bottom.right weight=0.75) "
-        +		") " 
-        +	")" ;
+        +        "(ROW weight=0.8 " 
+        +             "(COLUMN weight=0.25 "
+        +                 "(LEAF name=left.top weight=0.5) (LEAF name=left.middle weight=0.5) "
+        +             ") "
+        +             "(LEAF name=editor weight=0.75) "
+        +        ") " 
+//        +        "(LEAF name=bottom weight=0.2) " 
+        +        "(ROW weight=0.2 " 
+        +                 "(LEAF name=bottom.left weight=0.25) (LEAF name=bottom.right weight=0.75) "
+        +        ") " 
+        +    ")" ;
         MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel( layoutDef );
         msp.getMultiSplitLayout().setModel( modelRoot );
         msp.setDividerSize(2);
@@ -304,21 +301,35 @@ public class SimpleSplitPane extends JXPanel {
     private JXList<UoMTreeNode> uomLlist;
     private DefaultListModel<UoMTreeNode> listModel;
     private JComponent createList() {
-		UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
-		UoMTreeNode SI = UoMTreeNode.create(new UoM("SI-Basisgrößen", null), null);
-		UoMTreeNode len = UoMTreeNode.create(new UoM("Länge", "https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29"), null);
-		UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "https://de.wikipedia.org/wiki/Volumen"), null);
-		UoMTreeNode WE = UoMTreeNode.create(new UoM("Masse", "https://de.wikipedia.org/wiki/Masse_(Physik)"), null);
-		UoMTreeNode time = UoMTreeNode.create(new UoM("Zeit", "https://de.wikipedia.org/wiki/Zeit"), null);
-		UoMTreeNode I = UoMTreeNode.create(new UoM("Elektrische Stromstärke", "https://de.wikipedia.org/wiki/Elektrische_Stromst%C3%A4rke"), null);
-		UoMTreeNode ml = UoMTreeNode.create(UoM.create_ml(), null);
-		UoMTreeNode L = UoMTreeNode.create(UoM.create_L(), null);
-		UoMTreeNode Kg = UoMTreeNode.create(UoM.create_Kg(), null);
-		UoMTreeNode mg = UoMTreeNode.create(UoM.create_mg(), null);
-		UoMTreeNode t = UoMTreeNode.create(UoM.create_t(), null);
-		UoMTreeNode h = UoMTreeNode.create(UoM.create_h(), null);
-		UoMTreeNode m = UoMTreeNode.create(UoM.create_m(), null);
-		UoMTreeNode A = UoMTreeNode.create(UoM.create_A(), null);
+        UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
+        UoMTreeNode SI = UoMTreeNode.create(new UoM("SI-Basisgrößen", null), null);
+        UoMTreeNode len = UoMTreeNode.create(new UoM("Länge", "https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29"), null);
+        UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "https://de.wikipedia.org/wiki/Volumen"), null);
+        UoMTreeNode WE = UoMTreeNode.create(new UoM("Masse", "https://de.wikipedia.org/wiki/Masse_(Physik)"), null);
+        UoMTreeNode time = UoMTreeNode.create(new UoM("Zeit", "https://de.wikipedia.org/wiki/Zeit"), null);
+        UoMTreeNode I = UoMTreeNode.create(new UoM("Elektrische Stromstärke", "https://de.wikipedia.org/wiki/Elektrische_Stromst%C3%A4rke"), null);
+        uom.add(SI);
+        SI.add(len);
+        SI.add(WE);
+        SI.add(time);
+        SI.add(I);
+        UoMTreeNode ml = UoMTreeNode.create(UoM.create_ml(), null);
+        UoMTreeNode L = UoMTreeNode.create(UoM.create_L(), null);
+        UoMTreeNode Kg = UoMTreeNode.create(UoM.create_Kg(), null);
+        UoMTreeNode mg = UoMTreeNode.create(UoM.create_mg(), null);
+        UoMTreeNode t = UoMTreeNode.create(UoM.create_t(), null);
+        UoMTreeNode h = UoMTreeNode.create(UoM.create_h(), null);
+        UoMTreeNode m = UoMTreeNode.create(UoM.create_m(), null);
+        UoMTreeNode A = UoMTreeNode.create(UoM.create_A(), null);
+        len.add(m);
+        len.add(volumen);
+        volumen.add(L);
+        volumen.add(ml);
+        WE.add(Kg);
+        WE.add(mg);
+        WE.add(t);
+        time.add(h);
+        I.add(A);
         listModel = new DefaultListModel<UoMTreeNode>();
         listModel.addElement(uom);
         listModel.addElement(SI);
@@ -343,48 +354,48 @@ public class SimpleSplitPane extends JXPanel {
 //        list.addListSelectionListener(this);
         uomLlist.setVisibleRowCount(5);
 //        JScrollPane listScrollPane = new JScrollPane(list);
-		IconValue iv = (Object value) -> {
-			if (value instanceof UoMTreeNode c) {
-				return UoMTreeNode.SI_ICON.getIcon(c);
-			}
-			return IconValue.NULL_ICON;
-		};
+        IconValue iv = (Object value) -> {
+            if (value instanceof UoMTreeNode c) {
+                return UoMTreeNode.SI_ICON.getIcon(c);
+            }
+            return IconValue.NULL_ICON;
+        };
 
         // custom String representation: concat various element fields
         StringValue sv = (Object value) -> {
             if (value instanceof UoMTreeNode c) {
-            	return c.toString();
+                return c.toString();
             }
             return StringValues.TO_STRING.getString(value);
         };
         uomLlist.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
         uomLlist.addListSelectionListener( listSelectionEvent -> {
-        	UoMTreeNode node = uomLlist.getSelectedValue();
-//			LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
-//					.getCellRenderer()
-////					+"\n externalized node="+node.externalize() // NPE "node" is null
-//					);
-			getUoMTreeNodeContainer().add(node);
+            UoMTreeNode node = uomLlist.getSelectedValue();
+//            LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
+//                    .getCellRenderer()
+////                    +"\n externalized node="+node.externalize() // NPE "node" is null
+//                    );
+            getUoMTreeNodeContainer().add(node);
         });
         
         uomLlist.addMouseListener(
-        	new MouseAdapter() {
+            new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e){
                 if(e.getClickCount()==2){
-        			Point point = e.getPoint();
-        			int i =uomLlist.locationToIndex(point);
-//                	System.out.println("double clicked at "+(i>=0?uomLlist.getElementAt(i):i));
-                	if(i>=0) {
-                		UoMTreeNode uomNode = uomLlist.getElementAt(i);
-                		URI uri = uomNode.getObject().getURI();
-    					if(uri!=null) try {
-    						Desktop.getDesktop().browse(uri);
-    					} catch (IOException ex) {
-    						// TODO Auto-generated catch block
-    						ex.printStackTrace();
-    					}
-                	}
+                    Point point = e.getPoint();
+                    int i =uomLlist.locationToIndex(point);
+//                    System.out.println("double clicked at "+(i>=0?uomLlist.getElementAt(i):i));
+                    if(i>=0) {
+                        UoMTreeNode uomNode = uomLlist.getElementAt(i);
+                        URI uri = uomNode.getObject().getURI();
+                        if(uri!=null) try {
+                            Desktop.getDesktop().browse(uri);
+                        } catch (IOException ex) {
+                            // TODO Auto-generated catch block
+                            ex.printStackTrace();
+                        }
+                    }
                 }
             }
         });
