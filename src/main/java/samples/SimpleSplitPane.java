@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -22,6 +24,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -31,6 +34,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EtchedBorder;
@@ -399,6 +403,29 @@ public class SimpleSplitPane extends JXPanel {
                 }
             }
         });
+        uomLlist.setTransferHandler(new TransferHandler() {
+            public boolean canImport(TransferHandler.TransferSupport info) {
+                // TODO
+                LOG.info("TransferHandler.TransferSupport:" + info);
+                return true;
+            }
+            public boolean importData(TransferHandler.TransferSupport info) {
+                // TODO
+                LOG.info("TransferHandler.TransferSupport:" + info);
+                return false;
+            }
+            public int getSourceActions(JComponent c) {
+                return MOVE;
+            }
+            protected Transferable createTransferable(JComponent c) {
+                if(c==uomLlist) {
+                    UoMTreeNode n = uomLlist.getSelectedValue();
+                    return new StringSelection(n.externalize());
+                }
+                return null;
+            }
+        });
+        uomLlist.setDropMode(DropMode.ON_OR_INSERT);
 
         return uomLlist;
     }
