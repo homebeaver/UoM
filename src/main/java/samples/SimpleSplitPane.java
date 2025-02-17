@@ -47,6 +47,7 @@ import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXFrame.StartPosition;
+import org.jdesktop.swingx.icon.JXIcon;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
@@ -58,6 +59,7 @@ import org.jdesktop.swingx.renderer.StringValues;
 
 import io.homebeaver.GenericTreeNode;
 import io.homebeaver.NodeElementContainer;
+import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
@@ -185,6 +187,7 @@ public class SimpleSplitPane extends JXPanel {
     private JCheckBox editSelected;
     
     private JXButton quit;
+    private JXButton remove;
 
     private Map<String, List<String>> lafInfoMap; // info -> [classname] | [classname,themeclassname]
     private String lastLaFandTheme = null;
@@ -259,7 +262,7 @@ public class SimpleSplitPane extends JXPanel {
         +        ") " 
 //        +        "(LEAF name=bottom weight=0.2) " 
         +        "(ROW weight=0.05 " 
-        +                 "(LEAF name=bottom.left weight=0.25) (LEAF name=bottom.right weight=0.75) "
+        +                 "(LEAF name=bottom.left weight=0.40) (LEAF name=bottom.middle weight=0.30) (LEAF name=bottom.right weight=0.30) "
         +        ") " 
         +    ")" ;
         MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel( layoutDef );
@@ -277,23 +280,28 @@ public class SimpleSplitPane extends JXPanel {
 //        JXPanel listPane = new JXPanel(new BorderLayout());
 //        listPane.add(createList(), BorderLayout.CENTER);
         Box listPane = Box.createHorizontalBox();
-        listPane.add(Box.createVerticalGlue());
-//        listPane.add(Box.createHorizontalStrut(10));
+        listPane.add(Box.createHorizontalGlue());
+        listPane.add(Box.createHorizontalStrut(10));
         listPane.add(createList());
-//        listPane.add(Box.createHorizontalStrut(10));
-        listPane.add(Box.createVerticalGlue());
+        listPane.add(Box.createHorizontalStrut(10));
+        listPane.add(Box.createHorizontalGlue());
         listPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( listPane, "left.middle" );
         
+        remove = new JXButton("Delete UoM (remove selected)", KorelleRtrash_svgrepo_com.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
+        remove.setMnemonic('d'); // Alt-d
+        remove.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "remove"));
+        msp.add(remove, "bottom.left" );
+
         editSelected = new JCheckBox("Edit selected UoM");
-        editPane = new NodeElementContainer(editSelected, uomLlist);
+        editPane = new NodeElementContainer(editSelected, uomList);
         editPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( editPane, "editor" );
         
         editSelected.addActionListener( ae -> {
             getUoMTreeNodeContainer().setEnabled(editSelected.isSelected());
         });
-        msp.add(editSelected, "bottom.left" );
+        msp.add(editSelected, "bottom.middle" );
         
         quit = new JXButton("Quit");
         quit.setMnemonic('q'); // Alt-q
@@ -307,7 +315,7 @@ public class SimpleSplitPane extends JXPanel {
         
     }
 
-    private JXList<UoMTreeNode> uomLlist;
+    private JXList<UoMTreeNode> uomList;
     private DefaultListModel<UoMTreeNode> listModel;
     // recursively populate the DefaultListModel
     private void populateListModel(DefaultListModel<UoMTreeNode> listModel, GenericTreeNode<?> gtn) {
@@ -326,12 +334,12 @@ public class SimpleSplitPane extends JXPanel {
         populateListModel(listModel, root);
         
         //Create the list and put it in a scroll pane.
-        uomLlist = new JXList<UoMTreeNode>(listModel);
+        uomList = new JXList<UoMTreeNode>(listModel);
 //        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
-        uomLlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        uomLlist.setSelectedIndex(0);
+        uomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        uomList.setSelectedIndex(0);
 //        list.addListSelectionListener(this);
-        uomLlist.setVisibleRowCount(5);
+        uomList.setVisibleRowCount(5);
         IconValue iv = (Object value) -> {
             if (value instanceof UoMTreeNode c) {
                 return UoMTreeNode.SI_ICON.getIcon(c);
@@ -346,9 +354,9 @@ public class SimpleSplitPane extends JXPanel {
             }
             return StringValues.TO_STRING.getString(value);
         };
-        uomLlist.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
-        uomLlist.addListSelectionListener( listSelectionEvent -> {
-            UoMTreeNode node = uomLlist.getSelectedValue();
+        uomList.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
+        uomList.addListSelectionListener( listSelectionEvent -> {
+            UoMTreeNode node = uomList.getSelectedValue();
 //            LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
 //                    .getCellRenderer()
 ////                    +"\n externalized node="+node.externalize() // NPE "node" is null
@@ -356,16 +364,16 @@ public class SimpleSplitPane extends JXPanel {
             getUoMTreeNodeContainer().add(node);
         });
         
-        uomLlist.addMouseListener(
+        uomList.addMouseListener(
             new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e){
                 if(e.getClickCount()==2){
                     Point point = e.getPoint();
-                    int i =uomLlist.locationToIndex(point);
+                    int i =uomList.locationToIndex(point);
 //                    System.out.println("double clicked at "+(i>=0?uomLlist.getElementAt(i):i));
                     if(i>=0) {
-                        UoMTreeNode uomNode = uomLlist.getElementAt(i);
+                        UoMTreeNode uomNode = uomList.getElementAt(i);
                         URI uri = uomNode.getObject().getURI();
                         if(uri!=null) try {
                             Desktop.getDesktop().browse(uri);
@@ -377,7 +385,7 @@ public class SimpleSplitPane extends JXPanel {
                 }
             }
         });
-        uomLlist.setTransferHandler(new TransferHandler() {
+        uomList.setTransferHandler(new TransferHandler() {
         	int originOfTransferredObject = -1;
             // import method
             public boolean canImport(TransferHandler.TransferSupport info) {
@@ -420,7 +428,7 @@ public class SimpleSplitPane extends JXPanel {
                 }
 
                 JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
-                DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomLlist.getModel();
+                DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
                 int index = dl.getIndex();
                 if(index == originOfTransferredObject || index-1 == originOfTransferredObject) {
                 	LOG.warning("do not move to "+index+" from "+originOfTransferredObject);
@@ -486,22 +494,22 @@ public class SimpleSplitPane extends JXPanel {
              */
             // export method
             public int getSourceActions(JComponent c) {
-                if(c==uomLlist) {
+                if(c==uomList) {
                     return COPY_OR_MOVE;
                 }
                 return NONE;
             }
             // export method
             protected Transferable createTransferable(JComponent c) {
-                if(c==uomLlist) {
-                	originOfTransferredObject = uomLlist.getSelectedIndex();
-                    return new StringSelection(uomLlist.getSelectedValue().externalize());
+                if(c==uomList) {
+                	originOfTransferredObject = uomList.getSelectedIndex();
+                    return new StringSelection(uomList.getSelectedValue().externalize());
                 }
                 return null;
             }
             // export method
             protected void exportDone(JComponent c, Transferable data, int action) {
-                if(c==uomLlist) {
+                if(c==uomList) {
                     cleanup(c, action == TransferHandler.MOVE);
                 }
             }
@@ -514,7 +522,7 @@ public class SimpleSplitPane extends JXPanel {
 //            	LOG.info((remove?"remove ":"")+"c:"+c);
             	if (remove && originOfTransferredObject != -1) {
                 	LOG.info((remove?"remove ":"")+"indexOfTransferredObject:"+originOfTransferredObject);
-                    DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomLlist.getModel();
+                    DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
                     // TODO Neue Position beachten
                     listModel.remove(originOfTransferredObject);
 //                    uomLlist.updateUI();
@@ -523,14 +531,22 @@ public class SimpleSplitPane extends JXPanel {
 
         });
         
-        uomLlist.setDropMode(DropMode.ON_OR_INSERT);
-        uomLlist.setDragEnabled(true);
+        uomList.setDropMode(DropMode.ON_OR_INSERT);
+        uomList.setDragEnabled(true);
 
-        return new JScrollPane(uomLlist);
+        return new JScrollPane(uomList);
     }
 
     public void quit() {
         System.exit(0);
+    }
+
+    public void remove() {
+    	int i = uomList.getSelectedIndex();
+    	if(i==-1) return;
+    	LOG.info("remove "+i);
+        DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
+        listModel.remove(i);
     }
 
 }
