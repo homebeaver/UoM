@@ -89,7 +89,17 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
                } else if (v==null && "uomSymbol".equals(k)) {
                    // bei v==null uomSymbol nicht anzeigen
                } else {
-                JXTextField field = new JXTextField();
+                   JXTextField field = new JXTextField();
+//                JXTextField field = new JXTextField() {
+//                	    public synchronized DropTarget getDropTarget() { 
+//                	    	DropTarget dt = super.getDropTarget();
+//                	    	if(dt==null) return null;
+//                	    	System.out.println((dt.isActive()?"active ":"")+"DropTarget:"
+//                	    	+dt+" "+dt.getDropTargetContext()
+//                	    	+" "+dt.getFlavorMap());
+//                	    	return dt; 
+//                	    }
+//                };
                 field.setText((String)v); // auch bei v==null
                 label.setLabelFor(field);
                 add(label);

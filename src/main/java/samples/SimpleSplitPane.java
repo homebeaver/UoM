@@ -33,6 +33,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -212,6 +213,8 @@ public class SimpleSplitPane extends JXPanel {
         lafModel.addAll(lafInfoMap.keySet());
         // autoCreateRowSorter:
         lafSelector = new JXList<String>(lafModel, true);
+        lafSelector.setVisibleRowCount(3);
+        lafSelector.setLayoutOrientation(JList.VERTICAL_WRAP);
         // setSelectedIndex to current LaF:
         setSelectedIndexToCurrentLaF();
         // default is UNSORTED:
@@ -248,14 +251,14 @@ public class SimpleSplitPane extends JXPanel {
         msp = new JXMultiSplitPane();
         String layoutDef 
         = "(COLUMN " 
-        +        "(ROW weight=0.8 " 
+        +        "(ROW weight=0.95 " 
         +             "(COLUMN weight=0.25 "
-        +                 "(LEAF name=left.top weight=0.5) (LEAF name=left.middle weight=0.5) "
+        +                 "(LEAF name=left.top weight=0.1) (LEAF name=left.middle weight=0.9) "
         +             ") "
         +             "(LEAF name=editor weight=0.75) "
         +        ") " 
 //        +        "(LEAF name=bottom weight=0.2) " 
-        +        "(ROW weight=0.2 " 
+        +        "(ROW weight=0.05 " 
         +                 "(LEAF name=bottom.left weight=0.25) (LEAF name=bottom.right weight=0.75) "
         +        ") " 
         +    ")" ;
@@ -265,20 +268,20 @@ public class SimpleSplitPane extends JXPanel {
         
         Box lafSelectorPane = Box.createVerticalBox();
         lafSelectorPane.setBorder(new TitledBorder("Look and Feel Selector"));
-        lafSelectorPane.add(Box.createVerticalGlue());
+//        lafSelectorPane.add(Box.createVerticalGlue());
         lafSelectorPane.add(createLafList());
-        lafSelectorPane.add(Box.createVerticalGlue());
+//        lafSelectorPane.add(Box.createVerticalGlue());
         msp.add(lafSelectorPane, "left.top");
 
 //        msp.add( new JButton( "Left Middle" ), "left.middle" );
 //        JXPanel listPane = new JXPanel(new BorderLayout());
 //        listPane.add(createList(), BorderLayout.CENTER);
         Box listPane = Box.createHorizontalBox();
-        listPane.add(Box.createHorizontalGlue());
-        listPane.add(Box.createHorizontalStrut(10));
+        listPane.add(Box.createVerticalGlue());
+//        listPane.add(Box.createHorizontalStrut(10));
         listPane.add(createList());
-        listPane.add(Box.createHorizontalStrut(10));
-        listPane.add(Box.createHorizontalGlue());
+//        listPane.add(Box.createHorizontalStrut(10));
+        listPane.add(Box.createVerticalGlue());
         listPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( listPane, "left.middle" );
         
@@ -329,7 +332,6 @@ public class SimpleSplitPane extends JXPanel {
         uomLlist.setSelectedIndex(0);
 //        list.addListSelectionListener(this);
         uomLlist.setVisibleRowCount(5);
-//        JScrollPane listScrollPane = new JScrollPane(list);
         IconValue iv = (Object value) -> {
             if (value instanceof UoMTreeNode c) {
                 return UoMTreeNode.SI_ICON.getIcon(c);
@@ -377,18 +379,20 @@ public class SimpleSplitPane extends JXPanel {
         });
         uomLlist.setTransferHandler(new TransferHandler() {
         	int originOfTransferredObject = -1;
-//        	int targetOfTransferredObject = -1;
             // import method
             public boolean canImport(TransferHandler.TransferSupport info) {
                 // we only import Strings
                 if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                     return false;
                 }
-
                 JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
                 if (dl.getIndex() == -1) {
                     return false;
                 }
+//                LOG.info("TransferSupport DropAction=" + info.getDropAction()
+//                + " SourceDropActions="+info.getSourceDropActions()
+//                + " UserDropAction="+info.getUserDropAction()
+//                + " NONE==0 , COPY==1 , MOVE==2");
                 LOG.fine("TransferHandler.TransferSupport supports stringFlavor DropLocation=" + dl);
                 return true;
             }
@@ -397,21 +401,40 @@ public class SimpleSplitPane extends JXPanel {
             	if (!info.isDrop()) {
             		return false;
             	}
+//            	info.getComponent(); // target component 
+//            	info.getDropAction();
+//            	info.getSourceDropActions();
+//            	info.getUserDropAction();
                 if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                     LOG.warning("List doesn't accept a drop of this type. "+info.getTransferable());
                     return false;
                 }
+                if(COPY==info.getUserDropAction()) {
+                    boolean copySupported = (COPY & info.getSourceDropActions()) == COPY;
+                    if(copySupported) {
+                    	// do copy: import & insert data but do not remove the origin
+                    	LOG.info("COPY is supported.");
+                    } else {
+                    	LOG.warning("COPY is not supported.");
+                    }
+                }
+
                 JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
                 DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomLlist.getModel();
                 int index = dl.getIndex();
-//                targetOfTransferredObject = index;
                 if(index == originOfTransferredObject || index-1 == originOfTransferredObject) {
                 	LOG.warning("do not move to "+index+" from "+originOfTransferredObject);
                 	return false;
                 }
+
                 boolean insert = dl.isInsert(); // true==>insert before value, false==>override value at index
                 // Get the current string under or behind the drop.
-                UoMTreeNode value = (UoMTreeNode)listModel.getElementAt(index);
+                UoMTreeNode value = null;
+                try {
+                    value = (UoMTreeNode)listModel.getElementAt(index);
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                	LOG.info("destination is end of list");
+                }
 //                LOG.info("drop "+(insert?"before":"over")+" " + value + " at "+index);
                 
                 // Get the string that is being dropped.
@@ -456,9 +479,17 @@ public class SimpleSplitPane extends JXPanel {
                     return false;
                 }
             }
+            /*
+             * Typically, an ordinary drag requests the MOVE action. 
+             * Holding the Control key while dragging requests the COPY action, 
+             * and holding both Shift and Control requests the LINK action.
+             */
             // export method
             public int getSourceActions(JComponent c) {
-                return MOVE;
+                if(c==uomLlist) {
+                    return COPY_OR_MOVE;
+                }
+                return NONE;
             }
             // export method
             protected Transferable createTransferable(JComponent c) {
@@ -495,7 +526,7 @@ public class SimpleSplitPane extends JXPanel {
         uomLlist.setDropMode(DropMode.ON_OR_INSERT);
         uomLlist.setDragEnabled(true);
 
-        return uomLlist;
+        return new JScrollPane(uomLlist);
     }
 
     public void quit() {
