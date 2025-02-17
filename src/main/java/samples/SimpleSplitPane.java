@@ -55,8 +55,8 @@ import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 
+import io.homebeaver.GenericTreeNode;
 import io.homebeaver.NodeElementContainer;
-import io.homebeaver.uom.UoM;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
@@ -306,52 +306,22 @@ public class SimpleSplitPane extends JXPanel {
 
     private JXList<UoMTreeNode> uomLlist;
     private DefaultListModel<UoMTreeNode> listModel;
+    // recursively populate the DefaultListModel
+    private void populateListModel(DefaultListModel<UoMTreeNode> listModel, GenericTreeNode<?> gtn) {
+        for(int c=0; c<gtn.getChildCount(); c++) {
+        	GenericTreeNode<?> tn = (GenericTreeNode<?>)gtn.getChildAt(c);
+        	listModel.addElement((UoMTreeNode)tn);
+        	if(!tn.isLeaf()) {
+        		populateListModel(listModel, tn);
+        	}
+        }
+    }
     private JComponent createList() {
-        UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
-        UoMTreeNode SI = UoMTreeNode.create(new UoM("SI-Basisgrößen", null), null);
-        UoMTreeNode len = UoMTreeNode.create(new UoM("Länge", "https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29"), null);
-        UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "https://de.wikipedia.org/wiki/Volumen"), null);
-        UoMTreeNode WE = UoMTreeNode.create(new UoM("Masse", "https://de.wikipedia.org/wiki/Masse_(Physik)"), null);
-        UoMTreeNode time = UoMTreeNode.create(new UoM("Zeit", "https://de.wikipedia.org/wiki/Zeit"), null);
-        UoMTreeNode I = UoMTreeNode.create(new UoM("Elektrische Stromstärke", "https://de.wikipedia.org/wiki/Elektrische_Stromst%C3%A4rke"), null);
-        uom.add(SI);
-        SI.add(len);
-        SI.add(WE);
-        SI.add(time);
-        SI.add(I);
-        UoMTreeNode ml = UoMTreeNode.create(UoM.create_ml(), null);
-        UoMTreeNode L = UoMTreeNode.create(UoM.create_L(), null);
-        UoMTreeNode Kg = UoMTreeNode.create(UoM.create_Kg(), null);
-        UoMTreeNode mg = UoMTreeNode.create(UoM.create_mg(), null);
-        UoMTreeNode t = UoMTreeNode.create(UoM.create_t(), null);
-        UoMTreeNode h = UoMTreeNode.create(UoM.create_h(), null);
-        UoMTreeNode m = UoMTreeNode.create(UoM.create_m(), null);
-        UoMTreeNode A = UoMTreeNode.create(UoM.create_A(), null);
-        len.add(m);
-        len.add(volumen);
-        volumen.add(L);
-        volumen.add(ml);
-        WE.add(Kg);
-        WE.add(mg);
-        WE.add(t);
-        time.add(h);
-        I.add(A);
         listModel = new DefaultListModel<UoMTreeNode>();
-        listModel.addElement(uom);
-        listModel.addElement(SI);
-        listModel.addElement(len);
-        listModel.addElement(m);
-        listModel.addElement(volumen);
-        listModel.addElement(ml);
-        listModel.addElement(L);
-        listModel.addElement(WE);
-        listModel.addElement(Kg);
-        listModel.addElement(mg);
-        listModel.addElement(t);
-        listModel.addElement(time);
-        listModel.addElement(h);
-        listModel.addElement(I);
-        listModel.addElement(A);
+        GenericTreeNode<?> root = UoMTreeNode.getUomModelRoot();
+        listModel.addElement((UoMTreeNode)root);
+        populateListModel(listModel, root);
+        
         //Create the list and put it in a scroll pane.
         uomLlist = new JXList<UoMTreeNode>(listModel);
 //        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL

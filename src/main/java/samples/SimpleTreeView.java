@@ -45,10 +45,8 @@ import io.homebeaver.GenericTreeNode;
 import io.homebeaver.MyDefaultTreeCellRenderer;
 import io.homebeaver.MyTreeCellEditor;
 import io.homebeaver.MyXTree;
-import io.homebeaver.NodeElementContainer;
 import io.homebeaver.TreeTransferHandler;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
-import io.homebeaver.uom.UoM;
 import io.homebeaver.uom.UoMCellEditor;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
@@ -276,7 +274,7 @@ public class SimpleTreeView extends JXPanel {
 //    		editPane.setVisible(false); // true in NodeElementContainer.add
     		list.setVisible(true);
     		TreePath tp = new TreePath(new Object[] {treeModel.getRoot()});
-    		treeModel.valueForPathChanged(tp, getUomModelRoot());
+    		treeModel.valueForPathChanged(tp, UoMTreeNode.getUomModelRoot());
     		tree.addTreeSelectionListener( treeSelectionEvent -> {
     			UoMTreeNode tn = (UoMTreeNode)tree.getLastSelectedPathComponent();
     			LOG.info("treeSelectionEvent: tree.cellEditor="+tree // ==treeSelectionEvent.getSource()
@@ -319,44 +317,6 @@ public class SimpleTreeView extends JXPanel {
     	}
     }
 
-    private TreeModel uomModel; 
-    private GenericTreeNode<?> getUomModelRoot() {
-    	if(uomModel==null) {
-    		UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
-    		UoMTreeNode SI = UoMTreeNode.create(new UoM("SI-Basisgrößen", null), null);
-    		UoMTreeNode len = UoMTreeNode.create(new UoM("Länge", "https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29"), null);
-    		UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "https://de.wikipedia.org/wiki/Volumen"), null);
-    		UoMTreeNode WE = UoMTreeNode.create(new UoM("Masse", "https://de.wikipedia.org/wiki/Masse_(Physik)"), null);
-    		UoMTreeNode time = UoMTreeNode.create(new UoM("Zeit", "https://de.wikipedia.org/wiki/Zeit"), null);
-    		UoMTreeNode I = UoMTreeNode.create(new UoM("Elektrische Stromstärke", "https://de.wikipedia.org/wiki/Elektrische_Stromst%C3%A4rke"), null);
-    		uom.add(SI);
-    		SI.add(len);
-    		SI.add(WE);
-    		SI.add(time);
-    		SI.add(I);
-    		// ...
-    		UoMTreeNode ml = UoMTreeNode.create(UoM.create_ml(), null);
-    		UoMTreeNode L = UoMTreeNode.create(UoM.create_L(), null);
-    		UoMTreeNode Kg = UoMTreeNode.create(UoM.create_Kg(), null);
-    		UoMTreeNode mg = UoMTreeNode.create(UoM.create_mg(), null);
-    		UoMTreeNode t = UoMTreeNode.create(UoM.create_t(), null);
-    		UoMTreeNode h = UoMTreeNode.create(UoM.create_h(), null);
-    		UoMTreeNode m = UoMTreeNode.create(UoM.create_m(), null);
-    		UoMTreeNode A = UoMTreeNode.create(UoM.create_A(), null);
-    		len.add(m);
-    		len.add(volumen);
-    		volumen.add(L);
-    		volumen.add(ml);
-    		WE.add(Kg);
-    		WE.add(mg);
-    		WE.add(t);
-    		time.add(h);
-    		I.add(A);
-    		uomModel = new GenericTreeModel(uom);
-    	}
-    	return (GenericTreeNode<?>)uomModel.getRoot();    	
-    }
-    
     public void expand() {
     	tree.expandAll();
     	this.updateUI();
