@@ -35,6 +35,45 @@ public class UoMTreeNode extends GenericTreeNode<UoM> {
 	public static final String CHILDREN = "children";
 
 	/**
+	 * factory to create a demo UoM tree
+	 * @return GenericTreeNode root instance
+	 */
+    public static GenericTreeNode<?> getUomModelRoot() {
+		UoMTreeNode uom = UoMTreeNode.create(new UoM("Maßeinheit", "https://de.wikipedia.org/wiki/Ma%C3%9Feinheit"), null);
+		UoMTreeNode SI = UoMTreeNode.create(new UoM("SI-Basisgrößen", null), null);
+		UoMTreeNode len = UoMTreeNode.create(new UoM("Länge", "https://de.wikipedia.org/wiki/L%C3%A4nge_%28Physik%29"), null);
+		UoMTreeNode volumen = UoMTreeNode.create(new UoM("Volumen", "https://de.wikipedia.org/wiki/Volumen"), null);
+		UoMTreeNode WE = UoMTreeNode.create(new UoM("Masse", "https://de.wikipedia.org/wiki/Masse_(Physik)"), null);
+		UoMTreeNode time = UoMTreeNode.create(new UoM("Zeit", "https://de.wikipedia.org/wiki/Zeit"), null);
+		UoMTreeNode I = UoMTreeNode.create(new UoM("Elektrische Stromstärke", "https://de.wikipedia.org/wiki/Elektrische_Stromst%C3%A4rke"), null);
+		uom.add(SI);
+		SI.add(len);
+		SI.add(WE);
+		SI.add(time);
+		SI.add(I);
+		// ...
+		UoMTreeNode ml = UoMTreeNode.create(UoM.create_ml(), null);
+		UoMTreeNode L = UoMTreeNode.create(UoM.create_L(), null);
+		UoMTreeNode Kg = UoMTreeNode.create(UoM.create_Kg(), null);
+		UoMTreeNode mg = UoMTreeNode.create(UoM.create_mg(), null);
+		UoMTreeNode t = UoMTreeNode.create(UoM.create_t(), null);
+		UoMTreeNode h = UoMTreeNode.create(UoM.create_h(), null);
+		UoMTreeNode m = UoMTreeNode.create(UoM.create_m(), null);
+		UoMTreeNode A = UoMTreeNode.create(UoM.create_A(), null);
+		len.add(m);
+		len.add(volumen);
+		volumen.add(L);
+		volumen.add(ml);
+		WE.add(Kg);
+		WE.add(mg);
+		WE.add(t);
+		time.add(h);
+		I.add(A);
+
+    	return (GenericTreeNode<?>)uom;    	
+    }
+
+	/**
 	 * factory to create an object from JSON
 	 * @param jsonString
 	 * @return UoMTreeNode instance
