@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" id="svg46" x="0" y="0" style="enable-background:new 0 0 64 64" version="1.1" viewBox="0 0 64 64">
+  <style id="style2" type="text/css">
+    .st1{opacity:.2}.st2{fill:#231f20}.st3{fill:#4f5d73}.st5{fill:#fff}
+  </style>
+  <g id="Layer_1">
+    <g id="g6" style="fill:#fca;fill-opacity:1">
+      <circle id="circle4" cx="32" cy="32" r="32" style="fill:#fca;fill-opacity:1"/>
+    </g>
+    <g id="g1022" transform="matrix(1.0682 0 0 1.07145 -2.1825184 -3.5221414)">
+      <g id="g968" transform="translate(-.3389835 .21029867)">
+        <path id="rect948" d="M10.191541 19.738594c10.657743.000276 7.212269-8.655132 21.40168-8.21042v37.556572H10.033898Z" style="fill:#d38d5f;fill-opacity:1;stroke:none;stroke-width:6.73739338;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+        <path id="rect948-7" d="M54.486426 19.738594c-10.657743.000276-7.212269-8.655132-21.40168-8.21042v37.556572h21.559323z" style="fill:#d38d5f;fill-opacity:1;stroke:none;stroke-width:6.73739338;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+      </g>
+      <g id="g1007" transform="translate(.0220561 .47457627)">
+        <path id="rect970" d="M8.5275011 40.54845h2.3821983v5.7852707H8.5275011z" style="fill:#d38d5f;fill-opacity:1;stroke:#fca;stroke-width:.89537925;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+        <path id="rect970-4" d="M8.5275011 22.653118h2.3821983v5.7852707H8.5275011z" style="fill:#d38d5f;fill-opacity:1;stroke:#fca;stroke-width:.89537925;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+      </g>
+      <g id="g1011" transform="translate(.0220561 .45952252)">
+        <path id="rect970-3" d="M53.046188 40.563503h2.3821983v5.7852707H53.046188z" style="fill:#d38d5f;fill-opacity:1;stroke:#fca;stroke-width:.89537925;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+        <path id="rect970-4-5" d="M53.046188 22.668173h2.3821983v5.7852707H53.046188z" style="fill:#d38d5f;fill-opacity:1;stroke:#fca;stroke-width:.89537925;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+      </g>
+    </g>
+    <g id="g936" transform="matrix(.5068 -.29885 .29543 .51267 30.296652 .11179524)">
+      <g id="g1034" transform="translate(-3.3898005 -1.9760361)">
+        <g id="g22" class="st1" style="opacity:.2" transform="translate(-67.932203 5.6949153)">
+          <path id="path20" d="m53.3 18.4-6.5 6.5c-1.6 1.6-4.1 1.6-5.7 0-1.6-1.6-1.6-4.1 0-5.7l6.5-6.5c-1.1-.4-2.3-.7-3.6-.7-5.5 0-10 4.5-10 10 0 1.3.3 2.5.7 3.6l-11 11c-1.2-.3-2.4-.6-3.7-.6-5.5 0-10 4.5-10 10 0 1.3.3 2.5.7 3.6l6.5-6.5c1.6-1.6 4.1-1.6 5.7 0 1.6 1.6 1.6 4.1 0 5.7l-6.5 6.5c1.1.4 2.4.7 3.6.7 5.5 0 10-4.5 10-10 0-1.3-.3-2.5-.7-3.6l11-11c1.1.4 2.4.7 3.6.7 5.5 0 10-4.5 10-10 .1-1.4-.2-2.6-.6-3.7z" class="st2" style="fill:#231f20"/>
+        </g>
+        <g id="g26" style="fill:#b7b7c8" transform="translate(-67.932203 5.6949153)">
+          <path id="rect24" d="M23.4 28h17.1v8H23.4z" class="st5" style="fill:#b7b7c8" transform="rotate(-45 31.9998 32.00048284)"/>
+        </g>
+        <g id="g36" style="fill:#b7b7c8" transform="translate(-67.932203 5.6949153)">
+          <g id="g34" style="fill:#b7b7c8">
+            <path id="path32" d="M46.8 22.8c-1.6 1.6-4.1 1.6-5.7 0-1.6-1.6-1.6-4.1 0-5.7l6.5-6.5c-1.1-.3-2.3-.6-3.6-.6-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10c0-1.3-.3-2.5-.7-3.6z" class="st5" style="fill:#b7b7c8"/>
+          </g>
+        </g>
+        <g id="g42" style="fill:#b7b7c8" transform="translate(-67.932203 5.6949153)">
+          <g id="g40" style="fill:#b7b7c8">
+            <path id="path38" d="M17.2 41.2c1.6-1.6 4.1-1.6 5.7 0 1.6 1.6 1.6 4.1 0 5.7l-6.5 6.5c1.1.4 2.4.7 3.6.7 5.5 0 10-4.5 10-10s-4.5-10-10-10-10 4.5-10 10c0 1.3.3 2.5.7 3.6z" class="st5" style="fill:#b7b7c8"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g id="g946" transform="matrix(.60362 .21911 -.219 .6039 -2.7990038 -10.877641)">
+      <g id="g1163" transform="translate(-.77892308 .91766693)">
+        <g id="g10" class="st1" style="opacity:.2" transform="translate(58.576271 2.9830508)">
+          <path id="path8" d="M49.9 46.2 35.8 32.1c-1-1-2.5-1.4-3.8-1l-8.1-8-3-5.9-5.9-3-2.9 2.8 3 5.9 5.9 3 8.1 8c-.4 1.3 0 2.8 1 3.8l14.1 14.1c1.6 1.6 4.1 1.6 5.7 0 1.6-1.5 1.6-4 0-5.6z" class="st2" style="fill:#231f20"/>
+        </g>
+        <g id="g14" transform="translate(58.576271 2.9830508)">
+          <path id="polygon12" d="m37.4 34.5-2.9 2.8-16.1-15.9 2.9-2.8z" class="st3" style="fill:#4f5d73"/>
+        </g>
+        <g id="g18" style="fill:#d35f5f" transform="translate(58.576271 2.9830508)">
+          <path id="path16" d="M49.9 49.9c-1.6 1.6-4.1 1.6-5.7 0L30.1 35.8c-1.6-1.6-1.6-4.1 0-5.7 1.6-1.6 4.1-1.6 5.7 0l14.1 14.1c1.6 1.6 1.6 4.1 0 5.7z" style="fill:#d35f5f"/>
+        </g>
+        <g id="g30" transform="translate(58.576271 2.9830508)">
+          <path id="polygon28" d="M23.9 21.1 21 23.9l-5.9-3-3-5.9 2.8-2.9 5.9 3.1z" class="st3" style="fill:#4f5d73"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
