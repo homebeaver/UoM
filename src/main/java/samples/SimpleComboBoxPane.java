@@ -1,33 +1,21 @@
 package samples;
 
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
-import java.awt.Point;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.EventHandler;
-import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
-import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -35,9 +23,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -54,24 +39,19 @@ import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.MultiSplitLayout;
 import org.jdesktop.swingx.icon.JXIcon;
-import org.jdesktop.swingx.renderer.DefaultListRenderer;
-import org.jdesktop.swingx.renderer.IconValue;
-import org.jdesktop.swingx.renderer.StringValue;
-import org.jdesktop.swingx.renderer.StringValues;
 
 import io.homebeaver.GenericTreeNode;
-import io.homebeaver.ListTransferHandler;
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.icon.KorellerRCircle_icons_power;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
-public class SimpleSplitPane extends JXPanel {
+public class SimpleComboBoxPane extends JXPanel {
     
     private static final long serialVersionUID = -833123829892622625L;
-    private static final Logger LOG = Logger.getLogger(SimpleSplitPane.class.getName());
-    private static final String DESCRIPTION = "SimpleSplitPane";
+    private static final Logger LOG = Logger.getLogger(SimpleComboBoxPane.class.getName());
+    private static final String DESCRIPTION = "SimpleComboBoxPane";
 
     // The preferred size of the demo
     static int PREFERRED_WIDTH = 700;
@@ -126,7 +106,7 @@ public class SimpleSplitPane extends JXPanel {
     	UIManager.put("swing.boldMetal", Boolean.FALSE);
 
         //Create and set up the content pane.
-        SimpleSplitPane newContentPane = new SimpleSplitPane(frame);
+        SimpleComboBoxPane newContentPane = new SimpleComboBoxPane(frame);
 //        newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
 
@@ -142,6 +122,7 @@ public class SimpleSplitPane extends JXPanel {
     
     private JXFrame xframe;
     private JXMultiSplitPane msp;
+//    private JXComboBox<String> lafComboSelector; // BUG #1
     private JXList<String> lafSelector;
     private DefaultListModel<String> lafModel;
     private ButtonGroup lafMenuGroup;
@@ -236,7 +217,7 @@ public class SimpleSplitPane extends JXPanel {
         return lafSelector;
     }
   
-    public SimpleSplitPane(JXFrame frame) throws HeadlessException {
+    public SimpleComboBoxPane(JXFrame frame) throws HeadlessException {
         super(new BorderLayout());
         super.setPreferredSize(PREFERRED_SIZE);
         xframe = frame;
@@ -244,6 +225,20 @@ public class SimpleSplitPane extends JXPanel {
         JMenu plafMenu = createPlafMenu(xframe);
 //        if(plafMenu != null) xframe.getJMenuBar().add(plafMenu);
 
+/* buggy:
+        String[] toArray = new String[9];
+        // mit autoCreateRowSorter:
+        //lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray), true);
+        lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray));
+        lafSelector.setSelectedIndex(4);
+        lafSelector.addActionListener( ae -> {
+            Object o = lafSelector.getSelectedItem();
+            String k = (String)o;
+            setLaFandTheme(k);
+//            ae.getSource(); == lafSelector
+            msp.updateUI();
+        });
+*/
         msp = new JXMultiSplitPane();
         String layoutDef 
         = "(COLUMN " 
@@ -272,22 +267,24 @@ public class SimpleSplitPane extends JXPanel {
 //        msp.add( new JButton( "Left Middle" ), "left.middle" );
 //        JXPanel listPane = new JXPanel(new BorderLayout());
 //        listPane.add(createList(), BorderLayout.CENTER);
-        Box listPane = Box.createHorizontalBox();
-        listPane.add(Box.createHorizontalGlue());
-        listPane.add(Box.createHorizontalStrut(10));
-        listPane.add(createList());
-        listPane.add(Box.createHorizontalStrut(10));
-        listPane.add(Box.createHorizontalGlue());
+        Box listPane = Box.createVerticalBox();
+        listPane.add(Box.createVerticalGlue());
+//        listPane.add(Box.createHorizontalGlue());
+//        listPane.add(Box.createHorizontalStrut(10));
+        listPane.add(createComboBox());
+//        listPane.add(Box.createHorizontalStrut(10));
+//        listPane.add(Box.createHorizontalGlue());
+        listPane.add(Box.createVerticalGlue());
         listPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( listPane, "left.middle" );
         
         remove = new JXButton("Delete UoM (remove selected)", KorelleRtrash_svgrepo_com.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         remove.setMnemonic('d'); // Alt-d
-        remove.addActionListener(createRemoveListener());
+//        remove.addActionListener(createRemoveListener());
         msp.add(remove, "bottom.left" );
 
         editSelected = new JCheckBox("Edit selected UoM");
-        editPane = new NodeElementContainer(editSelected, uomList);
+        editPane = new NodeElementContainer(editSelected, uomComboBox); //TODO
         editPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( editPane, "editor" );
         
@@ -310,112 +307,130 @@ public class SimpleSplitPane extends JXPanel {
         
     }
 
-    private JXList<UoMTreeNode> uomList;
-    private DefaultListModel<UoMTreeNode> listModel;
+    private JXComboBox<UoMTreeNode> uomComboBox; // BUG #1
+
     // recursively populate the DefaultListModel
-    private void populateListModel(DefaultListModel<UoMTreeNode> listModel, GenericTreeNode<?> gtn) {
+    private void populateListModel(DefaultListModel<UoMTreeNode> uomModel, GenericTreeNode<?> gtn) {
         for(int c=0; c<gtn.getChildCount(); c++) {
         	GenericTreeNode<?> tn = (GenericTreeNode<?>)gtn.getChildAt(c);
-        	listModel.addElement((UoMTreeNode)tn);
+        	uomModel.addElement((UoMTreeNode)tn);
         	if(!tn.isLeaf()) {
-        		populateListModel(listModel, tn);
+        		populateListModel(uomModel, tn);
         	}
         }
     }
-    private JComponent createList() {
-        listModel = new DefaultListModel<UoMTreeNode>();
+    private JComponent createComboBox() {
+    	DefaultListModel<UoMTreeNode> uomModel = new DefaultListModel<UoMTreeNode>();
         GenericTreeNode<?> root = UoMTreeNode.getUomModelRoot();
-        listModel.addElement((UoMTreeNode)root);
-        populateListModel(listModel, root);
+        uomModel.addElement((UoMTreeNode)root);
+        populateListModel(uomModel, root);
+        
+        //Create the combobox with items from uomModel
+        UoMTreeNode[] items = new UoMTreeNode[uomModel.size()];
+        uomModel.copyInto(items);     
+        uomComboBox = new JXComboBox<UoMTreeNode>(items);
+
+        uomComboBox.setSelectedIndex(4);
+        uomComboBox.addActionListener( ae -> {
+            Object o = uomComboBox.getSelectedItem();
+            UoMTreeNode node = (UoMTreeNode)o;
+            getUoMTreeNodeContainer().add(node);
+            //uomComboBox bleibt ausgeklappt!
+            //uomComboBox.updateUI();
+//            SwingUtilities.invokeLater( () -> {
+//            	uomComboBox.updateUI();
+//            });
+        });
+
+        return uomComboBox;
         
         //Create the list and put it in a scroll pane.
-        uomList = new JXList<UoMTreeNode>(listModel);
-//        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
-        uomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        uomList.setVisibleRowCount(5);
-        IconValue iv = (Object value) -> {
-            if (value instanceof UoMTreeNode c) {
-                return UoMTreeNode.SI_ICON.getIcon(c);
-            }
-            return IconValue.NULL_ICON;
-        };
-
-        // custom String representation: concat various element fields
-        StringValue sv = (Object value) -> {
-            if (value instanceof UoMTreeNode c) {
-                return c.toString();
-            }
-            return StringValues.TO_STRING.getString(value);
-        };
-        uomList.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
-        uomList.addListSelectionListener( listSelectionEvent -> {
-            UoMTreeNode node = uomList.getSelectedValue();
-            getUoMTreeNodeContainer().add(node);
-        });
-        
-        uomList.addMouseListener(
-            new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e){
-                if(e.getClickCount()==2){
-                    Point point = e.getPoint();
-                    int i =uomList.locationToIndex(point);
-                    if(i>=0) {
-                        UoMTreeNode uomNode = uomList.getElementAt(i);
-                        URI uri = uomNode.getObject().getURI();
-                        if(uri!=null) try {
-                            Desktop.getDesktop().browse(uri);
-                        } catch (IOException ex) {
-                            // TODO Auto-generated catch block
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-        });
-        uomList.setTransferHandler(new ListTransferHandler(uomList));        
-        uomList.setDropMode(DropMode.ON_OR_INSERT);
-        uomList.setDragEnabled(true);
-        
-        InputMap inputMap = uomList.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        System.out.println("keys:"+inputMap.keys());
-        System.out.println("allKeys:"+inputMap.allKeys());
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), ListDeleteAction.REMOVE_SELECTED_ROW);
-        ActionMap actionMap = uomList.getActionMap();
-        System.out.println("actionMap.keys:"+Arrays.asList(actionMap.keys()));
-      //System.out.println("actionMap.allKeys:"+Arrays.asList(actionMap.allKeys()));
-      //many actions are defined in org.jdesktop.swingx.plaf.basic.BasicYListUI$Actions
-        Arrays.asList(actionMap.allKeys()).forEach( key -> {
-        	System.out.println("key:"+key+" -> " + actionMap.get(key));
-        });
-        actionMap.put(ListDeleteAction.REMOVE_SELECTED_ROW, new ListDeleteAction());
-
-        return new JScrollPane(uomList);
+//        uomList = new JXList<UoMTreeNode>(listModel);
+////        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
+//        uomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        uomList.setVisibleRowCount(5);
+//        IconValue iv = (Object value) -> {
+//            if (value instanceof UoMTreeNode c) {
+//                return UoMTreeNode.SI_ICON.getIcon(c);
+//            }
+//            return IconValue.NULL_ICON;
+//        };
+//
+//        // custom String representation: concat various element fields
+//        StringValue sv = (Object value) -> {
+//            if (value instanceof UoMTreeNode c) {
+//                return c.toString();
+//            }
+//            return StringValues.TO_STRING.getString(value);
+//        };
+//        uomList.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
+//        uomList.addListSelectionListener( listSelectionEvent -> {
+//            UoMTreeNode node = uomList.getSelectedValue();
+//            getUoMTreeNodeContainer().add(node);
+//        });
+//        
+//        uomList.addMouseListener(
+//            new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e){
+//                if(e.getClickCount()==2){
+//                    Point point = e.getPoint();
+//                    int i =uomList.locationToIndex(point);
+//                    if(i>=0) {
+//                        UoMTreeNode uomNode = uomList.getElementAt(i);
+//                        URI uri = uomNode.getObject().getURI();
+//                        if(uri!=null) try {
+//                            Desktop.getDesktop().browse(uri);
+//                        } catch (IOException ex) {
+//                            ex.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//        });
+//        uomList.setTransferHandler(new ListTransferHandler(uomList));        
+//        uomList.setDropMode(DropMode.ON_OR_INSERT);
+//        uomList.setDragEnabled(true);
+//        
+//        InputMap inputMap = uomList.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+//        System.out.println("keys:"+inputMap.keys());
+//        System.out.println("allKeys:"+inputMap.allKeys());
+//        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), ListDeleteAction.REMOVE_SELECTED_ROW);
+//        ActionMap actionMap = uomList.getActionMap();
+//        System.out.println("actionMap.keys:"+Arrays.asList(actionMap.keys()));
+//      //System.out.println("actionMap.allKeys:"+Arrays.asList(actionMap.allKeys()));
+//      //many actions are defined in org.jdesktop.swingx.plaf.basic.BasicYListUI$Actions
+//        Arrays.asList(actionMap.allKeys()).forEach( key -> {
+//        	System.out.println("key:"+key+" -> " + actionMap.get(key));
+//        });
+//        actionMap.put(ListDeleteAction.REMOVE_SELECTED_ROW, new ListDeleteAction());
+//
+//        return new JScrollPane(uomList);
     }
 
     public void quit() {
         System.exit(0);
     }
 
-    private ActionListener createRemoveListener() {
-    	// listenerMethodName is remove
-    	return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
-    }
-    // remove listenerMethod, visibility is public to be called by EventHandler
-    public void remove() {
-    	int i = uomList.getSelectedIndex();
-    	if(i==-1) return;
-    	LOG.info("remove row# "+i);
-        DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
-        listModel.remove(i);
-    }
-
-    private class ListDeleteAction extends AbstractAction {
-        protected static final String REMOVE_SELECTED_ROW = "removeSelectedRow";
-		@Override
-		public void actionPerformed(ActionEvent ae) {
-			remove();		
-		}
-    }
+//    private ActionListener createRemoveListener() {
+//    	// listenerMethodName is remove
+//    	return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
+//    }
+//    // remove listenerMethod, visibility is public to be called by EventHandler
+//    public void remove() {
+//    	int i = uomList.getSelectedIndex();
+//    	if(i==-1) return;
+//    	LOG.info("remove row# "+i);
+//        DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
+//        listModel.remove(i);
+//    }
+//
+//    private class ListDeleteAction extends AbstractAction {
+//        protected static final String REMOVE_SELECTED_ROW = "removeSelectedRow";
+//		@Override
+//		public void actionPerformed(ActionEvent ae) {
+//			remove();		
+//		}
+//    }
 
 }
