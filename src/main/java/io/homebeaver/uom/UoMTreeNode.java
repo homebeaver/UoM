@@ -24,6 +24,9 @@ import io.homebeaver.icon.KorelleRCircle_icons_dolly;
 import io.homebeaver.icon.KorelleRCircle_icons_plugin;
 import io.homebeaver.icon.KorelleRCircle_icons_rulertriangle;
 import io.homebeaver.icon.KorelleRMilk_ballonicon2;
+import io.homebeaver.icon.KorellerRCircle_icons_brightness;
+import io.homebeaver.icon.KorellerRCircle_icons_crop;
+import io.homebeaver.icon.KorellerRCircle_icons_flame;
 import net.sf.fstreem.FileSystemTreeNode;
 
 /**
@@ -179,19 +182,27 @@ public class UoMTreeNode extends GenericTreeNode<UoM> {
             if (value instanceof DirectoryTreeNode dtn) {
             	if("Länge".equals(dtn.getUoM().name)) {
             		return KorelleRCircle_icons_rulertriangle.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
-            	}
-            	// "Fläche" ist Länge zum Quadrat
+            	} else     	
+            	if("Fläche".equals(dtn.getUoM().name)) { // "Fläche" ist Länge zum Quadrat
+            		return KorellerRCircle_icons_crop.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	} else     	
             	if("Volumen".equals(dtn.getUoM().name)) { // Volumen ist Länge Hoch 3
             		return KorelleRMilk_ballonicon2.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
-            	}
+            	} else     	
             	if("Masse".equals(dtn.getUoM().name)) {
             		return KorelleRCircle_icons_dolly.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
-            	}
+            	} else     	
             	if("Zeit".equals(dtn.getUoM().name)) {
             		return KorelleRCircle_icons_clock.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
-            	}
+            	} else     	
             	if("Elektrische Stromstärke".equals(dtn.getUoM().name)) {
             		return KorelleRCircle_icons_plugin.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	} else     	
+            	if("Temperatur".equals(dtn.getUoM().name)) {
+            		return KorellerRCircle_icons_flame.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
+            	} else     	
+            	if("Lichtstärke".equals(dtn.getUoM().name)) {
+            		return KorellerRCircle_icons_brightness.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON);
             	}
             	//return FolderIcon.of(JXIcon.SMALL_ICON, JXIcon.SMALL_ICON);
             	// javax.swing.tree.DefaultTreeCellRenderer:
