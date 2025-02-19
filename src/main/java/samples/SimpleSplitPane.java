@@ -6,7 +6,9 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.EventHandler;
@@ -18,11 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
+import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -31,6 +36,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -114,6 +120,10 @@ public class SimpleSplitPane extends JXPanel {
         //Create and set up the window.
         JXFrame frame = new JXFrame(DESCRIPTION, exitOnClose);
         frame.setStartPosition(StartPosition.CenterInScreen);
+        //frame.setLocationByPlatform(true);
+
+    	//Turn off metal's use of bold fonts
+    	UIManager.put("swing.boldMetal", Boolean.FALSE);
 
         //Create and set up the content pane.
         SimpleSplitPane newContentPane = new SimpleSplitPane(frame);
@@ -288,7 +298,7 @@ public class SimpleSplitPane extends JXPanel {
         
         remove = new JXButton("Delete UoM (remove selected)", KorelleRtrash_svgrepo_com.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         remove.setMnemonic('d'); // Alt-d
-        remove.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "remove"));
+        remove.addActionListener(createRemoveListener());
         msp.add(remove, "bottom.left" );
 
         editSelected = new JCheckBox("Edit selected UoM");
@@ -305,6 +315,8 @@ public class SimpleSplitPane extends JXPanel {
         quit.setMnemonic('q'); // Alt-q
         quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
         msp.add(quit, "bottom.right" );
+        
+        // TODO up/down arrow icons
 
         // ADDING A BORDER TO THE MULTISPLITPANE CAUSES ALL SORTS OF ISSUES 
         msp.setBorder( BorderFactory.createEmptyBorder(W, W, W, W) );
@@ -379,6 +391,19 @@ public class SimpleSplitPane extends JXPanel {
         uomList.setTransferHandler(new ListTransferHandler(uomList));        
         uomList.setDropMode(DropMode.ON_OR_INSERT);
         uomList.setDragEnabled(true);
+        
+        InputMap inputMap = uomList.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        System.out.println("keys:"+inputMap.keys());
+        System.out.println("allKeys:"+inputMap.allKeys());
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), ListDeleteAction.REMOVE_SELECTED_ROW);
+        ActionMap actionMap = uomList.getActionMap();
+        System.out.println("actionMap.keys:"+Arrays.asList(actionMap.keys()));
+      //System.out.println("actionMap.allKeys:"+Arrays.asList(actionMap.allKeys()));
+      //many actions are defined in org.jdesktop.swingx.plaf.basic.BasicYListUI$Actions
+        Arrays.asList(actionMap.allKeys()).forEach( key -> {
+        	System.out.println("key:"+key+" -> " + actionMap.get(key));
+        });
+        actionMap.put(ListDeleteAction.REMOVE_SELECTED_ROW, new ListDeleteAction());
 
         return new JScrollPane(uomList);
     }
@@ -387,12 +412,25 @@ public class SimpleSplitPane extends JXPanel {
         System.exit(0);
     }
 
+    private ActionListener createRemoveListener() {
+    	// listenerMethodName is remove
+    	return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
+    }
+    // remove listenerMethod, visibility is public to be called by EventHandler
     public void remove() {
     	int i = uomList.getSelectedIndex();
     	if(i==-1) return;
-    	LOG.info("remove "+i);
+    	LOG.info("remove row# "+i);
         DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
         listModel.remove(i);
+    }
+
+    private class ListDeleteAction extends AbstractAction {
+        protected static final String REMOVE_SELECTED_ROW = "removeSelectedRow";
+		@Override
+		public void actionPerformed(ActionEvent ae) {
+			remove();		
+		}
     }
 
 }
