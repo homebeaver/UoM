@@ -1,6 +1,7 @@
 package io.homebeaver;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
     //            public Component Container.add(Component comp, int index)
     @Override
     public Component add(UoMTreeNode uomNode) {
+    	Dimension size = this.getSize(); // preserve the initial size
         removeAll();
         if(uomNode != null) {
             TreeNode parent = uomNode.getParent();
@@ -63,7 +65,7 @@ public class NodeElementContainer extends JPanel implements UoMTreeNodeContainer
             
             add(toJSONObject(uomNode));
         }
-        
+        this.setPreferredSize(size);
         revalidate();
 //        setVisible(true);
         this.uomNode = uomNode;
