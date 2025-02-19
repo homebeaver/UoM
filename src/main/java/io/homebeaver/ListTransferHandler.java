@@ -1,225 +1,213 @@
-/*
- * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   - Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Oracle or the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
 package io.homebeaver;
 
-import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.util.List;
+import java.util.logging.Logger;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.ListModel;
 import javax.swing.TransferHandler;
 
-/*
- * ListTransferHandler.java is used by the DropDemo example.
- * copied from https://docs.oracle.com/javase/tutorial/uiswing/dnd/dropmodedemo.html
+import io.homebeaver.uom.UoMTreeNode;
+
+/**
+ * ListTransferHandler to move or copy an element in a List. 
+ * <p>
+ * Please see the <em>The Java Tutorial</em> for more information:
+ * Drag and Drop and Data Transfer, 
+ * <a href="https://docs.oracle.com/javase/tutorial/uiswing/dnd/export.html">
+ * Export Methods</a> and
+ * <a href="https://docs.oracle.com/javase/tutorial/uiswing/dnd/import.html">
+ * Import Methods</a>.
  * 
- * honor instanceof DefaultListModel and DefaultComboBoxModel as listModel
  */
 @SuppressWarnings("serial")
-@Deprecated // ths class is not used in the project
 public class ListTransferHandler extends TransferHandler {
 	
-    private int[] indices = null;
-    protected void setIndizes(int[] indizes) {
-    	this.indices = indizes;
+    private static Logger LOG = Logger.getLogger(ListTransferHandler.class.getName());
+    
+    private JList<UoMTreeNode> list;
+	int originOfTransferredObject = -1;
+	
+    /**
+     * Constructs a transfer handler that can transfer a list cell
+     * to another position via a drag and drop operation.
+     *
+     * @param list  the list with cells from and to transfer 
+     */
+    public ListTransferHandler(JList<UoMTreeNode> list) {
+    	super();
+        this.list = list;
     }
-    private int addIndex = -1; //Location where items were added
-    private int addCount = 0;  //Number of items added.
-            
+    
+    // export method
+    /**
+     * {@inheritDoc} <p>
+     * Typically, an ordinary drag requests the MOVE action. 
+     * Holding the Control key while dragging requests the COPY action, 
+     * and holding both Shift and Control requests the LINK action.
+     */
+	@Override
+    public int getSourceActions(JComponent c) {
+        if(c==list) {
+            return COPY_OR_MOVE;
+        }
+        return NONE;
+    }
+
+    // export method
+	/**
+	 * {@inheritDoc} <p>
+     * @return  the representation of the data to be transferred in JSON notation
+	 */
+	@Override
+    protected Transferable createTransferable(JComponent c) {
+        if(c==list) {
+        	originOfTransferredObject = list.getSelectedIndex();
+            return new StringSelection(list.getSelectedValue().externalize());
+        }
+        return null;
+    }
+
+    // export method
+	/**
+	 * {@inheritDoc} <p>
+     * Invoked after data has been exported.  This method remove
+     * the data that was transferred if the action was <code>MOVE</code>.
+	 */
+	@Override
+    protected void exportDone(JComponent c, Transferable data, int action) {
+        if(c==list) {
+            cleanup(c, action == TransferHandler.MOVE);
+        }
+    }
+    
+    /* If the remove argument is true, the drop has been successful  
+     * and it's time to remove the selected items from the list. 
+     * If the remove argument is false, it was a Copy operation 
+     * and the original list is left intact.
+     */
+    protected void cleanup(JComponent c, boolean remove) {
+    	if (remove && originOfTransferredObject != -1) {
+        	LOG.info((remove?"remove ":"")+"origin index of TransferredObject:"+originOfTransferredObject);
+            DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)list.getModel();
+            listModel.remove(originOfTransferredObject);
+    	}
+    }
+
+    // import method
+    /**
+	 * {@inheritDoc} <p>
+     * @return  true if the area below the cursor can accept the transfer,
+     * false if the transfer will be rejected
+     */
+	@Override
     public boolean canImport(TransferHandler.TransferSupport info) {
-        // Check for String flavor
+        // we only import Strings
         if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            return false; // reject the transfer
+        }
+        JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
+        if (dl.getIndex() == -1) {
+            return false; // reject the transfer
+        }
+//        LOG.info("TransferSupport DropAction=" + info.getDropAction()
+//        + " SourceDropActions="+info.getSourceDropActions()
+//        + " UserDropAction="+info.getUserDropAction()
+//        + " NONE==0 , COPY==1 , MOVE==2");
+//        LOG.fine("TransferHandler.TransferSupport supports stringFlavor DropLocation=" + dl);
+        return true;
+    }
+
+    // import method
+    /**
+     * {@inheritDoc}
+     * <p>
+	 * @param info of type TransferSupport,
+     * see the <em>The Java Tutorial</em> for more information about
+     * <a href="https://docs.oracle.com/javase/tutorial/uiswing/dnd/transfersupport.html">
+     * TransferSupport</a>.
+     */
+	@Override
+    public boolean importData(TransferHandler.TransferSupport info) {
+    	if (!info.isDrop()) {
+    		return false;
+    	}
+        if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            LOG.warning("List doesn't accept a drop of this type. "+info.getTransferable());
             return false;
         }
-        return true;
-   }
-
-    protected Transferable createTransferable(JComponent c) {
-        return new StringSelection(exportString(c));
-    }
-    
-    public int getSourceActions(JComponent c) {
-        return TransferHandler.COPY_OR_MOVE;
-    }
-    
-    public boolean importData(TransferHandler.TransferSupport info) {
-        if (!info.isDrop()) {
-            return false;
+        if(COPY==info.getUserDropAction()) {
+            boolean copySupported = (COPY & info.getSourceDropActions()) == COPY;
+            if(copySupported) {
+            	// do copy: import & insert data but do not remove the origin
+            	LOG.info("COPY is supported.");
+            } else {
+            	LOG.warning("COPY is not supported.");
+            }
         }
 
         JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
+        DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)list.getModel();
         int index = dl.getIndex();
-        boolean insert = dl.isInsert();
+        if(index == originOfTransferredObject || index-1 == originOfTransferredObject) {
+        	LOG.warning("do not move to "+index+" from "+originOfTransferredObject);
+        	return false;
+        }
 
+        boolean insert = dl.isInsert(); // true==>insert before value, false==>override value at index
+        // Get the current string under or behind the drop.
+        UoMTreeNode value = null;
+        try {
+            value = (UoMTreeNode)listModel.getElementAt(index);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+        	LOG.info("destination is end of list");
+        }
+//        LOG.info("drop "+(insert?"before":"over")+" " + value + " at "+index);
+        
         // Get the string that is being dropped.
         Transferable t = info.getTransferable();
         String data;
         try {
             data = (String)t.getTransferData(DataFlavor.stringFlavor);
-        } 
-        catch (Exception e) { return false; }
-                        
-        Component comp = info.getComponent();
-        if(comp instanceof JList<?> list) {
-        	ListModel<?> listModel = list.getModel();
-        	if(listModel instanceof DefaultListModel<?>) {
-        		DefaultListModel<Object> model = (DefaultListModel<Object>)listModel;
-                // Perform the actual import.  
-                if (insert) {
-                	model.add(index, data);
-                } else {
-                	model.set(index, data);
-                }
-                return true;
-        	}
-        	if(listModel instanceof DefaultComboBoxModel<?>) {
-        		DefaultComboBoxModel<Object> model = (DefaultComboBoxModel<Object>)listModel;
-                // Perform the actual import.  
-                if (insert || index<0) {
-                	model.addElement(data);
-                } else {
-                	model.insertElementAt(data, index);
-                }
-                return true;
-        	}
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        	return false;
         }
-        return false;
-    }
-
-    protected void exportDone(JComponent c, Transferable data, int action) {
-        cleanup(c, action == TransferHandler.MOVE);
-    }
-
-    //Bundle up the selected items in the list as a single string, for export.
-    protected String exportString(JComponent c) {
-    	StringBuffer buff = new StringBuffer();
-    	if(c instanceof JList<?> list) {
-    		setIndizes(list.getSelectedIndices());
-    		List<?> l = list.getSelectedValuesList();
-    		Object[] values = new Object[l.size()];
-    		l.toArray(values); // fill the array
-    		for (int i = 0; i < values.length; i++) {
-                Object val = values[i];
-                buff.append(val == null ? "" : val.toString());
-                if (i != values.length - 1) {
-                    buff.append("\n");
-                }
-    		}
-    	}
-        return buff.toString();
-    }
-
-    //Take the incoming string and wherever there is a newline, 
-    //break it into a separate item in the list.
-    protected void importString(JComponent c, String str) {
-    	int index = -1;
-    	int max = 0;
-    	ListModel<?> listModel = null;
-    	if(c instanceof JList<?> list) {
-    		index = list.getSelectedIndex();
-    		listModel = list.getModel();
-    		max = listModel.getSize();
-    	}
-
-        //Prevent the user from dropping data back on itself.
-        //For example, if the user is moving items #4,#5,#6 and #7 and
-        //attempts to insert the items after item #5, this would
-        //be problematic when removing the original items.
-        //So this is not allowed.
-        if (indices != null && index >= indices[0] - 1 && index <= indices[indices.length - 1]) {
-            indices = null;
-            return;
-        }
-
-        if (index < 0) {
-            index = max;
+        /* dialog with the drop information, copied from https://docs.oracle.com/javase/tutorial/uiswing/examples/dnd/index.html#BasicDnD
+        String dropValue = "\"" + data + "\" dropped ";
+        if (dl.isInsert()) {
+            if (dl.getIndex() == 0) {
+                displayDropLocation(dropValue + "at beginning of list");
+            } else if (dl.getIndex() >= list.getModel().getSize()) {
+                displayDropLocation(dropValue + "at end of list");
+            } else {
+                String value1 = (String)list.getModel().getElementAt(dl.getIndex() - 1);
+                String value2 = (String)list.getModel().getElementAt(dl.getIndex());
+                displayDropLocation(dropValue + "between \"" + value1 + "\" and \"" + value2 + "\"");
+            }
         } else {
-            index++;
-            if (index > max) {
-                index = max;
-            }
+            displayDropLocation(dropValue + "on top of " + "\"" + value + "\"");
         }
-        addIndex = index;
-        String[] values = str.split("\n");
-        addCount = values.length;
-        for (int i = 0; i < values.length; i++) {
-        	if(listModel instanceof DefaultListModel<?>) {
-        		DefaultListModel<Object> model = (DefaultListModel<Object>)listModel;
-                model.add(index++, values[i]);
-        	}
-        	if(listModel instanceof DefaultComboBoxModel<?>) {
-        		DefaultComboBoxModel<Object> model = (DefaultComboBoxModel<Object>)listModel;
-        		model.insertElementAt(values[i], index++);
-        	}
-        }
-    }
-    
-    //If the remove argument is true, the drop has been
-    //successful and it's time to remove the selected items 
-    //from the list. If the remove argument is false, it
-    //was a Copy operation and the original list is left
-    //intact.
-    protected void cleanup(JComponent c, boolean remove) {
-        if (remove && indices != null) {
-            //If we are moving items around in the same list, we need to adjust the indices accordingly, 
-        	//since those after the insertion point have moved.
-            if (addCount > 0) {
-                for (int i = 0; i < indices.length; i++) {
-                    if (indices[i] > addIndex) {
-                        indices[i] += addCount;
-                    }
-                }
+        */
+        LOG.info("drop data "+(insert?"before":"over")+" "+value+" at "+index+": "+data);
+        
+        // Perform the actual import:
+        if (insert) {
+        	UoMTreeNode uomTn = UoMTreeNode.internalize(data);
+        	listModel.add(index, uomTn);
+            LOG.info("inserted "+uomTn+" before " + value);
+            // remove element on index originOfTransferredObject will be done in #cleanup
+            // adjust the origin index if element is inserted at i<origin !!!
+            if(index < originOfTransferredObject) {
+            	originOfTransferredObject++;
             }
-            if(c instanceof JList<?> list) {
-            	ListModel<?> listModel = list.getModel();
-            	if(listModel instanceof DefaultListModel<?> model) {
-                    for (int i = indices.length - 1; i >= 0; i--) {
-                        model.remove(indices[i]);
-                    }
-            	} 
-            	if(listModel instanceof DefaultComboBoxModel<?> model) {
-                    for (int i = indices.length - 1; i >= 0; i--) {
-                        model.removeElement(indices[i]);
-                    }
-            	} 
-            }
+        	return true;
+        } else {
+        	LOG.warning("not overridden: "+value);
+            return false;
         }
-        indices = null;
-        addCount = 0;
-        addIndex = -1;
     }
 }

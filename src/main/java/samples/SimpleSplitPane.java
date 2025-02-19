@@ -6,9 +6,6 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.Window;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -37,7 +34,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EtchedBorder;
@@ -47,19 +43,21 @@ import org.jdesktop.swingx.JXButton;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXFrame.StartPosition;
-import org.jdesktop.swingx.icon.JXIcon;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.MultiSplitLayout;
+import org.jdesktop.swingx.icon.JXIcon;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.StringValues;
 
 import io.homebeaver.GenericTreeNode;
+import io.homebeaver.ListTransferHandler;
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
+import io.homebeaver.icon.KorellerRCircle_icons_power;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
@@ -303,7 +301,7 @@ public class SimpleSplitPane extends JXPanel {
         });
         msp.add(editSelected, "bottom.middle" );
         
-        quit = new JXButton("Quit");
+        quit = new JXButton("Quit", KorellerRCircle_icons_power.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         quit.setMnemonic('q'); // Alt-q
         quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
         msp.add(quit, "bottom.right" );
@@ -337,8 +335,6 @@ public class SimpleSplitPane extends JXPanel {
         uomList = new JXList<UoMTreeNode>(listModel);
 //        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
         uomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        uomList.setSelectedIndex(0);
-//        list.addListSelectionListener(this);
         uomList.setVisibleRowCount(5);
         IconValue iv = (Object value) -> {
             if (value instanceof UoMTreeNode c) {
@@ -357,10 +353,6 @@ public class SimpleSplitPane extends JXPanel {
         uomList.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
         uomList.addListSelectionListener( listSelectionEvent -> {
             UoMTreeNode node = uomList.getSelectedValue();
-//            LOG.info("listSelectionEvent: list.cellRenderer="+uomLlist // ==listSelectionEvent.getSource()
-//                    .getCellRenderer()
-////                    +"\n externalized node="+node.externalize() // NPE "node" is null
-//                    );
             getUoMTreeNodeContainer().add(node);
         });
         
@@ -371,7 +363,6 @@ public class SimpleSplitPane extends JXPanel {
                 if(e.getClickCount()==2){
                     Point point = e.getPoint();
                     int i =uomList.locationToIndex(point);
-//                    System.out.println("double clicked at "+(i>=0?uomLlist.getElementAt(i):i));
                     if(i>=0) {
                         UoMTreeNode uomNode = uomList.getElementAt(i);
                         URI uri = uomNode.getObject().getURI();
@@ -385,152 +376,7 @@ public class SimpleSplitPane extends JXPanel {
                 }
             }
         });
-        uomList.setTransferHandler(new TransferHandler() {
-        	int originOfTransferredObject = -1;
-            // import method
-            public boolean canImport(TransferHandler.TransferSupport info) {
-                // we only import Strings
-                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    return false;
-                }
-                JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
-                if (dl.getIndex() == -1) {
-                    return false;
-                }
-//                LOG.info("TransferSupport DropAction=" + info.getDropAction()
-//                + " SourceDropActions="+info.getSourceDropActions()
-//                + " UserDropAction="+info.getUserDropAction()
-//                + " NONE==0 , COPY==1 , MOVE==2");
-                LOG.fine("TransferHandler.TransferSupport supports stringFlavor DropLocation=" + dl);
-                return true;
-            }
-            // import method
-            public boolean importData(TransferHandler.TransferSupport info) {
-            	if (!info.isDrop()) {
-            		return false;
-            	}
-//            	info.getComponent(); // target component 
-//            	info.getDropAction();
-//            	info.getSourceDropActions();
-//            	info.getUserDropAction();
-                if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    LOG.warning("List doesn't accept a drop of this type. "+info.getTransferable());
-                    return false;
-                }
-                if(COPY==info.getUserDropAction()) {
-                    boolean copySupported = (COPY & info.getSourceDropActions()) == COPY;
-                    if(copySupported) {
-                    	// do copy: import & insert data but do not remove the origin
-                    	LOG.info("COPY is supported.");
-                    } else {
-                    	LOG.warning("COPY is not supported.");
-                    }
-                }
-
-                JList.DropLocation dl = (JList.DropLocation)info.getDropLocation();
-                DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
-                int index = dl.getIndex();
-                if(index == originOfTransferredObject || index-1 == originOfTransferredObject) {
-                	LOG.warning("do not move to "+index+" from "+originOfTransferredObject);
-                	return false;
-                }
-
-                boolean insert = dl.isInsert(); // true==>insert before value, false==>override value at index
-                // Get the current string under or behind the drop.
-                UoMTreeNode value = null;
-                try {
-                    value = (UoMTreeNode)listModel.getElementAt(index);
-                } catch (ArrayIndexOutOfBoundsException ex) {
-                	LOG.info("destination is end of list");
-                }
-//                LOG.info("drop "+(insert?"before":"over")+" " + value + " at "+index);
-                
-                // Get the string that is being dropped.
-                Transferable t = info.getTransferable();
-                String data;
-                try {
-                    data = (String)t.getTransferData(DataFlavor.stringFlavor);
-                } catch (Exception ex) {
-                	ex.printStackTrace();
-                	return false;
-                }
-                /* dialog with the drop information.
-                String dropValue = "\"" + data + "\" dropped ";
-                if (dl.isInsert()) {
-                    if (dl.getIndex() == 0) {
-                        displayDropLocation(dropValue + "at beginning of list");
-                    } else if (dl.getIndex() >= list.getModel().getSize()) {
-                        displayDropLocation(dropValue + "at end of list");
-                    } else {
-                        String value1 = (String)list.getModel().getElementAt(dl.getIndex() - 1);
-                        String value2 = (String)list.getModel().getElementAt(dl.getIndex());
-                        displayDropLocation(dropValue + "between \"" + value1 + "\" and \"" + value2 + "\"");
-                    }
-                } else {
-                    displayDropLocation(dropValue + "on top of " + "\"" + value + "\"");
-                }
-                */
-                LOG.info("drop data "+(insert?"before":"over")+" "+value+" at "+index+": "+data);
-                
-                // Perform the actual import:
-                if (insert) {
-                	UoMTreeNode uomTn = UoMTreeNode.internalize(data);
-                	listModel.add(index, uomTn);
-                    LOG.info("inserted "+uomTn+" before " + value);
-                    // remove data from index originOfTransferredObject
-                    if(index < originOfTransferredObject) {
-                    	originOfTransferredObject++;
-                    }
-                	return true;
-                } else {
-                	LOG.warning("not overridden: "+value);
-                    return false;
-                }
-            }
-            /*
-             * Typically, an ordinary drag requests the MOVE action. 
-             * Holding the Control key while dragging requests the COPY action, 
-             * and holding both Shift and Control requests the LINK action.
-             */
-            // export method
-            public int getSourceActions(JComponent c) {
-                if(c==uomList) {
-                    return COPY_OR_MOVE;
-                }
-                return NONE;
-            }
-            // export method
-            protected Transferable createTransferable(JComponent c) {
-                if(c==uomList) {
-                	originOfTransferredObject = uomList.getSelectedIndex();
-                    return new StringSelection(uomList.getSelectedValue().externalize());
-                }
-                return null;
-            }
-            // export method
-            protected void exportDone(JComponent c, Transferable data, int action) {
-                if(c==uomList) {
-                    cleanup(c, action == TransferHandler.MOVE);
-                }
-            }
-            /* If the remove argument is true, the drop has been successful  
-             * and it's time to remove the selected items from the list. 
-             * If the remove argument is false, it was a Copy operation 
-             * and the original list is left intact.
-             */
-            protected void cleanup(JComponent c, boolean remove) {
-//            	LOG.info((remove?"remove ":"")+"c:"+c);
-            	if (remove && originOfTransferredObject != -1) {
-                	LOG.info((remove?"remove ":"")+"indexOfTransferredObject:"+originOfTransferredObject);
-                    DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
-                    // TODO Neue Position beachten
-                    listModel.remove(originOfTransferredObject);
-//                    uomLlist.updateUI();
-            	}
-            }
-
-        });
-        
+        uomList.setTransferHandler(new ListTransferHandler(uomList));        
         uomList.setDropMode(DropMode.ON_OR_INSERT);
         uomList.setDragEnabled(true);
 
