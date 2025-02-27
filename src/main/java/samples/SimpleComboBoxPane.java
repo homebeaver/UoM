@@ -43,6 +43,7 @@ import org.jdesktop.swingx.icon.JXIcon;
 import io.homebeaver.GenericTreeNode;
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
+import io.homebeaver.icon.KorellerRCircle_icons_arrow_down;
 import io.homebeaver.icon.KorellerRCircle_icons_power;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
@@ -183,12 +184,13 @@ public class SimpleComboBoxPane extends JXPanel {
         if (key != null) lastLaFandTheme = key == null ? initialLaF.get(0) : key;
         if ("Metal".equals(key)) {
             LaFUtils.setLAFandTheme(Arrays.asList("metal", STEEL));
+//            lafSelector.setSelectedValue(lastLaFandTheme, false);
         } else {
             SwingUtilities.invokeLater( () -> {
                 LaFUtils.setLAFandTheme(lafInfoMap.get(lastLaFandTheme));
             });
         }
-//        lafSelector.setSelectedValue(lastLaFandTheme, false);
+//        lafSelector.repaint();
     }
     private void setSelectedIndexToCurrentLaF() {
         String currentClassName = UIManager.getLookAndFeel().getClass().getName();
@@ -307,7 +309,7 @@ public class SimpleComboBoxPane extends JXPanel {
         
     }
 
-    private JXComboBox<UoMTreeNode> uomComboBox; // BUG #1
+    private JXComboBox<UoMTreeNode> uomComboBox;
 
     // recursively populate the DefaultListModel
     private void populateListModel(DefaultListModel<UoMTreeNode> uomModel, GenericTreeNode<?> gtn) {
@@ -327,19 +329,19 @@ public class SimpleComboBoxPane extends JXPanel {
         
         //Create the combobox with items from uomModel
         UoMTreeNode[] items = new UoMTreeNode[uomModel.size()];
-        uomModel.copyInto(items);     
+        uomModel.copyInto(items);
         uomComboBox = new JXComboBox<UoMTreeNode>(items);
+//        uomComboBox.setEditable(true);
+        /*
+         * TODO wird das icon gesetzt, so verschwindet es beim UI-wechsel
+         */
+        uomComboBox.setComboBoxIcon(KorellerRCircle_icons_arrow_down.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
 
-        uomComboBox.setSelectedIndex(4);
+        uomComboBox.setSelectedIndex(0);
         uomComboBox.addActionListener( ae -> {
             Object o = uomComboBox.getSelectedItem();
             UoMTreeNode node = (UoMTreeNode)o;
             getUoMTreeNodeContainer().add(node);
-            //uomComboBox bleibt ausgeklappt!
-            //uomComboBox.updateUI();
-//            SwingUtilities.invokeLater( () -> {
-//            	uomComboBox.updateUI();
-//            });
         });
 
         return uomComboBox;
