@@ -51,9 +51,9 @@ import org.jdesktop.swingx.renderer.StringValues;
 import io.homebeaver.GenericTreeNode;
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
-import io.homebeaver.icon.KorellerRCircle_icons_arrow_down;
-import io.homebeaver.icon.KorellerRCircle_icons_arrow_up;
-import io.homebeaver.icon.KorellerRCircle_icons_power;
+import io.homebeaver.icon.KorelleRCircle_icons_arrow_down;
+import io.homebeaver.icon.KorelleRCircle_icons_arrow_up;
+import io.homebeaver.icon.KorelleRCircle_icons_power;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
@@ -302,7 +302,7 @@ public class SimpleComboBoxPane extends JXPanel {
         });
         msp.add(editSelected, "bottom.middle" );
 
-        quit = new JXButton("Quit", KorellerRCircle_icons_power.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
+        quit = new JXButton("Quit", KorelleRCircle_icons_power.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         quit.setMnemonic('q'); // Alt-q
         quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
         msp.add(quit, "bottom.right" );
@@ -359,8 +359,8 @@ public class SimpleComboBoxPane extends JXPanel {
          * TODO nur in Ocean werden die Highlighter angezeigt
          * DONE werden zwei icons gesetzt, so wird das isShowingPopupIcon nicht gezeigt
          */
-        uomComboBox.setComboBoxIcon(KorellerRCircle_icons_arrow_down.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
-            , KorellerRCircle_icons_arrow_up.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
+        uomComboBox.setComboBoxIcon(KorelleRCircle_icons_arrow_down.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
+            , KorelleRCircle_icons_arrow_up.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
             );
 
         uomComboBox.setSelectedIndex(0);

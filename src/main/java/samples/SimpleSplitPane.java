@@ -62,7 +62,7 @@ import io.homebeaver.GenericTreeNode;
 import io.homebeaver.ListTransferHandler;
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
-import io.homebeaver.icon.KorellerRCircle_icons_power;
+import io.homebeaver.icon.KorelleRCircle_icons_power;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
@@ -284,7 +284,7 @@ public class SimpleSplitPane extends JXPanel {
         });
         msp.add(editSelected, "bottom.middle" );
         
-        quit = new JXButton("Quit", KorellerRCircle_icons_power.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
+        quit = new JXButton("Quit", KorelleRCircle_icons_power.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         quit.setMnemonic('q'); // Alt-q
         quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
         msp.add(quit, "bottom.right" );

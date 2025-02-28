@@ -12,7 +12,7 @@ import org.jdesktop.swingx.icon.RadianceIconUIResource;
  * This class has been automatically generated using 
  * <a href="https://jdesktop.wordpress.com/2022/09/25/svg-icons/">Radiance SVG converter</a>.
  */
-public class KorellerRCircle_icons_flame implements RadianceIcon {
+public class KorelleRCircle_icons_power implements RadianceIcon {
     private Shape shape = null;
     private GeneralPath generalPath = null;
     private Paint paint = null;
@@ -52,16 +52,40 @@ g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
 transformsStack.push(g.getTransform());
 g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
 // _0_0
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_0
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_0_0
 shape = new Ellipse2D.Double(0.0, 0.0, 64.0, 64.0);
 paint = (colorFilter != null) ? colorFilter.filter(new Color(199, 92, 92, 255)) : new Color(199, 92, 92, 255);
+g.setPaint(paint);
+g.fill(shape);
+g.setTransform(transformsStack.pop());
+g.setComposite(AlphaComposite.getInstance(3, 0.2f * origAlpha));
+transformsStack.push(g.getTransform());
+g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
+// _0_1
+g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
+transformsStack.push(g.getTransform());
+g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
+// _0_1_0
+if (generalPath == null) {
+   generalPath = new GeneralPath();
+} else {
+   generalPath.reset();
+}
+generalPath.moveTo(32.0f, 52.0f);
+generalPath.curveTo(22.1f, 52.0f, 14.0f, 43.9f, 14.0f, 34.0f);
+generalPath.curveTo(14.0f, 27.6f, 17.4f, 21.7f, 22.9f, 18.5f);
+generalPath.curveTo(23.9f, 17.9f, 25.1f, 18.3f, 25.6f, 19.2f);
+generalPath.curveTo(26.2f, 20.2f, 25.800001f, 21.400002f, 24.9f, 21.900002f);
+generalPath.curveTo(20.7f, 24.4f, 18.0f, 29.1f, 18.0f, 34.0f);
+generalPath.curveTo(18.0f, 41.7f, 24.3f, 48.0f, 32.0f, 48.0f);
+generalPath.curveTo(39.7f, 48.0f, 46.0f, 41.7f, 46.0f, 34.0f);
+generalPath.curveTo(46.0f, 28.9f, 43.3f, 24.3f, 38.8f, 21.8f);
+generalPath.curveTo(37.8f, 21.3f, 37.5f, 20.0f, 38.0f, 19.099998f);
+generalPath.curveTo(38.5f, 18.099998f, 39.8f, 17.8f, 40.7f, 18.3f);
+generalPath.curveTo(46.5f, 21.5f, 50.0f, 27.5f, 50.0f, 34.0f);
+generalPath.curveTo(50.0f, 43.9f, 41.9f, 52.0f, 32.0f, 52.0f);
+generalPath.closePath();
+shape = generalPath;
+paint = (colorFilter != null) ? colorFilter.filter(new Color(35, 31, 32, 255)) : new Color(35, 31, 32, 255);
 g.setPaint(paint);
 g.fill(shape);
 g.setTransform(transformsStack.pop());
@@ -69,26 +93,23 @@ g.setTransform(transformsStack.pop());
 g.setComposite(AlphaComposite.getInstance(3, 0.2f * origAlpha));
 transformsStack.push(g.getTransform());
 g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_1
+// _0_2
 g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
 transformsStack.push(g.getTransform());
 g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_1_0
+// _0_2_0
 if (generalPath == null) {
    generalPath = new GeneralPath();
 } else {
    generalPath.reset();
 }
-generalPath.moveTo(28.1f, 58.1f);
-generalPath.curveTo(28.1f, 58.1f, 12.0f, 55.699997f, 12.0f, 42.0f);
-generalPath.curveTo(12.0f, 28.300003f, 33.0f, 27.0f, 28.4f, 10.0f);
-generalPath.curveTo(28.4f, 10.0f, 44.1f, 14.9f, 40.3f, 30.2f);
-generalPath.curveTo(40.3f, 30.2f, 42.399998f, 28.900002f, 44.0f, 26.300001f);
-generalPath.curveTo(44.0f, 26.300001f, 52.0f, 32.5f, 52.0f, 41.800003f);
-generalPath.curveTo(52.0f, 51.100006f, 41.0f, 58.000004f, 35.7f, 58.000004f);
-generalPath.curveTo(35.7f, 58.000004f, 41.3f, 50.400005f, 36.2f, 45.500004f);
-generalPath.curveTo(28.900002f, 38.500004f, 32.0f, 34.100006f, 32.0f, 34.100006f);
-generalPath.curveTo(32.0f, 34.100006f, 14.2f, 42.8f, 28.1f, 58.1f);
+generalPath.moveTo(32.0f, 36.0f);
+generalPath.curveTo(30.9f, 36.0f, 30.0f, 35.1f, 30.0f, 34.0f);
+generalPath.lineTo(30.0f, 14.0f);
+generalPath.curveTo(30.0f, 12.9f, 30.9f, 12.0f, 32.0f, 12.0f);
+generalPath.curveTo(33.1f, 12.0f, 34.0f, 12.9f, 34.0f, 14.0f);
+generalPath.lineTo(34.0f, 34.0f);
+generalPath.curveTo(34.0f, 35.1f, 33.1f, 36.0f, 32.0f, 36.0f);
 generalPath.closePath();
 shape = generalPath;
 paint = (colorFilter != null) ? colorFilter.filter(new Color(35, 31, 32, 255)) : new Color(35, 31, 32, 255);
@@ -99,38 +120,34 @@ g.setTransform(transformsStack.pop());
 g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
 transformsStack.push(g.getTransform());
 g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_2
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_2_0
+// _0_3
+paint = (colorFilter != null) ? colorFilter.filter(new Color(255, 255, 255, 255)) : new Color(255, 255, 255, 255);
+stroke = new BasicStroke(4.0f,1,0,10.0f,null,0.0f);
 if (generalPath == null) {
    generalPath = new GeneralPath();
 } else {
    generalPath.reset();
 }
-generalPath.moveTo(28.1f, 56.1f);
-generalPath.curveTo(28.1f, 56.1f, 12.0f, 53.699997f, 12.0f, 40.0f);
-generalPath.curveTo(12.0f, 26.300003f, 33.0f, 25.0f, 28.4f, 8.0f);
-generalPath.curveTo(28.4f, 8.0f, 44.1f, 12.9f, 40.3f, 28.2f);
-generalPath.curveTo(40.3f, 28.2f, 42.399998f, 26.900002f, 44.0f, 24.300001f);
-generalPath.curveTo(44.0f, 24.300001f, 52.0f, 30.5f, 52.0f, 39.800003f);
-generalPath.curveTo(52.0f, 49.100006f, 41.0f, 56.000004f, 35.7f, 56.000004f);
-generalPath.curveTo(35.7f, 56.000004f, 41.3f, 48.400005f, 36.2f, 43.500004f);
-generalPath.curveTo(28.900002f, 36.500004f, 32.0f, 32.100006f, 32.0f, 32.100006f);
-generalPath.curveTo(32.0f, 32.100006f, 14.2f, 40.8f, 28.1f, 56.1f);
-generalPath.closePath();
+generalPath.moveTo(39.8f, 18.0f);
+generalPath.curveTo(44.7f, 20.7f, 48.0f, 26.0f, 48.0f, 32.0f);
+generalPath.curveTo(48.0f, 40.8f, 40.8f, 48.0f, 32.0f, 48.0f);
+generalPath.curveTo(23.2f, 48.0f, 16.0f, 40.8f, 16.0f, 32.0f);
+generalPath.curveTo(16.0f, 26.1f, 19.2f, 21.0f, 23.9f, 18.2f);
 shape = generalPath;
-paint = (colorFilter != null) ? colorFilter.filter(new Color(245, 207, 135, 255)) : new Color(245, 207, 135, 255);
 g.setPaint(paint);
-g.fill(shape);
-g.setTransform(transformsStack.pop());
-g.setTransform(transformsStack.pop());
+g.setStroke(stroke);
+g.draw(shape);
 g.setTransform(transformsStack.pop());
 g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
 transformsStack.push(g.getTransform());
 g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_1
+// _0_4
+paint = (colorFilter != null) ? colorFilter.filter(new Color(255, 255, 255, 255)) : new Color(255, 255, 255, 255);
+stroke = new BasicStroke(4.0f,1,0,10.0f,null,0.0f);
+shape = new Line2D.Float(32.000000f,32.000000f,32.000000f,12.000000f);
+g.setPaint(paint);
+g.setStroke(stroke);
+g.draw(shape);
 g.setTransform(transformsStack.pop());
 g.setTransform(transformsStack.pop());
 g.setTransform(transformsStack.pop());
@@ -206,7 +223,7 @@ g.setTransform(transformsStack.pop());
 	 * Creates a new transcoded SVG image. This is marked as private to indicate that app
 	 * code should be using the {@link #of(int, int)} method to obtain a pre-configured instance.
 	 */
-	private KorellerRCircle_icons_flame() {
+	private KorelleRCircle_icons_power() {
         this.width = (int) getOrigWidth();
         this.height = (int) getOrigHeight();
 	}
@@ -283,7 +300,7 @@ g.setTransform(transformsStack.pop());
      * @return A new instance of this icon with specified dimensions.
      */
     public static RadianceIcon of(int width, int height) {
-       KorellerRCircle_icons_flame base = new KorellerRCircle_icons_flame();
+       KorelleRCircle_icons_power base = new KorelleRCircle_icons_power();
        base.width = width;
        base.height = height;
        return base;
@@ -297,7 +314,7 @@ g.setTransform(transformsStack.pop());
      * @return A new {@link UIResource} instance of this icon with specified dimensions.
      */
     public static RadianceIconUIResource uiResourceOf(int width, int height) {
-       KorellerRCircle_icons_flame base = new KorellerRCircle_icons_flame();
+       KorelleRCircle_icons_power base = new KorelleRCircle_icons_power();
        base.width = width;
        base.height = height;
        return new RadianceIconUIResource(base);
@@ -309,7 +326,7 @@ g.setTransform(transformsStack.pop());
      * @return Factory that returns instances of this icon on demand.
      */
     public static Factory factory() {
-        return KorellerRCircle_icons_flame::new;
+        return KorelleRCircle_icons_power::new;
     }
 }
 

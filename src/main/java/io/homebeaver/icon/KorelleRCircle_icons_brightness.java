@@ -12,7 +12,7 @@ import org.jdesktop.swingx.icon.RadianceIconUIResource;
  * This class has been automatically generated using 
  * <a href="https://jdesktop.wordpress.com/2022/09/25/svg-icons/">Radiance SVG converter</a>.
  */
-public class KorellerRCircle_icons_brightness implements RadianceIcon {
+public class KorelleRCircle_icons_brightness implements RadianceIcon {
     private Shape shape = null;
     private GeneralPath generalPath = null;
     private Paint paint = null;
@@ -675,7 +675,7 @@ g.setTransform(transformsStack.pop());
 	 * Creates a new transcoded SVG image. This is marked as private to indicate that app
 	 * code should be using the {@link #of(int, int)} method to obtain a pre-configured instance.
 	 */
-	private KorellerRCircle_icons_brightness() {
+	private KorelleRCircle_icons_brightness() {
         this.width = (int) getOrigWidth();
         this.height = (int) getOrigHeight();
 	}
@@ -752,7 +752,7 @@ g.setTransform(transformsStack.pop());
      * @return A new instance of this icon with specified dimensions.
      */
     public static RadianceIcon of(int width, int height) {
-       KorellerRCircle_icons_brightness base = new KorellerRCircle_icons_brightness();
+       KorelleRCircle_icons_brightness base = new KorelleRCircle_icons_brightness();
        base.width = width;
        base.height = height;
        return base;
@@ -766,7 +766,7 @@ g.setTransform(transformsStack.pop());
      * @return A new {@link UIResource} instance of this icon with specified dimensions.
      */
     public static RadianceIconUIResource uiResourceOf(int width, int height) {
-       KorellerRCircle_icons_brightness base = new KorellerRCircle_icons_brightness();
+       KorelleRCircle_icons_brightness base = new KorelleRCircle_icons_brightness();
        base.width = width;
        base.height = height;
        return new RadianceIconUIResource(base);
@@ -778,7 +778,7 @@ g.setTransform(transformsStack.pop());
      * @return Factory that returns instances of this icon on demand.
      */
     public static Factory factory() {
-        return KorellerRCircle_icons_brightness::new;
+        return KorelleRCircle_icons_brightness::new;
     }
 }
 

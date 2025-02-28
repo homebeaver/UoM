@@ -12,7 +12,7 @@ import org.jdesktop.swingx.icon.RadianceIconUIResource;
  * This class has been automatically generated using 
  * <a href="https://jdesktop.wordpress.com/2022/09/25/svg-icons/">Radiance SVG converter</a>.
  */
-public class KorellerRCircle_icons_pencil implements RadianceIcon {
+public class KorelleRCircle_icons_arrow_down implements RadianceIcon {
     private Shape shape = null;
     private GeneralPath generalPath = null;
     private Paint paint = null;
@@ -61,7 +61,7 @@ transformsStack.push(g.getTransform());
 g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
 // _0_0_0_0
 shape = new Ellipse2D.Double(0.0, 0.0, 64.0, 64.0);
-paint = (colorFilter != null) ? colorFilter.filter(new Color(119, 179, 212, 255)) : new Color(119, 179, 212, 255);
+paint = (colorFilter != null) ? colorFilter.filter(new Color(118, 194, 175, 255)) : new Color(118, 194, 175, 255);
 g.setPaint(paint);
 g.fill(shape);
 g.setTransform(transformsStack.pop());
@@ -79,20 +79,19 @@ if (generalPath == null) {
 } else {
    generalPath.reset();
 }
-generalPath.moveTo(37.0f, 14.0f);
-generalPath.lineTo(27.0f, 14.0f);
-generalPath.curveTo(25.3f, 14.0f, 24.0f, 15.3f, 24.0f, 17.0f);
-generalPath.lineTo(24.0f, 22.0f);
-generalPath.lineTo(24.0f, 23.0f);
-generalPath.lineTo(24.0f, 46.0f);
-generalPath.lineTo(29.3f, 54.0f);
-generalPath.lineTo(32.0f, 58.0f);
-generalPath.lineTo(34.7f, 54.0f);
-generalPath.lineTo(40.0f, 46.0f);
-generalPath.lineTo(40.0f, 23.0f);
-generalPath.lineTo(40.0f, 22.0f);
-generalPath.lineTo(40.0f, 17.0f);
-generalPath.curveTo(40.0f, 15.3f, 38.7f, 14.0f, 37.0f, 14.0f);
+generalPath.moveTo(47.8f, 30.0f);
+generalPath.lineTo(40.0f, 30.0f);
+generalPath.lineTo(40.0f, 18.0f);
+generalPath.curveTo(40.0f, 15.8f, 38.2f, 14.0f, 36.0f, 14.0f);
+generalPath.lineTo(28.0f, 14.0f);
+generalPath.curveTo(25.8f, 14.0f, 24.0f, 15.8f, 24.0f, 18.0f);
+generalPath.lineTo(24.0f, 30.0f);
+generalPath.lineTo(16.2f, 30.0f);
+generalPath.curveTo(13.500001f, 30.0f, 12.700001f, 31.9f, 14.500001f, 34.1f);
+generalPath.lineTo(28.800001f, 52.199997f);
+generalPath.curveTo(30.6f, 54.499996f, 33.5f, 54.499996f, 35.300003f, 52.199997f);
+generalPath.lineTo(49.600002f, 34.1f);
+generalPath.curveTo(51.3f, 31.9f, 50.6f, 30.0f, 47.8f, 30.0f);
 generalPath.closePath();
 shape = generalPath;
 paint = (colorFilter != null) ? colorFilter.filter(new Color(35, 31, 32, 255)) : new Color(35, 31, 32, 255);
@@ -113,18 +112,18 @@ if (generalPath == null) {
 } else {
    generalPath.reset();
 }
-generalPath.moveTo(40.0f, 21.0f);
-generalPath.curveTo(40.0f, 22.7f, 38.7f, 24.0f, 37.0f, 24.0f);
-generalPath.lineTo(27.0f, 24.0f);
-generalPath.curveTo(25.3f, 24.0f, 24.0f, 22.7f, 24.0f, 21.0f);
-generalPath.lineTo(24.0f, 15.0f);
-generalPath.curveTo(24.0f, 13.3f, 25.3f, 12.0f, 27.0f, 12.0f);
-generalPath.lineTo(37.0f, 12.0f);
-generalPath.curveTo(38.7f, 12.0f, 40.0f, 13.3f, 40.0f, 15.0f);
-generalPath.lineTo(40.0f, 21.0f);
+generalPath.moveTo(24.0f, 16.0f);
+generalPath.curveTo(24.0f, 13.8f, 25.8f, 12.0f, 28.0f, 12.0f);
+generalPath.lineTo(36.0f, 12.0f);
+generalPath.curveTo(38.2f, 12.0f, 40.0f, 13.8f, 40.0f, 16.0f);
+generalPath.lineTo(40.0f, 40.0f);
+generalPath.curveTo(40.0f, 42.2f, 38.2f, 44.0f, 36.0f, 44.0f);
+generalPath.lineTo(28.0f, 44.0f);
+generalPath.curveTo(25.8f, 44.0f, 24.0f, 42.2f, 24.0f, 40.0f);
+generalPath.lineTo(24.0f, 16.0f);
 generalPath.closePath();
 shape = generalPath;
-paint = (colorFilter != null) ? colorFilter.filter(new Color(199, 92, 92, 255)) : new Color(199, 92, 92, 255);
+paint = (colorFilter != null) ? colorFilter.filter(new Color(255, 255, 255, 255)) : new Color(255, 255, 255, 255);
 g.setPaint(paint);
 g.fill(shape);
 g.setTransform(transformsStack.pop());
@@ -137,95 +136,23 @@ g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
 transformsStack.push(g.getTransform());
 g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
 // _0_0_3_0
-shape = new Rectangle2D.Double(24.0, 20.0, 4.0, 24.0);
-paint = (colorFilter != null) ? colorFilter.filter(new Color(224, 153, 94, 255)) : new Color(224, 153, 94, 255);
-g.setPaint(paint);
-g.fill(shape);
-g.setTransform(transformsStack.pop());
-g.setTransform(transformsStack.pop());
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_4
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_4_0
-shape = new Rectangle2D.Double(28.0, 20.0, 8.0, 26.0);
-paint = (colorFilter != null) ? colorFilter.filter(new Color(245, 207, 135, 255)) : new Color(245, 207, 135, 255);
-g.setPaint(paint);
-g.fill(shape);
-g.setTransform(transformsStack.pop());
-g.setTransform(transformsStack.pop());
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_5
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_5_0
-shape = new Rectangle2D.Double(36.0, 20.0, 4.0, 24.0);
-paint = (colorFilter != null) ? colorFilter.filter(new Color(224, 153, 94, 255)) : new Color(224, 153, 94, 255);
-g.setPaint(paint);
-g.fill(shape);
-g.setTransform(transformsStack.pop());
-g.setTransform(transformsStack.pop());
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_6
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_6_0
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_6_0_0
 if (generalPath == null) {
    generalPath = new GeneralPath();
 } else {
    generalPath.reset();
 }
-generalPath.moveTo(32.0f, 56.0f);
-generalPath.lineTo(34.7f, 52.0f);
-generalPath.lineTo(29.3f, 52.0f);
-generalPath.closePath();
-shape = generalPath;
-paint = (colorFilter != null) ? colorFilter.filter(new Color(79, 93, 115, 255)) : new Color(79, 93, 115, 255);
-g.setPaint(paint);
-g.fill(shape);
-g.setTransform(transformsStack.pop());
-g.setTransform(transformsStack.pop());
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_6_1
-g.setComposite(AlphaComposite.getInstance(3, 1.0f * origAlpha));
-transformsStack.push(g.getTransform());
-g.transform(new AffineTransform(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-// _0_0_6_1_0
-if (generalPath == null) {
-   generalPath = new GeneralPath();
-} else {
-   generalPath.reset();
-}
-generalPath.moveTo(24.0f, 44.0f);
-generalPath.lineTo(29.3f, 52.0f);
-generalPath.lineTo(34.7f, 52.0f);
-generalPath.lineTo(40.0f, 44.0f);
-generalPath.lineTo(38.0f, 44.0f);
-generalPath.lineTo(36.0f, 42.0f);
-generalPath.lineTo(32.0f, 46.0f);
-generalPath.lineTo(28.0f, 42.0f);
-generalPath.lineTo(26.0f, 44.0f);
+generalPath.moveTo(47.8f, 28.0f);
+generalPath.curveTo(50.5f, 28.0f, 51.3f, 29.9f, 49.5f, 32.1f);
+generalPath.lineTo(35.3f, 50.3f);
+generalPath.curveTo(33.5f, 52.6f, 30.599998f, 52.6f, 28.8f, 50.3f);
+generalPath.lineTo(14.5f, 32.1f);
+generalPath.curveTo(12.7f, 29.8f, 13.5f, 27.999998f, 16.2f, 27.999998f);
+generalPath.lineTo(47.8f, 27.999998f);
 generalPath.closePath();
 shape = generalPath;
 paint = (colorFilter != null) ? colorFilter.filter(new Color(255, 255, 255, 255)) : new Color(255, 255, 255, 255);
 g.setPaint(paint);
 g.fill(shape);
-g.setTransform(transformsStack.pop());
 g.setTransform(transformsStack.pop());
 g.setTransform(transformsStack.pop());
 g.setTransform(transformsStack.pop());
@@ -308,7 +235,7 @@ g.setTransform(transformsStack.pop());
 	 * Creates a new transcoded SVG image. This is marked as private to indicate that app
 	 * code should be using the {@link #of(int, int)} method to obtain a pre-configured instance.
 	 */
-	private KorellerRCircle_icons_pencil() {
+	private KorelleRCircle_icons_arrow_down() {
         this.width = (int) getOrigWidth();
         this.height = (int) getOrigHeight();
 	}
@@ -385,7 +312,7 @@ g.setTransform(transformsStack.pop());
      * @return A new instance of this icon with specified dimensions.
      */
     public static RadianceIcon of(int width, int height) {
-       KorellerRCircle_icons_pencil base = new KorellerRCircle_icons_pencil();
+       KorelleRCircle_icons_arrow_down base = new KorelleRCircle_icons_arrow_down();
        base.width = width;
        base.height = height;
        return base;
@@ -399,7 +326,7 @@ g.setTransform(transformsStack.pop());
      * @return A new {@link UIResource} instance of this icon with specified dimensions.
      */
     public static RadianceIconUIResource uiResourceOf(int width, int height) {
-       KorellerRCircle_icons_pencil base = new KorellerRCircle_icons_pencil();
+       KorelleRCircle_icons_arrow_down base = new KorelleRCircle_icons_arrow_down();
        base.width = width;
        base.height = height;
        return new RadianceIconUIResource(base);
@@ -411,7 +338,7 @@ g.setTransform(transformsStack.pop());
      * @return Factory that returns instances of this icon on demand.
      */
     public static Factory factory() {
-        return KorellerRCircle_icons_pencil::new;
+        return KorelleRCircle_icons_arrow_down::new;
     }
 }
 
