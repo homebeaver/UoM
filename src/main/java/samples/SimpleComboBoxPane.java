@@ -1,6 +1,7 @@
 package samples;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Window;
@@ -38,12 +39,20 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXMultiSplitPane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.MultiSplitLayout;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.icon.JXIcon;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.IconValue;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.StringValues;
 
 import io.homebeaver.GenericTreeNode;
 import io.homebeaver.NodeElementContainer;
 import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.icon.KorellerRCircle_icons_arrow_down;
+import io.homebeaver.icon.KorellerRCircle_icons_arrow_up;
 import io.homebeaver.icon.KorellerRCircle_icons_power;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
@@ -60,18 +69,16 @@ public class SimpleComboBoxPane extends JXPanel {
     public static final Dimension PREFERRED_SIZE = new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
     protected static final boolean exitOnClose = true; // used in JXFrame of the demo
 
-    /*
+    /* BUG ==> gelöst
      * Das Starten mit param Nimbus und LaFUtils.setLAFandTheme funktioniert zwar,
      * ABER: die values props [Selected] für JXList<String> lafSelector sind initial nicht korrekt:
-     * - dunkle Schrift auf dunkelblauen Hintergrund. BUG? ==> gelöst
+     * - dunkle Schrift auf dunkelblauen Hintergrund. 
      * 
      * Erst nach dem Umschalten Nimbus -> andere LaF -> Nimbus ist es korrekt
      * 
-     * Daher kommentiere ich setLAFandTheme in main aus und verschiebe es nach createAndShowGUI.
-     * Dazu dient initialLaF, da ich bei invokeLater bleiben will.
-     * Dann wird JXList<UoMTreeNode> uomLlist korrekt dargestellt.
-     * Bei lafSelector ist select nicht gesetzt und daher wird nichts hervorgehoben.
-     * Versucht man es zu setzten, so taucht das Problem wieder auf.
+     * Daher verschiebe ich setLAFandTheme nach createAndShowGUI.
+     * In main bleibt die Initalisierung von initialLaF, 
+     * da ich bei invokeLater bleiben will.
      */
     protected static List<String> initialLaF = Arrays.asList("Nimbus");
     
@@ -110,11 +117,11 @@ public class SimpleComboBoxPane extends JXPanel {
         SimpleComboBoxPane newContentPane = new SimpleComboBoxPane(frame);
 //        newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
+        newContentPane.lafSelector.setSelectedValue(initialLaF.get(0), false); // no scroll
 
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-        newContentPane.lafSelector.setSelectedValue(initialLaF.get(0), false); // no scroll
     }
 
     static final int W = 1; // BORDER width in pixels
@@ -258,7 +265,7 @@ public class SimpleComboBoxPane extends JXPanel {
         MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel( layoutDef );
         msp.getMultiSplitLayout().setModel( modelRoot );
         msp.setDividerSize(2);
-        
+
         Box lafSelectorPane = Box.createVerticalBox();
         lafSelectorPane.setBorder(new TitledBorder("Look and Feel Selector"));
 //        lafSelectorPane.add(Box.createVerticalGlue());
@@ -279,7 +286,7 @@ public class SimpleComboBoxPane extends JXPanel {
         listPane.add(Box.createVerticalGlue());
         listPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( listPane, "left.middle" );
-        
+
         remove = new JXButton("Delete UoM (remove selected)", KorelleRtrash_svgrepo_com.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         remove.setMnemonic('d'); // Alt-d
 //        remove.addActionListener(createRemoveListener());
@@ -289,12 +296,12 @@ public class SimpleComboBoxPane extends JXPanel {
         editPane = new NodeElementContainer(editSelected, uomComboBox); //TODO
         editPane.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
         msp.add( editPane, "editor" );
-        
+
         editSelected.addActionListener( ae -> {
             getUoMTreeNodeContainer().setEnabled(editSelected.isSelected());
         });
         msp.add(editSelected, "bottom.middle" );
-        
+
         quit = new JXButton("Quit", KorellerRCircle_icons_power.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         quit.setMnemonic('q'); // Alt-q
         quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
@@ -314,15 +321,15 @@ public class SimpleComboBoxPane extends JXPanel {
     // recursively populate the DefaultListModel
     private void populateListModel(DefaultListModel<UoMTreeNode> uomModel, GenericTreeNode<?> gtn) {
         for(int c=0; c<gtn.getChildCount(); c++) {
-        	GenericTreeNode<?> tn = (GenericTreeNode<?>)gtn.getChildAt(c);
-        	uomModel.addElement((UoMTreeNode)tn);
-        	if(!tn.isLeaf()) {
-        		populateListModel(uomModel, tn);
-        	}
+            GenericTreeNode<?> tn = (GenericTreeNode<?>)gtn.getChildAt(c);
+            uomModel.addElement((UoMTreeNode)tn);
+            if(!tn.isLeaf()) {
+                populateListModel(uomModel, tn);
+            }
         }
     }
     private JComponent createComboBox() {
-    	DefaultListModel<UoMTreeNode> uomModel = new DefaultListModel<UoMTreeNode>();
+        DefaultListModel<UoMTreeNode> uomModel = new DefaultListModel<UoMTreeNode>();
         GenericTreeNode<?> root = UoMTreeNode.getUomModelRoot();
         uomModel.addElement((UoMTreeNode)root);
         populateListModel(uomModel, root);
@@ -331,11 +338,30 @@ public class SimpleComboBoxPane extends JXPanel {
         UoMTreeNode[] items = new UoMTreeNode[uomModel.size()];
         uomModel.copyInto(items);
         uomComboBox = new JXComboBox<UoMTreeNode>(items);
-//        uomComboBox.setEditable(true);
+        
+        // custom String representation: concat various element fields
+        StringValue sv = (Object value) -> {
+            if (value instanceof UoMTreeNode c) {
+                return c.toString();
+            }
+            return StringValues.TO_STRING.getString(value);
+        };
+        IconValue iv = (Object value) -> {
+            if (value instanceof UoMTreeNode c) {
+                return UoMTreeNode.SI_ICON.getIcon(c);
+            }
+            return IconValue.NULL_ICON;
+        };
+        uomComboBox.setRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
+        uomComboBox.addHighlighter(HighlighterFactory.createSimpleStriping(HighlighterFactory.NOTEPAD));
+        uomComboBox.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, null, Color.RED));
         /*
-         * TODO wird das icon gesetzt, so verschwindet es beim UI-wechsel
+         * TODO nur in Ocean werden die Highlighter angezeigt
+         * DONE werden zwei icons gesetzt, so wird das isShowingPopupIcon nicht gezeigt
          */
-        uomComboBox.setComboBoxIcon(KorellerRCircle_icons_arrow_down.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
+        uomComboBox.setComboBoxIcon(KorellerRCircle_icons_arrow_down.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
+            , KorellerRCircle_icons_arrow_up.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
+            );
 
         uomComboBox.setSelectedIndex(0);
         uomComboBox.addActionListener( ae -> {
@@ -403,7 +429,7 @@ public class SimpleComboBoxPane extends JXPanel {
 //      //System.out.println("actionMap.allKeys:"+Arrays.asList(actionMap.allKeys()));
 //      //many actions are defined in org.jdesktop.swingx.plaf.basic.BasicYListUI$Actions
 //        Arrays.asList(actionMap.allKeys()).forEach( key -> {
-//        	System.out.println("key:"+key+" -> " + actionMap.get(key));
+//            System.out.println("key:"+key+" -> " + actionMap.get(key));
 //        });
 //        actionMap.put(ListDeleteAction.REMOVE_SELECTED_ROW, new ListDeleteAction());
 //
@@ -415,23 +441,23 @@ public class SimpleComboBoxPane extends JXPanel {
     }
 
 //    private ActionListener createRemoveListener() {
-//    	// listenerMethodName is remove
-//    	return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
+//        // listenerMethodName is remove
+//        return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
 //    }
 //    // remove listenerMethod, visibility is public to be called by EventHandler
 //    public void remove() {
-//    	int i = uomList.getSelectedIndex();
-//    	if(i==-1) return;
-//    	LOG.info("remove row# "+i);
+//        int i = uomList.getSelectedIndex();
+//        if(i==-1) return;
+//        LOG.info("remove row# "+i);
 //        DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
 //        listModel.remove(i);
 //    }
 //
 //    private class ListDeleteAction extends AbstractAction {
 //        protected static final String REMOVE_SELECTED_ROW = "removeSelectedRow";
-//		@Override
-//		public void actionPerformed(ActionEvent ae) {
-//			remove();		
+//        @Override
+//        public void actionPerformed(ActionEvent ae) {
+//            remove();		
 //		}
 //    }
 
