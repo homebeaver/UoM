@@ -65,7 +65,7 @@ public class SimpleComboBoxPane extends JXPanel {
 
     // The preferred size of the demo
     static int PREFERRED_WIDTH = 700;
-    static int PREFERRED_HEIGHT = 600;
+    static int PREFERRED_HEIGHT = 300;
     public static final Dimension PREFERRED_SIZE = new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
     protected static final boolean exitOnClose = true; // used in JXFrame of the demo
 
