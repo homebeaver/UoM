@@ -5,7 +5,6 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Point;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -15,33 +14,26 @@ import java.beans.EventHandler;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
 import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -61,8 +53,8 @@ import org.jdesktop.swingx.renderer.StringValues;
 import io.homebeaver.GenericTreeNode;
 import io.homebeaver.ListTransferHandler;
 import io.homebeaver.NodeElementContainer;
-import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.icon.KorelleRCircle_icons_power;
+import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
@@ -119,105 +111,80 @@ public class SimpleSplitPane extends JXPanel {
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-        newContentPane.lafSelector.setSelectedValue(initialLaF.get(0), false); // no scroll
     }
 
     static final int W = 1; // BORDER width in pixels
-    static final String STEEL = "javax.swing.plaf.metal.DefaultMetalTheme";
-    static final String OCEAN = "javax.swing.plaf.metal.OceanTheme";
     
     private JXFrame xframe;
     private JXMultiSplitPane msp;
     private JXList<String> lafSelector;
     private DefaultListModel<String> lafModel;
-    private ButtonGroup lafMenuGroup;
     private JPanel editPane;
     
     UoMTreeNodeContainer getUoMTreeNodeContainer() {
         return (UoMTreeNodeContainer)editPane;
     }
 
-    protected JMenu createPlafMenu(Window target) {
-        UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
-        lafInfoMap = new Hashtable<String, List<String>>();
-        JMenu menu = new JMenu("Set L&F");
-        lafMenuGroup = new ButtonGroup(); // wg. mi.setSelected
-        for (LookAndFeelInfo info : lafInfo) {
-            if ("Metal".equals(info.getName())) {
-                lafInfoMap.putIfAbsent("Metal STEEL"
-                        , Arrays.asList(info.getClassName(), STEEL));
-                lafInfoMap.putIfAbsent("Metal OCEAN"
-                        , Arrays.asList(info.getClassName(), OCEAN));
-                JMenuItem mi = createLafMenuItem(info);
-                lafMenuGroup.add(mi);
-                menu.add(mi);
-            } else {
-                lafInfoMap.putIfAbsent(info.getName(), Arrays.asList(info.getClassName()));
-                JMenuItem mi = createLafMenuItem(info);
-                LOG.fine("JMenuItem mi.Action:"+mi.getAction() + " ClassName="+info.getClassName());
-                lafMenuGroup.add(mi);
-                if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
-                    mi.setSelected(true);
-                }
-                menu.add(mi);
-            }
-        }
-        return menu;
-    }
-    protected JMenuItem createLafMenuItem(UIManager.LookAndFeelInfo info) {
-//        SetPlafAction action = new SetPlafAction(info.getName(), info.getClassName(), getLaFGroup(), this);
-//        JMenuItem mi = new JRadioButtonMenuItem(action);
-//        LOG.info(info.getName());
-        JMenuItem mi = new JRadioButtonMenuItem(info.getName());
-        if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
-            mi.setSelected(true);
-        }
-//        getLaFGroup().add(mi);
-        lafMenuGroup.add(mi);
-        return mi;
-    }
+//    private ButtonGroup lafMenuGroup;
+//    protected JMenu createPlafMenu(Window target) {
+//        UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
+//        lafInfoMap = new Hashtable<String, List<String>>();
+//        JMenu menu = new JMenu("Set L&F");
+//        lafMenuGroup = new ButtonGroup(); // wg. mi.setSelected
+//        for (LookAndFeelInfo info : lafInfo) {
+//            if ("Metal".equals(info.getName())) {
+//                lafInfoMap.putIfAbsent("Metal STEEL"
+//                        , Arrays.asList(info.getClassName(), STEEL));
+//                lafInfoMap.putIfAbsent("Metal OCEAN"
+//                        , Arrays.asList(info.getClassName(), OCEAN));
+//                JMenuItem mi = createLafMenuItem(info);
+//                lafMenuGroup.add(mi);
+//                menu.add(mi);
+//            } else {
+//                lafInfoMap.putIfAbsent(info.getName(), Arrays.asList(info.getClassName()));
+//                JMenuItem mi = createLafMenuItem(info);
+//                LOG.fine("JMenuItem mi.Action:"+mi.getAction() + " ClassName="+info.getClassName());
+//                lafMenuGroup.add(mi);
+//                if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
+//                    mi.setSelected(true);
+//                }
+//                menu.add(mi);
+//            }
+//        }
+//        return menu;
+//    }
+//    protected JMenuItem createLafMenuItem(UIManager.LookAndFeelInfo info) {
+////        SetPlafAction action = new SetPlafAction(info.getName(), info.getClassName(), getLaFGroup(), this);
+////        JMenuItem mi = new JRadioButtonMenuItem(action);
+////        LOG.info(info.getName());
+//        JMenuItem mi = new JRadioButtonMenuItem(info.getName());
+//        if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
+//            mi.setSelected(true);
+//        }
+////        getLaFGroup().add(mi);
+//        lafMenuGroup.add(mi);
+//        return mi;
+//    }
 
     private JCheckBox editSelected;
     
     private JXButton quit;
     private JXButton remove;
 
-    private Map<String, List<String>> lafInfoMap; // info -> [classname] | [classname,themeclassname]
-    private String lastLaFandTheme = null;
-    private void setLaFandTheme(String key) {
-        if (key != null) lastLaFandTheme = key == null ? initialLaF.get(0) : key;
-        if ("Metal".equals(key)) {
-            LaFUtils.setLAFandTheme(Arrays.asList("metal", STEEL));
-        } else {
-            SwingUtilities.invokeLater( () -> {
-                LaFUtils.setLAFandTheme(lafInfoMap.get(lastLaFandTheme));
-            });
-        }
-//        lafSelector.setSelectedValue(lastLaFandTheme, false);
-    }
-    private void setSelectedIndexToCurrentLaF() {
-        String currentClassName = UIManager.getLookAndFeel().getClass().getName();
-        for (int i = 0; i < lafModel.getSize(); i++) {
-            if(currentClassName.contains(lafModel.getElementAt(i))) {
-                lafSelector.setSelectedIndex(i); 
-                break;
-            }
-        }
-    }
     private JComponent createLafSelector() {
         lafModel = new DefaultListModel<String>();
-        lafModel.addAll(lafInfoMap.keySet());
+        lafModel.addAll(LaFUtils.getLAFandThemeKeySet());
         // autoCreateRowSorter:
         lafSelector = new JXList<String>(lafModel, true);
         lafSelector.setVisibleRowCount(3);
         lafSelector.setLayoutOrientation(JList.VERTICAL_WRAP);
         // setSelectedIndex to current LaF:
-        setSelectedIndexToCurrentLaF();
+        lafSelector.setSelectedValue(LaFUtils.getCurrentLAFandThemeString(), false);
         // default is UNSORTED:
         lafSelector.setSortOrder(SortOrder.DESCENDING);
         lafSelector.addListSelectionListener( listSelectionEvent -> {
             String lafKey = lafSelector.getSelectedValue();
-            setLaFandTheme(lafKey); 
+            LaFUtils.setLAFandTheme(lafKey);
         });
         return lafSelector;
     }
@@ -227,7 +194,7 @@ public class SimpleSplitPane extends JXPanel {
         super.setPreferredSize(PREFERRED_SIZE);
         xframe = frame;
         
-        JMenu plafMenu = createPlafMenu(xframe);
+//        JMenu plafMenu = createPlafMenu(xframe);
 //        if(plafMenu != null) xframe.getJMenuBar().add(plafMenu);
 
         msp = new JXMultiSplitPane();
@@ -249,9 +216,7 @@ public class SimpleSplitPane extends JXPanel {
         
         Box lafSelectorPane = Box.createVerticalBox();
         lafSelectorPane.setBorder(new TitledBorder("Look and Feel Selector"));
-//        lafSelectorPane.add(Box.createVerticalGlue());
         lafSelectorPane.add(createLafSelector());
-//        lafSelectorPane.add(Box.createVerticalGlue());
         msp.add(lafSelectorPane, "right.top");
 
 //        msp.add( new JButton( "Left Middle" ), "left.middle" );

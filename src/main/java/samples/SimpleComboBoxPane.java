@@ -120,7 +120,7 @@ public class SimpleComboBoxPane extends JXPanel {
     private JXButton quit;
     private JXButton remove;
 
-    private JComponent createLafList() {
+    private JComponent createLafSelector() {
         lafModel = new DefaultListModel<String>();
         lafModel.addAll(LaFUtils.getLAFandThemeKeySet());
         // autoCreateRowSorter:
@@ -128,7 +128,6 @@ public class SimpleComboBoxPane extends JXPanel {
         lafSelector.setVisibleRowCount(3);
         lafSelector.setLayoutOrientation(JList.VERTICAL_WRAP);
         // setSelectedIndex to current LaF:
-//        LOG.info(">>>>>>>>>>>>>"+LaFUtils.getCurrentLAFandThemeString());
         lafSelector.setSelectedValue(LaFUtils.getCurrentLAFandThemeString(), false);
         // default is UNSORTED:
         lafSelector.setSortOrder(SortOrder.DESCENDING);
@@ -165,7 +164,7 @@ public class SimpleComboBoxPane extends JXPanel {
         Box lafSelectorPane = Box.createVerticalBox();
         lafSelectorPane.setBorder(new TitledBorder("Look and Feel Selector"));
 //        lafSelectorPane.add(Box.createVerticalGlue());
-        lafSelectorPane.add(createLafList());
+        lafSelectorPane.add(createLafSelector());
 //        lafSelectorPane.add(Box.createVerticalGlue());
         msp.add(lafSelectorPane, "left.top");
 
