@@ -4,30 +4,22 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
-import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -50,10 +42,10 @@ import org.jdesktop.swingx.renderer.StringValues;
 
 import io.homebeaver.GenericTreeNode;
 import io.homebeaver.NodeElementContainer;
-import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.icon.KorelleRCircle_icons_arrow_down;
 import io.homebeaver.icon.KorelleRCircle_icons_arrow_up;
 import io.homebeaver.icon.KorelleRCircle_icons_power;
+import io.homebeaver.icon.KorelleRtrash_svgrepo_com;
 import io.homebeaver.uom.UoMTreeNode;
 import io.homebeaver.uom.UoMTreeNodeContainer;
 
@@ -69,19 +61,6 @@ public class SimpleComboBoxPane extends JXPanel {
     public static final Dimension PREFERRED_SIZE = new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT);
     protected static final boolean exitOnClose = true; // used in JXFrame of the demo
 
-    /* BUG ==> gelöst
-     * Das Starten mit param Nimbus und LaFUtils.setLAFandTheme funktioniert zwar,
-     * ABER: die values props [Selected] für JXList<String> lafSelector sind initial nicht korrekt:
-     * - dunkle Schrift auf dunkelblauen Hintergrund. 
-     * 
-     * Erst nach dem Umschalten Nimbus -> andere LaF -> Nimbus ist es korrekt
-     * 
-     * Daher verschiebe ich setLAFandTheme nach createAndShowGUI.
-     * In main bleibt die Initalisierung von initialLaF, 
-     * da ich bei invokeLater bleiben will.
-     */
-    protected static List<String> initialLaF = Arrays.asList("Nimbus");
-    
     /**
      * 
      * @param args (optional) 
@@ -91,10 +70,11 @@ public class SimpleComboBoxPane extends JXPanel {
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
-        if(args.length>0) {
-            initialLaF = Arrays.asList(args);
-            LOG.info("args: "+initialLaF);
-        }
+    	if(args.length>0) {
+    		List<String> a = Arrays.asList(args);
+        	LOG.info("args: "+a);
+    		LaFUtils.setLAFandTheme(a);
+    	}
         SwingUtilities.invokeLater( () -> {
             createAndShowGUI();
         });
@@ -115,9 +95,8 @@ public class SimpleComboBoxPane extends JXPanel {
 
         //Create and set up the content pane.
         SimpleComboBoxPane newContentPane = new SimpleComboBoxPane(frame);
-//        newContentPane.setOpaque(true); //content panes must be opaque
+//        newContentPane.setOpaque(true); //content panes must be opaque ?
         frame.setContentPane(newContentPane);
-        newContentPane.lafSelector.setSelectedValue(initialLaF.get(0), false); // no scroll
 
         //Display the window.
         frame.pack();
@@ -125,59 +104,15 @@ public class SimpleComboBoxPane extends JXPanel {
     }
 
     static final int W = 1; // BORDER width in pixels
-    static final String STEEL = "javax.swing.plaf.metal.DefaultMetalTheme";
-    static final String OCEAN = "javax.swing.plaf.metal.OceanTheme";
     
     private JXFrame xframe;
     private JXMultiSplitPane msp;
-//    private JXComboBox<String> lafComboSelector; // BUG #1
     private JXList<String> lafSelector;
     private DefaultListModel<String> lafModel;
-    private ButtonGroup lafMenuGroup;
     private JPanel editPane;
     
     UoMTreeNodeContainer getUoMTreeNodeContainer() {
         return (UoMTreeNodeContainer)editPane;
-    }
-
-    protected JMenu createPlafMenu(Window target) {
-        UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
-        lafInfoMap = new Hashtable<String, List<String>>();
-        JMenu menu = new JMenu("Set L&F");
-        lafMenuGroup = new ButtonGroup(); // wg. mi.setSelected
-        for (LookAndFeelInfo info : lafInfo) {
-            if ("Metal".equals(info.getName())) {
-                lafInfoMap.putIfAbsent("Metal STEEL"
-                        , Arrays.asList(info.getClassName(), STEEL));
-                lafInfoMap.putIfAbsent("Metal OCEAN"
-                        , Arrays.asList(info.getClassName(), OCEAN));
-                JMenuItem mi = createLafMenuItem(info);
-                lafMenuGroup.add(mi);
-                menu.add(mi);
-            } else {
-                lafInfoMap.putIfAbsent(info.getName(), Arrays.asList(info.getClassName()));
-                JMenuItem mi = createLafMenuItem(info);
-                LOG.fine("JMenuItem mi.Action:"+mi.getAction() + " ClassName="+info.getClassName());
-                lafMenuGroup.add(mi);
-                if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
-                    mi.setSelected(true);
-                }
-                menu.add(mi);
-            }
-        }
-        return menu;
-    }
-    protected JMenuItem createLafMenuItem(UIManager.LookAndFeelInfo info) {
-//        SetPlafAction action = new SetPlafAction(info.getName(), info.getClassName(), getLaFGroup(), this);
-//        JMenuItem mi = new JRadioButtonMenuItem(action);
-//        LOG.info(info.getName());
-        JMenuItem mi = new JRadioButtonMenuItem(info.getName());
-        if(info.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
-            mi.setSelected(true);
-        }
-//        getLaFGroup().add(mi);
-        lafMenuGroup.add(mi);
-        return mi;
     }
 
     private JCheckBox editSelected;
@@ -185,43 +120,21 @@ public class SimpleComboBoxPane extends JXPanel {
     private JXButton quit;
     private JXButton remove;
 
-    private Map<String, List<String>> lafInfoMap; // info -> [classname] | [classname,themeclassname]
-    private String lastLaFandTheme = null;
-    private void setLaFandTheme(String key) {
-        if (key != null) lastLaFandTheme = key == null ? initialLaF.get(0) : key;
-        if ("Metal".equals(key)) {
-            LaFUtils.setLAFandTheme(Arrays.asList("metal", STEEL));
-//            lafSelector.setSelectedValue(lastLaFandTheme, false);
-        } else {
-            SwingUtilities.invokeLater( () -> {
-                LaFUtils.setLAFandTheme(lafInfoMap.get(lastLaFandTheme));
-            });
-        }
-//        lafSelector.repaint();
-    }
-    private void setSelectedIndexToCurrentLaF() {
-        String currentClassName = UIManager.getLookAndFeel().getClass().getName();
-        for (int i = 0; i < lafModel.getSize(); i++) {
-            if(currentClassName.contains(lafModel.getElementAt(i))) {
-                lafSelector.setSelectedIndex(i); 
-                break;
-            }
-        }
-    }
     private JComponent createLafList() {
         lafModel = new DefaultListModel<String>();
-        lafModel.addAll(lafInfoMap.keySet());
+        lafModel.addAll(LaFUtils.getLAFandThemeKeySet());
         // autoCreateRowSorter:
         lafSelector = new JXList<String>(lafModel, true);
         lafSelector.setVisibleRowCount(3);
         lafSelector.setLayoutOrientation(JList.VERTICAL_WRAP);
         // setSelectedIndex to current LaF:
-        setSelectedIndexToCurrentLaF();
+//        LOG.info(">>>>>>>>>>>>>"+LaFUtils.getCurrentLAFandThemeString());
+        lafSelector.setSelectedValue(LaFUtils.getCurrentLAFandThemeString(), false);
         // default is UNSORTED:
         lafSelector.setSortOrder(SortOrder.DESCENDING);
         lafSelector.addListSelectionListener( listSelectionEvent -> {
             String lafKey = lafSelector.getSelectedValue();
-            setLaFandTheme(lafKey); 
+            LaFUtils.setLAFandTheme(lafKey);
         });
         return lafSelector;
     }
@@ -231,23 +144,6 @@ public class SimpleComboBoxPane extends JXPanel {
         super.setPreferredSize(PREFERRED_SIZE);
         xframe = frame;
         
-        JMenu plafMenu = createPlafMenu(xframe);
-//        if(plafMenu != null) xframe.getJMenuBar().add(plafMenu);
-
-/* buggy:
-        String[] toArray = new String[9];
-        // mit autoCreateRowSorter:
-        //lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray), true);
-        lafSelector = new JXComboBox<String>(lafInfoMap.keySet().toArray(toArray));
-        lafSelector.setSelectedIndex(4);
-        lafSelector.addActionListener( ae -> {
-            Object o = lafSelector.getSelectedItem();
-            String k = (String)o;
-            setLaFandTheme(k);
-//            ae.getSource(); == lafSelector
-            msp.updateUI();
-        });
-*/
         msp = new JXMultiSplitPane();
         String layoutDef 
         = "(COLUMN " 
@@ -289,7 +185,7 @@ public class SimpleComboBoxPane extends JXPanel {
 
         remove = new JXButton("Delete UoM (remove selected)", KorelleRtrash_svgrepo_com.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON));
         remove.setMnemonic('d'); // Alt-d
-//        remove.addActionListener(createRemoveListener());
+//        remove.addActionListener(createRemoveListener()); TODO
         msp.add(remove, "bottom.left" );
 
         editSelected = new JCheckBox("Edit selected UoM");
@@ -307,13 +203,10 @@ public class SimpleComboBoxPane extends JXPanel {
         quit.addActionListener((ActionListener) EventHandler.create(ActionListener.class, this, "quit"));
         msp.add(quit, "bottom.right" );
         
-        // TODO up/down arrow icons
-
         // ADDING A BORDER TO THE MULTISPLITPANE CAUSES ALL SORTS OF ISSUES 
         msp.setBorder( BorderFactory.createEmptyBorder(W, W, W, W) );
 
-        add( msp, BorderLayout.CENTER );
-        
+        add( msp, BorderLayout.CENTER );     
     }
 
     private JXComboBox<UoMTreeNode> uomComboBox;
@@ -356,8 +249,8 @@ public class SimpleComboBoxPane extends JXPanel {
         uomComboBox.addHighlighter(HighlighterFactory.createSimpleStriping(HighlighterFactory.NOTEPAD));
         uomComboBox.addHighlighter(new ColorHighlighter(HighlightPredicate.ROLLOVER_ROW, null, Color.RED));
         /*
-         * TODO nur in Ocean werden die Highlighter angezeigt
-         * DONE werden zwei icons gesetzt, so wird das isShowingPopupIcon nicht gezeigt
+         * nach einem LaF Wechsel die Highlighter nicht angezeigt
+         * ... auch die SI_ICON nicht ===> TODO
          */
         uomComboBox.setComboBoxIcon(KorelleRCircle_icons_arrow_down.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
             , KorelleRCircle_icons_arrow_up.of(JXIcon.BUTTON_ICON, JXIcon.BUTTON_ICON)
@@ -370,95 +263,11 @@ public class SimpleComboBoxPane extends JXPanel {
             getUoMTreeNodeContainer().add(node);
         });
 
-        return uomComboBox;
-        
-        //Create the list and put it in a scroll pane.
-//        uomList = new JXList<UoMTreeNode>(listModel);
-////        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
-//        uomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        uomList.setVisibleRowCount(5);
-//        IconValue iv = (Object value) -> {
-//            if (value instanceof UoMTreeNode c) {
-//                return UoMTreeNode.SI_ICON.getIcon(c);
-//            }
-//            return IconValue.NULL_ICON;
-//        };
-//
-//        // custom String representation: concat various element fields
-//        StringValue sv = (Object value) -> {
-//            if (value instanceof UoMTreeNode c) {
-//                return c.toString();
-//            }
-//            return StringValues.TO_STRING.getString(value);
-//        };
-//        uomList.setCellRenderer(new DefaultListRenderer<UoMTreeNode>(sv, iv));
-//        uomList.addListSelectionListener( listSelectionEvent -> {
-//            UoMTreeNode node = uomList.getSelectedValue();
-//            getUoMTreeNodeContainer().add(node);
-//        });
-//        
-//        uomList.addMouseListener(
-//            new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e){
-//                if(e.getClickCount()==2){
-//                    Point point = e.getPoint();
-//                    int i =uomList.locationToIndex(point);
-//                    if(i>=0) {
-//                        UoMTreeNode uomNode = uomList.getElementAt(i);
-//                        URI uri = uomNode.getObject().getURI();
-//                        if(uri!=null) try {
-//                            Desktop.getDesktop().browse(uri);
-//                        } catch (IOException ex) {
-//                            ex.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
-//        });
-//        uomList.setTransferHandler(new ListTransferHandler(uomList));        
-//        uomList.setDropMode(DropMode.ON_OR_INSERT);
-//        uomList.setDragEnabled(true);
-//        
-//        InputMap inputMap = uomList.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-//        System.out.println("keys:"+inputMap.keys());
-//        System.out.println("allKeys:"+inputMap.allKeys());
-//        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), ListDeleteAction.REMOVE_SELECTED_ROW);
-//        ActionMap actionMap = uomList.getActionMap();
-//        System.out.println("actionMap.keys:"+Arrays.asList(actionMap.keys()));
-//      //System.out.println("actionMap.allKeys:"+Arrays.asList(actionMap.allKeys()));
-//      //many actions are defined in org.jdesktop.swingx.plaf.basic.BasicYListUI$Actions
-//        Arrays.asList(actionMap.allKeys()).forEach( key -> {
-//            System.out.println("key:"+key+" -> " + actionMap.get(key));
-//        });
-//        actionMap.put(ListDeleteAction.REMOVE_SELECTED_ROW, new ListDeleteAction());
-//
-//        return new JScrollPane(uomList);
+        return uomComboBox;     
     }
 
     public void quit() {
         System.exit(0);
     }
-
-//    private ActionListener createRemoveListener() {
-//        // listenerMethodName is remove
-//        return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
-//    }
-//    // remove listenerMethod, visibility is public to be called by EventHandler
-//    public void remove() {
-//        int i = uomList.getSelectedIndex();
-//        if(i==-1) return;
-//        LOG.info("remove row# "+i);
-//        DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
-//        listModel.remove(i);
-//    }
-//
-//    private class ListDeleteAction extends AbstractAction {
-//        protected static final String REMOVE_SELECTED_ROW = "removeSelectedRow";
-//        @Override
-//        public void actionPerformed(ActionEvent ae) {
-//            remove();		
-//		}
-//    }
 
 }
