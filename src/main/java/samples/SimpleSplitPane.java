@@ -305,6 +305,7 @@ public class SimpleSplitPane extends JXPanel {
             UoMTreeNode node = uomList.getSelectedValue();
             getUoMTreeNodeContainer().add(node);
         });
+        uomList.clearSelection(); // wird aber hervorgehoben TODO
         
         uomList.addMouseListener(
             new MouseAdapter() {
