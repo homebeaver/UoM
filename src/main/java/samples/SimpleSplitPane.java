@@ -100,8 +100,8 @@ public class SimpleSplitPane extends JXPanel {
         frame.setStartPosition(StartPosition.CenterInScreen);
         //frame.setLocationByPlatform(true);
 
-    	//Turn off metal's use of bold fonts
-    	UIManager.put("swing.boldMetal", Boolean.FALSE);
+        //Turn off metal's use of bold fonts
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
 
         //Create and set up the content pane.
         SimpleSplitPane newContentPane = new SimpleSplitPane(frame);
@@ -268,11 +268,11 @@ public class SimpleSplitPane extends JXPanel {
     // recursively populate the DefaultListModel
     private void populateListModel(DefaultListModel<UoMTreeNode> listModel, GenericTreeNode<?> gtn) {
         for(int c=0; c<gtn.getChildCount(); c++) {
-        	GenericTreeNode<?> tn = (GenericTreeNode<?>)gtn.getChildAt(c);
-        	listModel.addElement((UoMTreeNode)tn);
-        	if(!tn.isLeaf()) {
-        		populateListModel(listModel, tn);
-        	}
+            GenericTreeNode<?> tn = (GenericTreeNode<?>)gtn.getChildAt(c);
+            listModel.addElement((UoMTreeNode)tn);
+            if(!tn.isLeaf()) {
+                populateListModel(listModel, tn);
+            }
         }
     }
     private JComponent createUoMlist() {
@@ -283,16 +283,19 @@ public class SimpleSplitPane extends JXPanel {
         
         //Create the list and put it in a scroll pane.
         uomList = new JXList<UoMTreeNode>(listModel);
-//        list.setLayoutOrientation(JList.HORIZONTAL_WRAP); // default is VERTICAL
         uomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        uomList.setVisibleRowCount(5);
+        uomList.setVisibleRowCount(3);
+//      uomList.setLayoutOrientation(JList.VERTICAL); // default
+//        uomList.clearSelection(); // wird aber hervorgehoben TODO
+//        uomList.setSelectedValue(null, false); // == clearSelection TODO
+//        uomList.setSelectedIndex(-1); // alle 3 Verfahren funktionieren nicht TODO
+
         IconValue iv = (Object value) -> {
             if (value instanceof UoMTreeNode c) {
                 return UoMTreeNode.SI_ICON.getIcon(c);
             }
             return IconValue.NULL_ICON;
         };
-
         // custom String representation: concat various element fields
         StringValue sv = (Object value) -> {
             if (value instanceof UoMTreeNode c) {
@@ -305,7 +308,6 @@ public class SimpleSplitPane extends JXPanel {
             UoMTreeNode node = uomList.getSelectedValue();
             getUoMTreeNodeContainer().add(node);
         });
-        uomList.clearSelection(); // wird aber hervorgehoben TODO
         
         uomList.addMouseListener(
             new MouseAdapter() {
@@ -328,7 +330,7 @@ public class SimpleSplitPane extends JXPanel {
             }
         });
         
-        uomList.setTransferHandler(new ListTransferHandler(uomList));        
+        uomList.setTransferHandler(new ListTransferHandler(uomList));
         uomList.setDropMode(DropMode.ON_OR_INSERT);
         uomList.setDragEnabled(true);
         
@@ -341,7 +343,7 @@ public class SimpleSplitPane extends JXPanel {
       //System.out.println("actionMap.allKeys:"+Arrays.asList(actionMap.allKeys()));
       //many actions are defined in org.jdesktop.swingx.plaf.basic.BasicYListUI$Actions
         Arrays.asList(actionMap.allKeys()).forEach( key -> {
-        	System.out.println("key:"+key+" -> " + actionMap.get(key));
+            System.out.println("key:"+key+" -> " + actionMap.get(key));
         });
         actionMap.put(ListDeleteAction.REMOVE_SELECTED_ROW, new ListDeleteAction());
 
@@ -353,24 +355,25 @@ public class SimpleSplitPane extends JXPanel {
     }
 
     private ActionListener createRemoveListener() {
-    	// listenerMethodName is remove
-    	return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
+        // listenerMethodName is remove
+        return (ActionListener)EventHandler.create(ActionListener.class, this, "remove");
     }
     // remove listenerMethod, visibility is public to be called by EventHandler
     public void remove() {
-    	int i = uomList.getSelectedIndex();
-    	if(i==-1) return;
-    	LOG.info("remove row# "+i);
+        int i = uomList.getSelectedIndex();
+        if(i==-1) return;
+        LOG.info("remove row# "+i);
         DefaultListModel<UoMTreeNode> listModel = (DefaultListModel<UoMTreeNode>)uomList.getModel();
         listModel.remove(i);
     }
 
-    private class ListDeleteAction extends AbstractAction {
+    @SuppressWarnings("serial")
+	private class ListDeleteAction extends AbstractAction {
         protected static final String REMOVE_SELECTED_ROW = "removeSelectedRow";
-		@Override
-		public void actionPerformed(ActionEvent ae) {
-			remove();		
-		}
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            remove();
+        }
     }
 
 }
